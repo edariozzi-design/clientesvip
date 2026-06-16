@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <title>Clientes Vip</title>
+</head>
+
+<body>
+
+    <header>
+        <section class="titulo-fun">
+            <img class="fun-img" src="/img/Fun.png" alt="fun">
+            <h1>CONTROL DE INGRESO VIP</h1>
+        </section>
+    </header>
+
+    <main>
+
+<nav class="navbar navbar-vip px-3">
+
+    <!-- IZQUIERDA -->
+    <div class="nav-block left">
+
+        <div id="panel-admin" class="dropdown">
+            <button class="btn btn-vip dropdown-toggle" data-bs-toggle="dropdown">
+                Informe
+            </button>
+
+            <ul class="dropdown-menu">
+                <li><button id="btn-metricas" class="dropdown-item">Métricas</button></li>
+            </ul>
+        </div>
+
+
+    </div>
+
+    <!-- CENTRO -->
+    <div class="nav-block center">
+
+        <form id="form-busqueda" class="search-box">
+
+            <input id="buscador" type="search"
+                placeholder="DNI, ID, Nombre y Apellido, Tarjeta">
+
+            <button class="btn btn-vip" type="submit">Buscar</button>
+
+            <button id="btn-nuevo" type="button" class="btn btn-vip">
+                Nuevo Ingreso
+            </button>
+
+        </form>
+
+    </div>
+
+    <!-- DERECHA -->
+    <div class="nav-block right">
+
+        <button onclick="volverInicio()" class="btn btn-vip">
+            Inicio
+        </button>
+
+        <button id="btn-supervisor" class="btn btn-vip">
+            Supervisor
+        </button>
+
+        <button id="btn-logout" class="btn btn-danger" style="display:none;">
+            Salir
+        </button>
+
+    </div>
+
+</nav>
+
+<section id="panel-nuevo" class="oculto"></section>
+
+<div class="panel-sistema">
+
+    <aside id="panel-categorias" class="oculto">
+        <button data-categoria="todos">Todos</button>
+        <button data-categoria="Bespoke">Bespoke</button>
+        <button data-categoria="Diamond">Diamond</button>
+        <button data-categoria="Diamond Seg.">Diamond Seg.</button>
+        <button data-categoria="Platinium">Platinium</button>
+        <button data-categoria="Gold">Gold</button>
+        <button data-categoria="Classic">Classic</button>
+        <button data-categoria="No socios">No socios</button>
+
+        <hr>
+
+        <button id="btn-exportar">Exportar Backup</button>
+
+        <input type="file" id="input-importar" hidden>
+
+        <button id="btn-importar">Importar Backup</button>
+    </aside>
+
+    <section class="contenido-principal">
+
+        <!-- ZONA CONTROLES -->
+        <div class="top-zone">
+
+            <div class="zone-controls">
+                <section id="panel-dinamico"></section>
+
+                <div id="controles-historico" class="controles-historico">
+                    <input type="date" id="fechaDesde">
+                    <input type="date" id="fechaHasta">
+                </div>
+            </div>
+
+        </div>
+
+        <!-- DASHBOARD -->
+        <div class="dashboard-zone">
+            <section id="panel-estadisticas"></section>
+        </div>
+
+        <!-- RESULTADOS -->
+        <div class="result-zone">
+            <section id="resultado-cliente"></section>
+        </div>
+
+    </section>
+
+</div>
+
+
+    </main>
+
+
+    <div id="login-supervisor" class="login-overlay oculto">
+
+    <div class="login-card">
+
+        <h3>Acceso Supervisor</h3>
+
+        <input type="password" id="input-pass" placeholder="Contraseña">
+
+        <button id="btn-login-ok" class="btn btn-vip">
+            Ingresar
+        </button>
+
+        <button id="btn-login-cancel" class="btn btn-danger">
+            Cancelar
+        </button>
+
+    </div>
+
+</div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="js/script.js"></script>
+
+</body>
+
+</html>
