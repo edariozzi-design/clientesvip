@@ -848,6 +848,20 @@ input[type="date"]:focus {
 }
 
 
+.btn-dorado {
+    background: #daa520;
+    color: black;
+    border: none;
+}
+
+.btn-dorado:hover {
+    background: #c6951c;
+    color: black;
+}
+
+
+
+
 @media (max-width: 768px) {
 
     .titulo-fun {

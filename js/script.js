@@ -1167,13 +1167,32 @@ function renderCliente(cliente) {
 
     <input type="text" id="acomp-dni" placeholder="DNI" class="form-control mb-2">
 
-    <label>Foto</label>
-    <input type="file" id="acomp-foto" accept="image/*" class="form-control mb-2">
+    <div class="mb-2">
+
+    <img
+        id="preview-acomp"
+        src="/img/logo-foto.png"
+        style="
+            width:80px;
+            height:80px;
+            border-radius:50%;
+            object-fit:cover;
+            cursor:pointer;
+            border:2px solid #daa520;
+        ">
+
+    <input
+    type="file"
+    id="acomp-foto"
+    accept="image/*"
+    style="position:absolute; left:-9999px;">
+
+</div>
 
     <button
-        data-action="guardar-acompanante"
-        class="btn btn-primary">
-        Guardar
+    data-action="guardar-acompanante"
+    class="btn btn-dorado">
+    Guardar
     </button>
 
 </div>
@@ -1197,6 +1216,19 @@ function renderCliente(cliente) {
 `;
 
     resultadoCliente.innerHTML = html;
+}
+
+const preview = document.getElementById("preview-acomp");
+
+if (preview) {
+
+    preview.addEventListener("click", function () {
+
+        document
+            .getElementById("acomp-foto")
+            ?.click();
+
+    });
 }
 
 
@@ -2184,3 +2216,23 @@ function registrarEventoCliente(clienteId, tipo, datos = {}) {
 function tieneProhibicionActiva(cliente) {
     return false;
 }
+
+
+/*ICONO DE IMAGEN DEL ACOMPAÑANTE*/
+
+document.addEventListener("click", (e) => {
+    console.log("CLICK EN:", e.target);
+});
+
+document.addEventListener("click", (e) => {
+
+    const preview = e.target.closest("#preview-acomp");
+
+    if (!preview) return;
+
+    const input = document.getElementById("acomp-foto");
+
+    if (!input) return;
+
+    input.click();
+});
