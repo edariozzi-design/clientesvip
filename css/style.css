@@ -512,11 +512,15 @@ font-size: 18px;
     background-color: #666;
 }
 
-.zona-volver {
-    display: flex;
-    justify-content: center;
-    margin: 15px 0;
+.zona-volver{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    margin-top:20px;
+    margin-bottom:20px;
 }
+
+
 
 
 /*GRID INTERNO*/
@@ -742,6 +746,106 @@ input[type="date"]:focus {
     color: black;
 }
 
+/*FICHAS*/
+
+.ficha-cliente{
+    width:24rem;
+    min-height:460px;
+}
+
+.ficha-acompanante{
+    min-width:320px;
+    min-height:120px;
+    padding:15px;
+    margin-bottom: 18px;
+}
+
+.barra-ficha{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:20px;
+    margin-bottom:20px;
+}
+
+.estado-operativo{
+    max-width:500px;
+    margin: 20px auto;
+    padding: 15px 20px;
+    border:1px solid #444;
+    border-radius:8px;
+}
+
+
+.barra-ficha button{
+    min-width: 140px;
+    height: 50px;
+    font-size: 18px;
+}
+
+.ficha-acompanante{
+    min-height:170px;
+    padding:15px;
+    text-align:center;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+
+    gap:8px;
+}
+
+.acciones-acompanante{
+    display:flex;
+    justify-content:center;
+    gap:15px;
+    margin-top:10px;
+}
+
+.btn-editar-acomp,
+.btn-eliminar-acomp{
+    background:none;
+    border:none;
+    cursor:pointer;
+    color:#daa520;
+    font-size:18px;
+}
+
+.btn-editar-acomp:hover,
+.btn-eliminar-acomp:hover{
+    opacity:0.8;
+}
+
+.modal-confirmacion{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.55);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+}
+
+.modal-confirmacion-box{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    min-width:320px;
+    text-align:center;
+    box-shadow:0 0 20px rgba(0,0,0,.25);
+}
+
+.modal-botones{
+    margin-top:20px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.oculto{
+    display:none !important;
+}
 
 
 @media (max-width: 768px) {

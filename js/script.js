@@ -23,25 +23,41 @@ let usuarioActual = operador;
 
 
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [
-
-    {
-        id: "1001",
-        nombre: "Juan Pérez",
-        dni: "30111222",
-        categoria: "Diamond",
-        patente: "AB123CD",
-        foto: "/img/foto1.PNG",
-        acompanante: {
-            nombre: "María López",
-            dni: "28999888",
-            categoria: "Acompañante",
-            foto: "/img/foto2.PNG"
-        },
-        enVip: true,
-        historial: [],
-        novedades: []
-    }
+  {
+    id: "1001",
+    nombre: "Juan Pérez",
+    dni: "30111222",
+    categoria: "Diamond",
+    tarjeta: "AB123CD",
+    foto: "/img/foto1.PNG",
+    acompanantes: [
+      {
+        nombre: "María López",
+        dni: "28999888",
+        categoria: "Acompañante",
+        foto: "/img/foto2.PNG"
+      }
+    ],
+    enVip: true,
+    historial: [],
+    novedades: []
+  }
 ];
+
+clientes.forEach(cliente => {
+
+    if (!cliente.acompanantes) {
+
+        cliente.acompanantes = [];
+
+        if (cliente.acompanante) {
+            cliente.acompanantes.push(cliente.acompanante);
+        }
+    }
+
+});
+
+
 
 const formulario = document.getElementById("form-busqueda");
 const buscador = document.getElementById("buscador");
@@ -97,6 +113,9 @@ let clienteActual = null;
 let vistaActual = "historial";
 
 let categoriaExpandida = null;
+let acompananteEditIndex = null;
+
+let accionPendiente = null;
 
 
 function getEnSalaAhora() {
@@ -176,6 +195,49 @@ function guardarClientes() {
     localStorage.setItem("clientes", JSON.stringify(clientes));
 
 }
+
+function abrirModalConfirmacion(titulo, mensaje, callback) {
+
+    const modal = document.getElementById("modal-confirmacion");
+
+    const tituloEl = document.getElementById("modal-titulo");
+    const textoEl = document.getElementById("modal-texto");
+
+    const btnSi = document.getElementById("btn-modal-confirmar");
+    const btnNo = document.getElementById("btn-modal-cancelar");
+
+    tituloEl.textContent = titulo;
+    textoEl.textContent = mensaje;
+
+    modal.classList.remove("oculto");
+
+    btnSi.onclick = null;
+    btnNo.onclick = null;
+
+    btnSi.onclick = () => {
+
+        modal.classList.add("oculto");
+
+        if (callback) callback(true);
+    };
+
+    btnNo.onclick = () => {
+
+        modal.classList.add("oculto");
+
+        if (callback) callback(false);
+    };
+
+    modal.onclick = (e) => {
+
+        if (e.target !== modal) return;
+
+        modal.classList.add("oculto");
+
+        if (callback) callback(false);
+    };
+}
+
 
 function actualizarVistaUsuario() {
 
@@ -530,7 +592,7 @@ function getClientesPorHoraCategoria(lista = clientes) {
 // FIX COMPATIBILIDAD UI
 // =====================
 
-// alias crítico (esto rompía el click en métricas)
+
 function seleccionarCategoria(cat) {
     toggleCategoria(cat);
 }
@@ -570,7 +632,7 @@ function getClientesEnSalaPorCategoria() {
         resultado[categoria].push({
             id: cliente.id,
             nombre: cliente.nombre,
-            apellido: cliente.apellido || "" // FIX: evita crash
+            apellido: cliente.apellido || "" 
         });
     });
 
@@ -650,7 +712,7 @@ function renderEstadisticas() {
     <!-- MOVIMIENTO DIARIO -->
     <div class="card metric-card">
         <h5>MOVIMIENTO DIARIO</h5>
-        <small>Jornada 06:00 → 06:00</small>
+        <small>Jornada 06:00 hs → 06:00 hs</small>
         <hr>
 
         <div class="fila-cruce encabezado">
@@ -887,17 +949,23 @@ formulario.addEventListener("submit", function (e) {
 
     const resultados = clientes.filter(cliente => {
 
-        const nombre = (cliente.nombre || "").toLowerCase();
-        const dni = String(cliente.dni || "").toLowerCase();
-        const id = String(cliente.id || "").toLowerCase();
-        const tarjeta = String(cliente.tarjeta || "").toLowerCase();
+        const normalizar = (texto) =>
+            String(texto || "")
+                .toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
 
-        return (
-            nombre.includes(valor) ||
-            dni.includes(valor) ||
-            id.includes(valor) ||
-            tarjeta.includes(valor)
-        );
+        const termino = normalizar(valor);
+
+        const textoBusqueda = normalizar(`
+    ${cliente.nombre}
+    ${cliente.dni}
+    ${cliente.id}
+    ${cliente.tarjeta}
+`);
+
+        return textoBusqueda.includes(termino);
     });
 
     if (resultados.length === 1) {
@@ -941,14 +1009,10 @@ function obtenerClaseCategoria(categoria) {
 
 function renderCliente(cliente) {
 
+    console.log("ROL ACTUAL:", usuarioActual.rol);
+
     let html = `
 
-    
-<div class="zona-volver">
-    <button class="btn btn-secondary btn-volver" onclick="volverMetricas()">
-        Volver  
-    </button>
-</div>
 
 <div class="clientes-wrapper">
 
@@ -956,7 +1020,7 @@ function renderCliente(cliente) {
 
         <b>CLIENTE</b>
 
-        <div class="card ${cliente.enVip ? 'vip-activo' : ''} ${obtenerClaseCategoria(cliente.categoria)}" style="width: 18rem;">
+        <div class="card ficha-cliente ${cliente.enVip ? 'vip-activo' : ''} ${obtenerClaseCategoria(cliente.categoria)}">
             
             <div class="card-header">
                 <button class="icon-btn" data-action="ver-foto-cliente">
@@ -965,11 +1029,51 @@ function renderCliente(cliente) {
             </div>
 
             <ul class="list-group list-group-flush">
-                <li class="list-group-item">${cliente.nombre}</li>
-                <li class="list-group-item">${cliente.dni}</li>
-                <li class="list-group-item">${cliente.id}</li>
-                <li class="list-group-item">${cliente.categoria}</li>
-                <li class="list-group-item">${cliente.patente}</li>
+                <li class="list-group-item">
+    Nombre: ${cliente.nombre}
+</li>
+
+<li class="list-group-item">
+    DNI: ${cliente.dni}
+</li>
+
+<li class="list-group-item">
+    ID: ${cliente.id}
+</li>
+
+<li class="list-group-item">
+    Tarjeta: ${cliente.tarjeta || "-"}
+</li>
+
+<li class="list-group-item">
+    Categoría: ${cliente.categoria}
+</li>
+
+<li class="list-group-item estado-cliente">
+    Autoexclusión:
+    ${cliente.autoexclusion?.activa ? "ACTIVA" : "NO"}
+</li>
+
+<li class="list-group-item estado-cliente">
+    Prohibición:
+    ${cliente.prohibicion?.activa ? "ACTIVA" : "NO"}
+</li>
+
+<li class="list-group-item acciones-ficha">
+
+    <button
+        class="btn btn-outline-dark"
+        data-action="historial">
+        Historial
+    </button>
+
+    <button
+        class="btn btn-outline-dark"
+        data-action="novedades">
+        Novedades
+    </button>
+
+</li>
             </ul>
         </div>
 
@@ -994,37 +1098,102 @@ function renderCliente(cliente) {
     </article>
 `;
 
-    if (cliente.acompanante) {
-        html += `
-    <article class="datos-contenedor">
+    const acompanantes = cliente.acompanantes || [];
 
-        <b>ACOMPAÑANTE</b>
+    html += `
+<article class="datos-contenedor">
 
-        <div class="acompanante-item">
-
-            <button class="icon-btn" data-action="ver-foto">
-                <i class="bi bi-camera-fill"></i>
-            </button>
-
-            <span class="nombre-acompanante">
-                ${cliente.acompanante.nombre}
-            </span>
-
-            <input 
-type="checkbox" 
-    data-action="toggle-acompanante"
-    ${cliente.acompanante.ingresa ? "checked" : ""}
->
-
-        </div>
-
-    </article>
+    <div style="margin-bottom:10px;">
+        <button class="btn btn-sm btn-outline-primary" data-action="agregar-acompanante">
+            Agregar acompañante
+        </button>
+    </div>
 `;
+
+    if (acompanantes.length === 0) {
+
+        html += `<div class="text-muted">Sin acompañantes</div>`;
+
+    } else {
+
+        acompanantes.slice(0, 2).forEach((a, index) => {
+
+            html += `
+
+<div class="acompanante-item ficha-acompanante">
+
+    <button class="icon-btn"
+        data-action="ver-foto-acompanante"
+        data-index="${index}">
+        <i class="bi bi-camera-fill"></i>
+    </button>
+
+    <div>
+        <strong>${a.nombre}</strong>
+    </div>
+
+    <div>
+        DNI: ${a.dni}
+    </div>
+
+    <div class="acciones-acompanante">
+
+        <button
+            class="btn-editar-acomp"
+            data-action="editar-acompanante"
+            data-index="${index}">
+            <i class="bi bi-pencil"></i>
+        </button>
+
+        <button
+            class="btn-eliminar-acomp"
+            data-action="eliminar-acompanante"
+            data-index="${index}">
+            <i class="bi bi-trash"></i>
+        </button>
+
+    </div>
+
+</div>`;
+        });
     }
 
     html += `
-    
+
+<div id="form-acompanante-dinamico"
+     style="display:none; margin-top:10px; border:1px solid #daa520; padding:10px; border-radius:8px; text-align:center;">
+
+    <input type="text" id="acomp-nombre" placeholder="Nombre y apellido" class="form-control mb-2">
+
+    <input type="text" id="acomp-dni" placeholder="DNI" class="form-control mb-2">
+
+    <label>Foto</label>
+    <input type="file" id="acomp-foto" accept="image/*" class="form-control mb-2">
+
+    <button
+        data-action="guardar-acompanante"
+        class="btn btn-primary">
+        Guardar
+    </button>
+
+</div>
+</article>
+`;
+
+    html += `
+</div>
+
+
 <div id="panel-extra"></div>
+
+<div class="zona-volver">
+    <button
+        class="btn btn-secondary btn-volver"
+        onclick="volverMetricas()">
+        Volver
+    </button>
+</div>
+
 `;
 
     resultadoCliente.innerHTML = html;
@@ -1140,8 +1309,9 @@ resultadoCliente.addEventListener("click", function (e) {
 
     if (action === "editar") {
 
-        modoEdicion = true;
-        clienteEditando = clienteActual;
+        console.log("CLICK EDITAR");
+
+        panelNuevo.classList.remove("oculto");
 
         panelNuevo.innerHTML = `
     <div class="modal-edicion-overlay">
@@ -1149,10 +1319,38 @@ resultadoCliente.addEventListener("click", function (e) {
 
             <h4>Editar cliente</h4>
 
-            <input id="edit-nombre" class="form-control mb-2" value="${clienteActual.nombre}">
-            <input id="edit-dni" class="form-control mb-2" value="${clienteActual.dni}">
-            <input id="edit-email" class="form-control mb-2" value="${clienteActual.email || ""}">
-            <input id="edit-celular" class="form-control mb-2" value="${clienteActual.celular || ""}">
+            <div class="mb-2">
+    <label>Nombre y Apellido</label>
+    <input
+        id="edit-nombre"
+        class="form-control"
+        value="${clienteActual.nombre}">
+</div>
+
+<div class="mb-2">
+    <label>DNI</label>
+    <input
+        id="edit-dni"
+        class="form-control"
+        value="${clienteActual.dni}">
+</div>
+
+<div class="mb-2">
+    <label>ID Cliente</label>
+    <input
+        id="edit-id"
+        class="form-control"
+        value="${clienteActual.id}"
+        ${usuarioActual.rol !== "supervisor" ? "readonly" : ""}>
+</div>
+
+<div class="mb-2">
+    <label>Número de Tarjeta</label>
+    <input
+        id="edit-tarjeta"
+        class="form-control"
+        value="${clienteActual.tarjeta || ""}">
+</div>
 
             <div class="d-flex gap-2 justify-content-center">
                 <button id="guardar-edicion" class="btn btn-warning">
@@ -1166,7 +1364,7 @@ resultadoCliente.addEventListener("click", function (e) {
 
         </div>
     </div>
-`;
+    `;
     }
 
     if (action === "ingreso") {
@@ -1284,7 +1482,7 @@ resultadoCliente.addEventListener("click", function (e) {
 
         boton.innerHTML = `
         <img 
-            src="${clienteActual.acompanante.foto}" 
+            src="${clienteActual.acompanantes[0].foto}" 
             style="
                 width:110px;
                 height:110px;
@@ -1379,14 +1577,232 @@ function toggleCategoria(cat) {
     renderEstadisticas();
 }
 
+
+/* =========================
+CLICK PRINCIPAL (ACCIONES)
+========================= */
+
 document.addEventListener("click", function (e) {
 
+    const action = e.target.closest("[data-action]")?.dataset.action;
+
+    /* VOLVER */
     if (e.target.id === "btn-volver-categorias") {
         categoriaExpandida = null;
         renderEstadisticas();
         renderListaClientes(clientes);
+        return;
+    }
+
+    /* AGREGAR */
+    if (action === "agregar-acompanante") {
+        const form = document.getElementById("form-acompanante-dinamico");
+        if (form) form.style.display = "block";
+    }
+
+    /* EDITAR */
+    if (action === "editar-acompanante") {
+
+        const boton = e.target.closest("[data-index]");
+        if (!boton) return;
+
+        const index = parseInt(boton.dataset.index);
+
+        const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
+        const clienteIndex = clientes.findIndex(c => c.id == clienteActual.id);
+
+        if (clienteIndex === -1) return;
+
+        const acomp = clientes[clienteIndex].acompanantes[index];
+        if (!acomp) return;
+
+        acompananteEditIndex = index;
+
+        document.getElementById("acomp-nombre").value = acomp.nombre;
+        document.getElementById("acomp-dni").value = acomp.dni;
+
+        const form = document.getElementById("form-acompanante-dinamico");
+        if (form) form.style.display = "block";
+
+        clienteActual = clientes[clienteIndex];
+    }
+
+    if (action === "ver-foto-acompanante") {
+
+    const index = parseInt(
+        e.target.closest("[data-index]")?.dataset.index
+    );
+
+    if (isNaN(index)) return;
+
+    const acomp = clienteActual.acompanantes[index];
+
+    if (!acomp?.foto) return;
+
+    const boton = e.target.closest("button");
+
+    boton.innerHTML = `
+        <img
+            src="${acomp.foto}"
+            style="
+                width:110px;
+                height:110px;
+                object-fit:cover;
+                border-radius:50%;
+                border:3px solid #daa520;
+            ">
+    `;
+
+    boton.style.background = "transparent";
+    boton.style.border = "none";
+    boton.style.width = "120px";
+    boton.style.height = "120px";
+
+    setTimeout(() => {
+
+        boton.innerHTML =
+            `<i class="bi bi-camera-fill"></i>`;
+
+        boton.style.width = "";
+        boton.style.height = "";
+        boton.style.background = "";
+        boton.style.border = "";
+
+    }, 4000);
+}
+
+    /* ELIMINAR */
+    if (action === "eliminar-acompanante") {
+
+        const index = parseInt(
+            e.target.closest("[data-index]")?.dataset.index
+        );
+
+        if (isNaN(index)) return;
+
+        abrirModalConfirmacion(
+            "Eliminar acompañante",
+            "¿Desea eliminar este acompañante?",
+            (confirmado) => {
+
+                if (!confirmado) return;
+
+                clienteActual.acompanantes.splice(index, 1);
+
+                guardarClientes();
+                renderCliente(clienteActual);
+            }
+        );
+
+        return;
+    }
+
+    /* GUARDAR */
+    if (action === "guardar-acompanante") {
+
+        const nombre = document.getElementById("acomp-nombre").value.trim();
+        const dni = document.getElementById("acomp-dni").value.trim();
+        const fileInput = document.getElementById("acomp-foto");
+
+        if (!nombre || !dni) return;
+
+        const file = fileInput.files[0];
+
+        const procesarGuardado = (fotoBase64 = "") => {
+
+            if (!clienteActual.acompanantes) {
+                clienteActual.acompanantes = [];
+            }
+
+            if (acompananteEditIndex !== null) {
+
+                clienteActual.acompanantes[acompananteEditIndex].nombre = nombre;
+                clienteActual.acompanantes[acompananteEditIndex].dni = dni;
+
+                if (fotoBase64) {
+                    clienteActual.acompanantes[acompananteEditIndex].foto = fotoBase64;
+                }
+
+                acompananteEditIndex = null;
+
+            } else {
+
+                if (clienteActual.acompanantes.length >= 2) return;
+
+                clienteActual.acompanantes.push({
+                    nombre,
+                    dni,
+                    foto: fotoBase64
+                });
+            }
+
+            guardarClientes();
+            renderCliente(clienteActual);
+
+            document.getElementById("acomp-nombre").value = "";
+            document.getElementById("acomp-dni").value = "";
+            document.getElementById("acomp-foto").value = "";
+
+            document.getElementById("form-acompanante-dinamico").style.display = "none";
+        };
+
+        if (file) {
+
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                procesarGuardado(e.target.result);
+            };
+
+            reader.readAsDataURL(file);
+
+        } else {
+
+            procesarGuardado("");
+        }
+    }
+
+});
+
+
+/* =========================
+CLICK FUERA (CERRAR FORM)
+========================= */
+
+document.addEventListener("click", function (e) {
+
+    const form = document.getElementById("form-acompanante-dinamico");
+    if (!form) return;
+
+    const isInside = form.contains(e.target);
+    const isActionButton =
+        e.target.closest("[data-action='agregar-acompanante']") ||
+        e.target.closest("[data-action='editar-acompanante']");
+
+    if (!isInside && !isActionButton) {
+        form.style.display = "none";
+        acompananteEditIndex = null;
     }
 });
+
+
+/* =========================
+INPUT CLEAN
+========================= */
+
+document.addEventListener("input", function (e) {
+
+    if (e.target.id === "acomp-nombre") {
+        e.target.style.border = "";
+    }
+
+    if (e.target.id === "acomp-dni") {
+        e.target.style.border = "";
+    }
+
+});
+
+
 
 
 // =====================
@@ -1484,6 +1900,32 @@ btnLogout.addEventListener("click", function () {
 
 actualizarVistaUsuario();
 setInterval(actualizarReloj, 1000);
+
+document
+    .getElementById("btn-modal-cancelar")
+    .addEventListener("click", () => {
+
+        document
+            .getElementById("modal-confirmacion")
+            .classList.add("oculto");
+
+        accionPendiente = null;
+    });
+
+document
+    .getElementById("btn-modal-confirmar")
+    .addEventListener("click", () => {
+
+        if (accionPendiente) {
+            accionPendiente();
+        }
+
+        document
+            .getElementById("modal-confirmacion")
+            .classList.add("oculto");
+
+        accionPendiente = null;
+    });
 
 resultadoCliente.innerHTML = `
     <div id="pantalla-espera">
@@ -1617,7 +2059,8 @@ document.addEventListener("click", function (e) {
             foto: "/img/foto1.PNG",
             enVip: false,
             historial: [],
-            novedades: []
+            novedades: [],
+            acompanantes: []
         };
 
 
@@ -1631,49 +2074,49 @@ document.addEventListener("click", function (e) {
         alert("Cliente creado correctamente");
         volverInicio();
     }
-});
 
 
-// =====================
-// EDITAR CLIENTE
-// =====================
+    // =====================
+    // EDITAR CLIENTE
+    // =====================
 
-
-document.addEventListener("click", function (e) {
 
     if (e.target.id === "guardar-edicion") {
 
+        if (!clienteActual) return;
+
         const nombre = document.getElementById("edit-nombre").value.trim();
         const dni = document.getElementById("edit-dni").value.trim();
-        const email = document.getElementById("edit-email").value.trim();
-        const celular = document.getElementById("edit-celular").value.trim();
+        const idCliente = document.getElementById("edit-id").value.trim();
+        const tarjeta = document.getElementById("edit-tarjeta").value.trim();
 
-        // actualizar clienteActual
+        if (!nombre || !dni) {
+            alert("Nombre y DNI son obligatorios");
+            return;
+        }
+
         clienteActual.nombre = nombre;
         clienteActual.dni = dni;
-        clienteActual.email = email;
-        clienteActual.celular = celular;
+        clienteActual.tarjeta = tarjeta;
 
-        // actualizar en el array 
+        if (usuarioActual.rol === "supervisor") {
+            clienteActual.id = idCliente;
+        }
+
         const index = clientes.findIndex(c => c.id === clienteActual.id);
 
         if (index !== -1) {
             clientes[index] = { ...clienteActual };
         }
 
-        // guardar en storage
         guardarClientes();
 
-        // limpiar panel
         panelNuevo.innerHTML = "";
         panelNuevo.classList.add("oculto");
 
-        // re-render seguro
         renderCliente(clienteActual);
     }
-});
 
-document.addEventListener("click", function (e) {
 
     if (e.target.id === "cancelar-edicion") {
         panelNuevo.innerHTML = "";
@@ -1735,4 +2178,9 @@ function registrarEventoCliente(clienteId, tipo, datos = {}) {
     guardarClientes();
 
     return evento;
+}
+
+
+function tieneProhibicionActiva(cliente) {
+    return false;
 }
