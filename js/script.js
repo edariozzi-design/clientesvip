@@ -23,25 +23,25 @@ let usuarioActual = operador;
 
 
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [
-  {
-    id: "1001",
-    nombre: "Juan Pérez",
-    dni: "30111222",
-    categoria: "Diamond",
-    tarjeta: "AB123CD",
-    foto: "/img/foto1.PNG",
-    acompanantes: [
-      {
-        nombre: "María López",
-        dni: "28999888",
-        categoria: "Acompañante",
-        foto: "/img/foto2.PNG"
-      }
-    ],
-    enVip: true,
-    historial: [],
-    novedades: []
-  }
+    {
+        id: "1001",
+        nombre: "Juan Pérez",
+        dni: "30111222",
+        categoria: "Diamond",
+        tarjeta: "AB123CD",
+        foto: "/img/foto1.PNG",
+        acompanantes: [
+            {
+                nombre: "María López",
+                dni: "28999888",
+                categoria: "Acompañante",
+                foto: "/img/foto2.PNG"
+            }
+        ],
+        enVip: true,
+        historial: [],
+        novedades: []
+    }
 ];
 
 clientes.forEach(cliente => {
@@ -107,10 +107,15 @@ const btnNuevo = document.getElementById("btn-nuevo");
 const btnSupervisor = document.getElementById("btn-supervisor");
 const btnLogout = document.getElementById("btn-logout");
 const panelAdmin = document.getElementById("panel-admin");
+const anioMinimo = 2026;
+const mesMinimoPorAnio = 6; 
 
 
 let clienteActual = null;
 let vistaActual = "historial";
+let modoCrearNovedad = false;
+let anioHistorialSeleccionado = "2026";
+let mesHistorialSeleccionado = "06";
 
 let categoriaExpandida = null;
 let acompananteEditIndex = null;
@@ -199,10 +204,8 @@ function guardarClientes() {
 function abrirModalConfirmacion(titulo, mensaje, callback) {
 
     const modal = document.getElementById("modal-confirmacion");
-
     const tituloEl = document.getElementById("modal-titulo");
     const textoEl = document.getElementById("modal-texto");
-
     const btnSi = document.getElementById("btn-modal-confirmar");
     const btnNo = document.getElementById("btn-modal-cancelar");
 
@@ -211,30 +214,31 @@ function abrirModalConfirmacion(titulo, mensaje, callback) {
 
     modal.classList.remove("oculto");
 
-    btnSi.onclick = null;
-    btnNo.onclick = null;
+    const cb = callback;
 
     btnSi.onclick = () => {
-
         modal.classList.add("oculto");
-
-        if (callback) callback(true);
+        btnSi.onclick = null;
+        btnNo.onclick = null;
+        modal.onclick = null;
+        if (cb) cb(true);
     };
 
     btnNo.onclick = () => {
-
         modal.classList.add("oculto");
-
-        if (callback) callback(false);
+        btnSi.onclick = null;
+        btnNo.onclick = null;
+        modal.onclick = null;
+        if (cb) cb(false);
     };
 
     modal.onclick = (e) => {
-
         if (e.target !== modal) return;
-
         modal.classList.add("oculto");
-
-        if (callback) callback(false);
+        btnSi.onclick = null;
+        btnNo.onclick = null;
+        modal.onclick = null;
+        if (cb) cb(false);
     };
 }
 
@@ -632,7 +636,7 @@ function getClientesEnSalaPorCategoria() {
         resultado[categoria].push({
             id: cliente.id,
             nombre: cliente.nombre,
-            apellido: cliente.apellido || "" 
+            apellido: cliente.apellido || ""
         });
     });
 
@@ -1161,7 +1165,7 @@ function renderCliente(cliente) {
     html += `
 
 <div id="form-acompanante-dinamico"
-     style="display:none; margin-top:10px; border:1px solid #daa520; padding:10px; border-radius:8px; text-align:center;">
+    style="display:none; margin-top:10px; border:1px solid #daa520; padding:10px; border-radius:8px; text-align:center;">
 
     <input type="text" id="acomp-nombre" placeholder="Nombre y apellido" class="form-control mb-2">
 
@@ -1234,57 +1238,364 @@ if (preview) {
 
 // RENDER PANEL (HISTORIAL / NOVEDADES)//
 
+function formatearFecha(ts) {
+    const d = new Date(ts);
+
+    const dia = String(d.getDate()).padStart(2, '0');
+    const mes = String(d.getMonth() + 1).padStart(2, '0');
+    const anio = d.getFullYear();
+
+    const hora = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+
+    return `${dia}/${mes}/${anio} ${hora}:${min} hs.`;
+}
+
+
+function formatearHora(ts) {
+
+    const d = new Date(ts);
+
+    const hora = String(d.getHours()).padStart(2, '0');
+    const min = String(d.getMinutes()).padStart(2, '0');
+
+    return `${hora}:${min} hs.`;
+}
+
+function agruparHistorial(historial) {
+
+    const dias = {};
+
+    historial.forEach(item => {
+
+        const fechaObj = new Date(item.fecha);
+        const key = fechaObj.toLocaleDateString("es-AR");
+
+        if (!dias[key]) {
+            dias[key] = {
+                fecha: key,
+                visitas: [],
+                acompanantes: 0
+            };
+        }
+
+        if (item.tipo === "INGRESO") {
+            dias[key].visitas.push({
+                ingreso: item.fecha,
+                egreso: null
+            });
+        }
+
+        if (item.tipo === "EGRESO") {
+            const visitas = dias[key].visitas;
+
+            for (let i = visitas.length - 1; i >= 0; i--) {
+                if (visitas[i].egreso === null) {
+                    visitas[i].egreso = item.fecha;
+                    break;
+                }
+            }
+        }
+    });
+
+    return Object.values(dias).sort((a, b) => {
+    return new Date(a.fecha.split('/').reverse().join('-')) -
+            new Date(b.fecha.split('/').reverse().join('-'));
+});
+}
+
 function renderPanel() {
+
 
     if (!clienteActual) return;
 
     const div = document.getElementById("panel-extra");
 
-    if (vistaActual === "historial") {
 
-        if (usuarioActual.rol !== "supervisor") {
+    /* ================= HISTORIAL ================= */
 
-            const ultimo = clienteActual.historial.at(-1);
 
-            div.innerHTML = ultimo
-                ? `
-                <div class="card mt-2 p-3">
-                    <h5>ÚLTIMO MOVIMIENTO</h5>
-                    <p><strong>${ultimo.tipo}</strong></p>
-                    <p>${ultimo.fecha}</p>
+if (vistaActual === "historial") {
+
+    const historialFiltrado = clienteActual.historial.filter(item => {
+        const fecha = new Date(item.fecha);
+
+        return (
+            String(fecha.getMonth() + 1).padStart(2, "0") === mesHistorialSeleccionado &&
+            String(fecha.getFullYear()) === anioHistorialSeleccionado
+        );
+    });
+
+    const historialAgrupado = agruparHistorial(historialFiltrado)
+    .map(dia => ({
+        ...dia,
+        visitas: dia.visitas.filter(v => v.ingreso && v.egreso)
+    }))
+    .filter(dia => dia.visitas.length > 0);
+
+    
+
+        const contenidoHistorial = `
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+
+                <button
+                    onclick="anioHistorialSeleccionado=String(Number(anioHistorialSeleccionado)-1);renderPanel();"
+                    style="all:unset; cursor:pointer; font-size:28px; color:#d4af37; padding:0 12px;">
+                    −
+                </button>
+
+                <div class="px-3 py-2 border border-warning rounded text-warning fw-bold fs-4">
+                    ${anioHistorialSeleccionado}
                 </div>
-            `
-                : "<p>Sin movimientos del día</p>";
 
-        } else {
+                <button
+                    onclick="anioHistorialSeleccionado=String(Number(anioHistorialSeleccionado)+1);renderPanel();"
+                    style="all:unset; cursor:pointer; font-size:28px; color:#d4af37; padding:0 12px;">
+                    +
+                </button>
 
-            div.innerHTML = clienteActual.historial.length
-                ? clienteActual.historial.slice().reverse().map(item => `
-                <div class="card mt-2">
-                    <div class="card-body">
-                        <p><strong>${item.tipo}</strong></p>
-                        <p>${item.fecha}</p>
+            </div>
+
+            ${
+                historialAgrupado.length > 0
+                    ? `
+                        <div class="row g-2">
+                            ${historialAgrupado.map(dia => `
+                                <div class="col-12 col-md-3">
+                                    <div class="card h-100">
+                                        <div class="card-body" style="color:#d4af37; display:flex; flex-direction:column; gap:6px; text-align:center;">
+
+                                            <div style="font-weight:bold; border-bottom:1px solid rgba(212,175,55,0.3); padding-bottom:4px;">
+                                                ${dia.fecha}
+                                            </div>
+
+                                            <div>
+                                                ${dia.visitas
+                                                    .filter(v => v.egreso)
+                                                    .map(v => `
+                                                        <div style="padding:2px 0;">
+                                                            ${formatearHora(v.ingreso)} → ${formatearHora(v.egreso)}
+                                                        </div>
+                                                    `).join("")}
+                                            </div>
+
+                                            ${(clienteActual.categoria === "Diamond" || clienteActual.categoria === "Bespoke") && dia.acompanantes > 0 ? `
+                                                <div style="margin-top:6px; font-size:0.9em; opacity:0.9;">
+                                                    Acompañante${dia.acompanantes > 1 ? "s" : ""}: ${dia.acompanantes}
+                                                </div>
+                                            ` : ""}
+
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join("")}
+                        </div>
+                    `
+                    : `
+                        <div class="alert alert-secondary text-center">
+    No existen registros para el período seleccionado
+</div>
+                    `
+            }
+        `;
+
+        div.innerHTML = contenidoHistorial;
+    }
+
+
+
+    /* ================= NOVEDADES ================= */
+
+    else if (vistaActual === "novedades") {
+
+        const novedades = clienteActual.novedades || [];
+
+        let html = `
+            <div class="d-flex align-items-center gap-1 mb-2">
+                <h5 class="m-0">Novedades</h5>
+
+                <button class="btn btn-warning fw-bold"
+                        data-action="agregar-novedad"
+                        style="width:24px;height:24px;padding:0;">
+                    +
+                </button>
+            </div>
+    `;
+
+
+        if (modoCrearNovedad) {
+
+            html += `
+        <div class="card mb-2"
+            style="border:1px solid #d4af37;border-radius:10px;background:#fff;overflow:hidden;">
+
+        <textarea id="input-novedad" class="novedad-textarea" placeholder="Escribí la novedad..."></textarea>
+
+        <div class="p-2">
+
+            <div class="novedad-footer">
+
+    <div class="contador-novedad" id="contador-novedad">
+        0/50 
+    </div>
+
+    <div class="novedad-actions">
+
+        <button data-action="guardar-edicion-novedad" class="icon-btn">
+    <i class="bi bi-floppy"></i>
+</button>
+
+<button data-action="cancelar-edicion-novedad" class="icon-btn">
+    <i class="bi bi-x-lg"></i>
+</button>
+
+    </div>
+
+</div>
+
+            </div>
+
+        </div>
+
+    </div>
+`;
+        }
+
+        if (novedades.length > 0) {
+
+            html += novedades
+                .slice()
+                .sort((a, b) => b.fecha - a.fecha)
+                .map(item => `
+                    <div class="card mt-2">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+
+                            <div>
+                                <small style="color:#d4af37;">
+                                    ${formatearFecha(item.fecha)}
+                                </small>
+
+                                <p class="mb-0" style="color:#d4af37;">
+                                    ${item.texto}
+                                </p>
+                            </div>
+
+                            <div>
+
+                                <div class="d-flex gap-2">
+
+    <button data-action="ver-novedad"
+            data-fecha="${item.fecha}"
+            class="icon-btn">
+        <i class="bi bi-eye"></i>
+    </button>
+
+    ${usuarioActual.rol === "supervisor" ? `
+        <button data-action="editar-novedad"
+                data-fecha="${item.fecha}"
+                class="icon-btn">
+            <i class="bi bi-pencil"></i>
+        </button>
+
+        <button data-action="eliminar-novedad"
+                data-fecha="${item.fecha}"
+                class="icon-btn">
+            <i class="bi bi-trash3"></i>
+        </button>` : ""}
+
+</div>
+
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `).join("")
-                : "<p>Sin historial registrado</p>";
+
+                `).join("");
+        } else {
+            html += `<p class="text-muted">Sin novedades registradas</p>`;
+        }
+        div.innerHTML = html;
+
+
+        if (modoCrearNovedad) {
+
+            const textarea = document.getElementById("input-novedad");
+            const contador = document.getElementById("contador-novedad");
+
+            textarea?.addEventListener("input", () => {
+
+                const palabras = textarea.value
+                    .trim()
+                    .split(/\s+/)
+                    .filter(Boolean);
+
+                contador.textContent =
+                    `${palabras.length} / 50 palabras`;
+            });
         }
     }
 
-    if (vistaActual === "novedades") {
+    /* ================= VER NOVEDAD ================= */
 
-        div.innerHTML = clienteActual.novedades.length
-            ? clienteActual.novedades.map(item => `
-                <div class="card mt-2" style="width: 15rem;">
-                    <div class="card-body">
-                        <p>${item.texto}</p>
-                        <p>${item.fecha}</p>
+
+    else if (vistaActual === "ver-novedad") {
+
+
+        const esSupervisor = usuarioActual.rol === "supervisor";
+
+        const fechaNovedad = new Date(novedadSeleccionada.fecha);
+
+        const fechaFormateada =
+            fechaNovedad.toLocaleDateString("es-AR") +
+            " " +
+            fechaNovedad.toLocaleTimeString("es-AR", {
+                hour: "2-digit",
+                minute: "2-digit",
+                hour12: false
+            }) +
+            " hs.";
+
+        div.innerHTML = `
+            <div class="card mt-2" style="border-radius:10px; overflow:hidden;">
+                <div class="card-body p-3" style="position:relative;">
+
+                    <button class="btn btn-sm btn-warning"
+                            style="position:absolute; top:10px; right:10px;"
+                            data-action="volver-novedades">
+                        ✖
+                    </button>
+
+                    <small class="d-block mb-2"
+                        style="color:#d4af37; font-weight:500;">
+                        ${fechaFormateada}
+                    </small>
+
+                    ${!modoEdicionNovedad ? `
+    <p class="mb-0" style="color:#d4af37;">
+        ${novedadSeleccionada.texto || ""}
+    </p>
+` : `
+    <textarea id="input-novedad" class="novedad-textarea">${novedadSeleccionada.texto || ""}</textarea>
+
+    <small id="contador-novedad" class="d-block text-center" style="color:#d4af37;">0 / 50 palabras</small>
+`}
+
+                    <div class="mt-3 d-flex justify-content-center gap-2">
+
+                        ${esSupervisor && modoEdicionNovedad ? `
+                            <button class="btn btn-warning btn-sm"
+                                    data-action="guardar-edicion-novedad">
+                                Guardar
+                            </button>
+                        ` : ""}
+
                     </div>
+
                 </div>
-            `).join("")
-            : "<p>Sin novedades registradas</p>";
+            </div>
+        `;
     }
 }
+
 
 function normalizarEvento(evento) {
 
@@ -1431,25 +1742,168 @@ resultadoCliente.addEventListener("click", function (e) {
         return;
     }
 
-    if (action === "historial") {
-        vistaActual = "historial";
-        renderPanel();
-    }
+    document.addEventListener("click", function (e) {
 
-    if (action === "novedades") {
+        const boton = e.target.closest("[data-action]");
 
-        const texto = prompt("Escribí la novedad:");
-        if (!texto) return;
+        if (!boton) return;
 
-        clienteActual.novedades.push({
-            texto,
-            fecha: Date.now()
-        });
+        const action = boton.getAttribute("data-action");
 
-        guardarClientes();
-        vistaActual = "novedades";
-        renderPanel();
-    }
+        if (action === "historial") {
+            vistaActual = "historial";
+            renderPanel();
+        }
+
+        if (action === "agregar-novedad") {
+            modoCrearNovedad = true;
+            console.log("modoCrearNovedad:", modoCrearNovedad);
+            renderPanel();
+        }
+
+
+        if (action === "novedades") {
+            vistaActual = "novedades";
+            renderPanel();
+
+        }
+
+        if (action === "guardar-novedad") {
+
+            const texto = document.getElementById("input-novedad")?.value.trim();
+
+            if (!texto) return;
+
+            clienteActual.novedades.push({
+                texto,
+                fecha: Date.now()
+            });
+
+            guardarClientes();
+
+            modoCrearNovedad = false;
+            renderPanel();
+        }
+
+
+        if (action === "cancelar-novedad") {
+            modoCrearNovedad = false;
+            renderPanel();
+        }
+
+        if (action === "ver-novedad") {
+
+            const fecha = Number(boton.getAttribute("data-fecha"));
+
+            const index = clienteActual.novedades.findIndex(
+                n => n.fecha === fecha
+            );
+
+            if (index === -1) return;
+
+            novedadSeleccionada = clienteActual.novedades[index];
+            indexNovedadSeleccionada = index;
+
+            modoEdicionNovedad = false;
+            vistaActual = "ver-novedad";
+
+            renderPanel();
+        }
+
+        if (action === "volver-novedades") {
+            vistaActual = "novedades";
+            renderPanel();
+        }
+
+        if (action === "editar-novedad") {
+
+            const fecha = Number(boton.getAttribute("data-fecha"));
+
+            const index = clienteActual.novedades.findIndex(
+                n => n.fecha === fecha
+            );
+
+            if (index === -1) return;
+
+            novedadSeleccionada = clienteActual.novedades[index];
+            indexNovedadSeleccionada = index;
+
+            modoEdicionNovedad = true;
+            vistaActual = "ver-novedad";
+
+            renderPanel();
+
+            if (action === "editar-novedad") {
+
+                const fecha = Number(boton.getAttribute("data-fecha"));
+
+                const index = clienteActual.novedades.findIndex(
+                    n => n.fecha === fecha
+                );
+
+                if (index === -1) return;
+
+                novedadSeleccionada = clienteActual.novedades[index];
+                indexNovedadSeleccionada = index;
+
+                modoEdicionNovedad = true;
+                vistaActual = "ver-novedad";
+
+                setTimeout(() => {
+                    document.getElementById("input-novedad").value = novedadSeleccionada.texto || "";
+                }, 0);
+
+                renderPanel();
+            }
+        }
+
+
+        if (action === "guardar-edicion-novedad") {
+
+            const texto = document
+                .getElementById("input-novedad")
+                ?.value.trim();
+
+            if (!texto) return;
+
+            novedadSeleccionada.texto = texto;
+
+            guardarClientes();
+
+            modoEdicionNovedad = false;
+
+            renderPanel();
+        }
+
+        if (action === "eliminar-novedad") {
+
+            const fecha = Number(
+                boton.getAttribute("data-fecha")
+            );
+
+            const index = clienteActual.novedades.findIndex(
+                n => n.fecha === fecha
+            );
+
+            if (index === -1) return;
+
+            abrirModalConfirmacion(
+                "Eliminar novedad",
+                "¿Desea eliminar esta novedad?",
+                (confirmado) => {
+
+                    if (!confirmado) return;
+
+                    clienteActual.novedades.splice(index, 1);
+
+                    guardarClientes();
+
+                    renderPanel();
+                }
+            );
+        }
+
+    });
 
     if (action === "toggle-acompanante") {
         clienteActual.acompanante.ingresa = e.target.checked;
@@ -1661,19 +2115,19 @@ document.addEventListener("click", function (e) {
 
     if (action === "ver-foto-acompanante") {
 
-    const index = parseInt(
-        e.target.closest("[data-index]")?.dataset.index
-    );
+        const index = parseInt(
+            e.target.closest("[data-index]")?.dataset.index
+        );
 
-    if (isNaN(index)) return;
+        if (isNaN(index)) return;
 
-    const acomp = clienteActual.acompanantes[index];
+        const acomp = clienteActual.acompanantes[index];
 
-    if (!acomp?.foto) return;
+        if (!acomp?.foto) return;
 
-    const boton = e.target.closest("button");
+        const boton = e.target.closest("button");
 
-    boton.innerHTML = `
+        boton.innerHTML = `
         <img
             src="${acomp.foto}"
             style="
@@ -1685,23 +2139,23 @@ document.addEventListener("click", function (e) {
             ">
     `;
 
-    boton.style.background = "transparent";
-    boton.style.border = "none";
-    boton.style.width = "120px";
-    boton.style.height = "120px";
+        boton.style.background = "transparent";
+        boton.style.border = "none";
+        boton.style.width = "120px";
+        boton.style.height = "120px";
 
-    setTimeout(() => {
+        setTimeout(() => {
 
-        boton.innerHTML =
-            `<i class="bi bi-camera-fill"></i>`;
+            boton.innerHTML =
+                `<i class="bi bi-camera-fill"></i>`;
 
-        boton.style.width = "";
-        boton.style.height = "";
-        boton.style.background = "";
-        boton.style.border = "";
+            boton.style.width = "";
+            boton.style.height = "";
+            boton.style.background = "";
+            boton.style.border = "";
 
-    }, 4000);
-}
+        }, 4000);
+    }
 
     /* ELIMINAR */
     if (action === "eliminar-acompanante") {
