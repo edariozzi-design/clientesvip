@@ -13,7 +13,7 @@ const categoriasBase = [
     "Bespoke",
     "Diamond",
     "Diamond Seg.",
-    "Platinium",
+    "Platinum",
     "Gold",
     "Classic",
     "No socios"
@@ -24,23 +24,2872 @@ let usuarioActual = operador;
 
 let clientes = JSON.parse(localStorage.getItem("clientes")) || [
     {
-        id: "1001",
-        nombre: "Juan Pérez",
-        dni: "30111222",
-        categoria: "Diamond",
-        tarjeta: "AB123CD",
-        foto: "/img/foto1.PNG",
-        acompanantes: [
-            {
-                nombre: "María López",
-                dni: "28999888",
-                categoria: "Acompañante",
-                foto: "/img/foto2.PNG"
-            }
-        ],
-        enVip: true,
-        historial: [],
-        novedades: []
+        "id": "100003",
+        "nombre": "LIN JIAN",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100005",
+        "nombre": "GUTIERREZ PAULA GILDA",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100009",
+        "nombre": "FELDSTEIN MAXIMILIANO HERNAN",
+        "dni": "22333444",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "img/fotos/22333444.jpg",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100010",
+        "nombre": "LEE CHIN HAENG",
+        "dni": "11222333",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "img/fotos/11222333.jpg",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100015",
+        "nombre": "MAOUR SCHAUL VICTOR ARIEL",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100066",
+        "nombre": "SUEZ PATRICIA RAQUEL",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100176",
+        "nombre": "BROGI PEDRO AUGUSTO",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100183",
+        "nombre": "BUJAN SILVIA ALEJANDRA",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100322",
+        "nombre": "GIANNITRAPANI SUSANA MARINA",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1093141",
+        "nombre": "MARTIN MAXIMILIANO",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1096504",
+        "nombre": "PAPADOPULOS LUCIA DEL CARMEN",
+        "dni": "09530145-1",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "img/fotos/09530145-1.jpg",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1243243",
+        "nombre": "ROCHA MANUEL RAMON",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1331962",
+        "nombre": "SOLIMA ALICIA BEATRIZ",
+        "dni": "",
+        "categoria": "Bespoke",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100006",
+        "nombre": "KAMENSKY GUILLERMO OSCAR",
+        "dni": "13782297",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100011",
+        "nombre": "SCHIANCHI NILDA RAQUEL",
+        "dni": "6161951",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100023",
+        "nombre": "SA NESTOR ANIBAL",
+        "dni": "17606955",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100032",
+        "nombre": "ARDITTI RAQUEL BEATRIZ",
+        "dni": "4412088",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100047",
+        "nombre": "CALVAGNA MARIANO",
+        "dni": "30081163",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100049",
+        "nombre": "CRESPIN MARINA ANA",
+        "dni": "23670286",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100052",
+        "nombre": "MINNITI MARIA CARMEN",
+        "dni": "11038324",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100056",
+        "nombre": "DABAAN LILIANA",
+        "dni": "18787980",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100082",
+        "nombre": "ORMAZABAL MARIA CECILIA",
+        "dni": "29319608",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100095",
+        "nombre": "SANCHEZ PAOLO JAVIER HERNAN",
+        "dni": "28079442",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100103",
+        "nombre": "ROMERO GUILLERMO ALBERTO",
+        "dni": "13062758",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100109",
+        "nombre": "MANDALAOUI ARLETTE",
+        "dni": "18584992",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100112",
+        "nombre": "SALOMON JULIO MARIO",
+        "dni": "11985585",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100128",
+        "nombre": "CAPELUTO GABRIEL JOSE",
+        "dni": "17453859",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "img/fotos/17453859.jpg",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100130",
+        "nombre": "KULISCH CECCON CARLA",
+        "dni": "95313278",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100132",
+        "nombre": "ANTONINI JORGE LUIS",
+        "dni": "8273307",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100136",
+        "nombre": "RUOCCO VERONICA",
+        "dni": "17193756",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100146",
+        "nombre": "SANABRIA DAVALOS ROSA MABEL",
+        "dni": "94596830",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100156",
+        "nombre": "PEREZ MARTA ELISA",
+        "dni": "13482854",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100173",
+        "nombre": "GONZALEZ MARIA DORA",
+        "dni": "10463180",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100199",
+        "nombre": "BOUSO„O ELIAS ISIDORO",
+        "dni": "4357153",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100209",
+        "nombre": "BALLINA MARIA SOLEDAD",
+        "dni": "23372901",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100252",
+        "nombre": "ABADI ELENA JUDITH",
+        "dni": "16893888",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100320",
+        "nombre": "SERGI MARCELA PATRICIA",
+        "dni": "20298192",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100341",
+        "nombre": "LAMEIRO MAXIMILIANO",
+        "dni": "24235206",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100374",
+        "nombre": "GATTI CARLOS FERNANDO",
+        "dni": "10087644",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100445",
+        "nombre": "MU„OZ ABEL",
+        "dni": "16491519",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100545",
+        "nombre": "WERBAJH SANTIAGO ENRIQUE",
+        "dni": "18299782",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100563",
+        "nombre": "ARGONZ DIEGO",
+        "dni": "32149380",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100576",
+        "nombre": "AROZENA NANCY ROSALIA",
+        "dni": "23601601",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "300025",
+        "nombre": "PONTIERO ALEJANDRO TOMAS",
+        "dni": "12849465",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1036916",
+        "nombre": "PARRILLA RUBEN OSVALDO",
+        "dni": "14686646",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1048696",
+        "nombre": "ETCHART VERONICA",
+        "dni": "34318574",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1059276",
+        "nombre": "PEIRANO MAURICIO NICOLAS",
+        "dni": "24960444",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1094942",
+        "nombre": "BENVENUTO DIEGO LUIS",
+        "dni": "23087042",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1112088",
+        "nombre": "GIL ARROYO JORGE EUGENIO",
+        "dni": "32037003",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1129902",
+        "nombre": "XUE JINGBIAO",
+        "dni": "94997621",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1130258",
+        "nombre": "PRUEBA ATC NUEVA",
+        "dni": "35267543",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1158081",
+        "nombre": "GARCIA MARTIN",
+        "dni": "18053202",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1176624",
+        "nombre": "GALLI CAROLINA NATALIA",
+        "dni": "29902072",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1223650",
+        "nombre": "SALA NUEVA",
+        "dni": "26545879",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1248738",
+        "nombre": "CORA FEDERICO GERMAN",
+        "dni": "23926407",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1254054",
+        "nombre": "MIGNABURU INES ANA MARIA",
+        "dni": "17863514",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1260805",
+        "nombre": "MAGLIOLA ANDRES NICOLAS",
+        "dni": "30780223",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1322551",
+        "nombre": "COSTESSICH LAURA MARIANA",
+        "dni": "20861101",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1332642",
+        "nombre": "FERNANDEZ CASTA„ON LAURA EUGENIA",
+        "dni": "23648842",
+        "categoria": "Diamond",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100008",
+        "nombre": "PARGAMENT MAXIMO JOSE",
+        "dni": "25431938",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100019",
+        "nombre": "PORCEL GABRIELA MARIA",
+        "dni": "13213121",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100026",
+        "nombre": "GLIK MANUEL",
+        "dni": "4319745",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100028",
+        "nombre": "ZAJIC RODOLFO MARCELO",
+        "dni": "13403439",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100029",
+        "nombre": "PARI SUSANA MARIA",
+        "dni": "11205642",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100031",
+        "nombre": "FERRARI JUAN DAVID",
+        "dni": "4557932",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100033",
+        "nombre": "GALLEGO LEONARDO OSCAR",
+        "dni": "22922867",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100035",
+        "nombre": "CHALBAUD ANTONIO",
+        "dni": "10924170",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100038",
+        "nombre": "BERETTA ADRIANA SILVIA",
+        "dni": "12966079",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100039",
+        "nombre": "MORENO MARIA DEL CARMEN",
+        "dni": "6542868",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100041",
+        "nombre": "MILANESE GUSTAVO DANTE",
+        "dni": "14010348",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100043",
+        "nombre": "FELMAN MATIAS LUCAS",
+        "dni": "25940359",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100045",
+        "nombre": "NARVAEZ ADRIANA HAYDEE",
+        "dni": "25784281",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100046",
+        "nombre": "VARENNES FLAVIO OSCAR",
+        "dni": "14526565",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100048",
+        "nombre": "FERNANDEZ EMMANUEL ALBERTO",
+        "dni": "32993379",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100050",
+        "nombre": "SONDER CARMEN RAQUEL",
+        "dni": "10530587",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100051",
+        "nombre": "SALA RICARDO GABRIEL",
+        "dni": "28387607",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100054",
+        "nombre": "ROMANO GUSTAVO",
+        "dni": "21436878",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100061",
+        "nombre": "SELPA MARIA ANDREA",
+        "dni": "14902099",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100062",
+        "nombre": "GILIBERTI MIGUEL ANTONIO",
+        "dni": "12463615",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100063",
+        "nombre": "TAMAYO MARCELO ENRIQUE",
+        "dni": "17486598",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100064",
+        "nombre": "MARTINEZ IRMA",
+        "dni": "10137210",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100065",
+        "nombre": "MARTUCCI EDGARDO OSCAR",
+        "dni": "11837300",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100067",
+        "nombre": "TONANTI ALICIA LUCIA",
+        "dni": "5250061",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100076",
+        "nombre": "CHOI SAE JEONG",
+        "dni": "92755548",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100077",
+        "nombre": "JABULIJ ADRIAN MIGUEL",
+        "dni": "4380169",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100084",
+        "nombre": "ROSSI MARIA PAULA",
+        "dni": "25704995",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100087",
+        "nombre": "VINZIA RAUL CARLOS",
+        "dni": "8480415",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100091",
+        "nombre": "MASTELLONE JOSE FABIAN",
+        "dni": "16676022",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100093",
+        "nombre": "CELANO FABIAN GUSTAVO",
+        "dni": "18165348",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100096",
+        "nombre": "GUERRA PAMFILO",
+        "dni": "12618827",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100100",
+        "nombre": "AXELRAD MARCELO GABRIEL",
+        "dni": "21483779",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100102",
+        "nombre": "LEE HYON GUN",
+        "dni": "93554843",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100105",
+        "nombre": "PISTONE GUSTAVO ADRIAN",
+        "dni": "23992739",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100111",
+        "nombre": "LEON ALEJANDRO DANIEL",
+        "dni": "14151786",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100113",
+        "nombre": "GUIDI EDUARDO ELOY",
+        "dni": "16260337",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100115",
+        "nombre": "SCHINNEA MARIO",
+        "dni": "13805408",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100117",
+        "nombre": "ISMACH JAVIER OSCAR",
+        "dni": "17861662",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100118",
+        "nombre": "LEE YUAN MEI",
+        "dni": "18666852",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100123",
+        "nombre": "CARITA ALBERTO ANGEL",
+        "dni": "10504908",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100125",
+        "nombre": "WALTER DANIEL EDUARDO",
+        "dni": "14217061",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100127",
+        "nombre": "ARZAMENDIA ILDA",
+        "dni": "10348569",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100129",
+        "nombre": "BRUNO MARIA ROSA",
+        "dni": "18693285",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100133",
+        "nombre": "MAGARI„OS EDUARDO RAMON",
+        "dni": "7739409",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100142",
+        "nombre": "TOMINO PABLO",
+        "dni": "22149265",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100143",
+        "nombre": "CHIANG YA CHING",
+        "dni": "18845534",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100148",
+        "nombre": "ZUAIN ROSANNA ELIZABETH",
+        "dni": "16382964",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100149",
+        "nombre": "DABKIEWICZ ROMINA",
+        "dni": "25670345",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100150",
+        "nombre": "AMOR EDUARDO OSVALDO",
+        "dni": "16161644",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100151",
+        "nombre": "MAITA QUIROGA URSULA ADELAIDA",
+        "dni": "13417660",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100155",
+        "nombre": "DEL MEDICO ALEJANDRO GABRIEL",
+        "dni": "11644078",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100166",
+        "nombre": "MIRAGAYA IGNACIO HUGO",
+        "dni": "38324234",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100167",
+        "nombre": "MIRAGAYA EDUARDO DANIEL",
+        "dni": "11068227",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100168",
+        "nombre": "MIRAGAYA AGUSTIN JUAN",
+        "dni": "33780282",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100169",
+        "nombre": "PICASSO MIRIAM ESTELA",
+        "dni": "6695113",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100175",
+        "nombre": "FORTTI NORMA BEATRIZ",
+        "dni": "10921067",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100177",
+        "nombre": "LEMA ELISA MARIA",
+        "dni": "21486648",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100181",
+        "nombre": "LI XIAOYAN",
+        "dni": "94532894",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100182",
+        "nombre": "AYERZA EZEQUIEL MARTIN EDUARDO",
+        "dni": "10966814",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100185",
+        "nombre": "BURCHERI DANIEL EDUARDO",
+        "dni": "11842812",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100191",
+        "nombre": "OCK KYOUNGMIN",
+        "dni": "94246202",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100208",
+        "nombre": "GOLDSTEIN ANA ALEJANDRA",
+        "dni": "13173425",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100214",
+        "nombre": "PELLERANO RICARDO DANIEL",
+        "dni": "25705565",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100215",
+        "nombre": "ABALSA HUGO ALBERTO",
+        "dni": "11528279",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100230",
+        "nombre": "LOPEZ VERîNICA MERCEDES",
+        "dni": "16130405",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100236",
+        "nombre": "PIAGGIO LILIANA MONICA",
+        "dni": "16559912",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100275",
+        "nombre": "LEVI DAVID ALBERTO",
+        "dni": "4398336",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100276",
+        "nombre": "AREVALO ANA MARIA",
+        "dni": "6052686",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100282",
+        "nombre": "BRITO JOSE ANTONIO",
+        "dni": "13781937",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100302",
+        "nombre": "GRANDE SIBILA CORA",
+        "dni": "16130190",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100307",
+        "nombre": "DUGATKIN GABRIEL EDUARDO",
+        "dni": "13285118",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100309",
+        "nombre": "PIOVANO AURORA RAQUEL ELIZABETH",
+        "dni": "12549145",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100316",
+        "nombre": "COSTOYA ISABEL SUSANA",
+        "dni": "11602149",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100332",
+        "nombre": "PEDREIRA CARLOS ABEL",
+        "dni": "24315580",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100334",
+        "nombre": "KAPTAN ANA LAURA",
+        "dni": "22849214",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100338",
+        "nombre": "YACONIS ENRIQUE ALBERTO",
+        "dni": "11266864",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100362",
+        "nombre": "GUZMAN JOSE ALBERTO",
+        "dni": "8319268",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100364",
+        "nombre": "SERGI SILVIA ANDREA",
+        "dni": "18095468",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100373",
+        "nombre": "GOLTZ ADRIANA CLAUDIA",
+        "dni": "14315413",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100381",
+        "nombre": "DENG HUI ZHEN",
+        "dni": "93277227",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100395",
+        "nombre": "REIRIS INSAURRALDE LUCAS NICOLAS",
+        "dni": "31316242",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100433",
+        "nombre": "KORENFELD BEATRIZ LILIANA",
+        "dni": "10789403",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100435",
+        "nombre": "BERTRAN MARIA LUISA",
+        "dni": "4716364",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100460",
+        "nombre": "NEU BERNARDO LUIS",
+        "dni": "8400567",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100466",
+        "nombre": "LOGGIA CELESTE AIDA",
+        "dni": "17513181",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100471",
+        "nombre": "MAQUEDA LUISA ESTER",
+        "dni": "4775417",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100492",
+        "nombre": "SAHYOUN MARIA ISABEL",
+        "dni": "22110013",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100495",
+        "nombre": "KOVAL ARIEL",
+        "dni": "25770861",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100496",
+        "nombre": "ZEAITER MARCELA ADRIANA",
+        "dni": "18355923",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100500",
+        "nombre": "MACIAS DARLENE LILIAN",
+        "dni": "11988396",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100502",
+        "nombre": "GHILLIONE PABLO ALEJANDRO",
+        "dni": "27120887",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "img/fotos/27120887.jpg",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100512",
+        "nombre": "SCOMPARIN HAYDEE ZOILA",
+        "dni": "10265360",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "100562",
+        "nombre": "VIDAL CAMILA",
+        "dni": "35078290",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "300024",
+        "nombre": "BOISSELIER IRMA NOEMI",
+        "dni": "13397057",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "300041",
+        "nombre": "NUBILE ALBERTO JOSE",
+        "dni": "5090398",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1003908",
+        "nombre": "MICHA JOSE DANIEL",
+        "dni": "35094364",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1005748",
+        "nombre": "GUZMAN JULIO CESAR",
+        "dni": "92530760",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1020441",
+        "nombre": "BROGGIA FRANCO",
+        "dni": "41768576",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1024685",
+        "nombre": "GARCIA ESTEBAN MARTIN",
+        "dni": "26364451",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1028071",
+        "nombre": "CHALELACHUILI AARON",
+        "dni": "13411708",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1032519",
+        "nombre": "DOMINGUEZ MARIA LUISA",
+        "dni": "18405754",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1038132",
+        "nombre": "HAN JUNG",
+        "dni": "92812564",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1038295",
+        "nombre": "ARCHIOPOLI HUGO",
+        "dni": "11111301",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1041355",
+        "nombre": "RAGO CARLOS",
+        "dni": "14189668",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1045894",
+        "nombre": "DERKACZ BEATRIZ",
+        "dni": "13978366",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1047745",
+        "nombre": "BORDES SERGIO ANGEL",
+        "dni": "25154136",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1048357",
+        "nombre": "BRITEZ MONICA",
+        "dni": "21349652",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1051629",
+        "nombre": "FAVELUKES ROBERTO SANTIAGO",
+        "dni": "22708299",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1053559",
+        "nombre": "QUEVEDO MARISOL DANIELA",
+        "dni": "23598145",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1053625",
+        "nombre": "ALONSO SILVINA ALONSO",
+        "dni": "16038000",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1055337",
+        "nombre": "KAPUSI MIRIAM TERESA",
+        "dni": "17513036",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1059175",
+        "nombre": "MASTELLONE PABLO GABRIEL",
+        "dni": "20028212",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1068503",
+        "nombre": "TOURI„O ANDREA RAQUEL",
+        "dni": "20011847",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1087112",
+        "nombre": "FERNANDEZ JUAN MARIA",
+        "dni": "22570443",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1088279",
+        "nombre": "GAO GUANGZHE",
+        "dni": "94011627",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1090531",
+        "nombre": "IVOR SERGIO ALBERTO",
+        "dni": "12204292",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1090602",
+        "nombre": "DOLZ MARIA CLARA",
+        "dni": "16976837",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1092367",
+        "nombre": "DE GENNARO AUGUSTO",
+        "dni": "36829583",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1095955",
+        "nombre": "ZAPUTOVICH MARTIN FERNANDO",
+        "dni": "24646709",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1096372",
+        "nombre": "AHUMADA MARIA",
+        "dni": "47184096",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1100930",
+        "nombre": "VENTIMIGLIA ELIZABETH",
+        "dni": "27593407",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1101476",
+        "nombre": "MEDINA GUSTAVO HORACIO",
+        "dni": "17364763",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1109623",
+        "nombre": "CABRAL VICTORIA MERCEDES",
+        "dni": "18216168",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1111422",
+        "nombre": "ROMERO LAMAS ESTEBAN",
+        "dni": "13277116",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1113493",
+        "nombre": "PROTZER SONIA BEATRIZ",
+        "dni": "26623369",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1114121",
+        "nombre": "FOLGUERAL NORMA BEATRIZ",
+        "dni": "16376236",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1117559",
+        "nombre": "VERA FLORES IGOR ALFREDO",
+        "dni": "95902694",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1135977",
+        "nombre": "KALIEROF INES LEONOR",
+        "dni": "14231048",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1137486",
+        "nombre": "LLERMANOS DANIEL HUGO",
+        "dni": "10671650",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1139644",
+        "nombre": "FONTANA GUILLERMO ESTEBAN",
+        "dni": "17407811",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1140175",
+        "nombre": "BOGADO JUAN MANUEL",
+        "dni": "22808738",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1143506",
+        "nombre": "HUANG QIXIN",
+        "dni": "94028847",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1146559",
+        "nombre": "NU„EZ CELIA CAROLINA",
+        "dni": "5198751",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1148230",
+        "nombre": "SOMMARO FERNANDO",
+        "dni": "27257898",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1148896",
+        "nombre": "NOVELO OSUNA LUIS ALBERTO",
+        "dni": "22492058",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1149665",
+        "nombre": "BRITHET HORACIO",
+        "dni": "10962554",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1155591",
+        "nombre": "SOSA DE MORENO MARIA CRISTINA SOSA DE MORENO",
+        "dni": "1104700",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1160276",
+        "nombre": "INCARDONA JUAN DIEGO",
+        "dni": "22366248",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1162142",
+        "nombre": "GARCIA COSTERO JUAN PABLO",
+        "dni": "29248804",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1166689",
+        "nombre": "RECAYTE LLANTADA GRACIELA BEATRIZ",
+        "dni": "5612900",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1169147",
+        "nombre": "GIANNETTASIO FERNANDO ADRIAN",
+        "dni": "23768366",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1182053",
+        "nombre": "YAMAN JOSE MIGUEL YAMAN",
+        "dni": "8354322",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1182361",
+        "nombre": "KERNER EDUARDO",
+        "dni": "12945690",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1194369",
+        "nombre": "DEGREGORIO MARCELO ALEJANDRO",
+        "dni": "14194651",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1198079",
+        "nombre": "CARDOZO DIEGO OSCAR",
+        "dni": "29009046",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1198622",
+        "nombre": "SOSA CARLOS ALBERTO SOSA",
+        "dni": "17318961",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1200818",
+        "nombre": "DOMBROWSKI LIZA MARIA",
+        "dni": "32344295",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1202591",
+        "nombre": "PALERMO DANIEL JOSE",
+        "dni": "23446822",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1216572",
+        "nombre": "MARQUEZ PESOA RAUL",
+        "dni": "14745697",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1217536",
+        "nombre": "CLAPS NORBERTO JOSE",
+        "dni": "14887424",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1219913",
+        "nombre": "MU„OZ RICARDO",
+        "dni": "14565019",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1220547",
+        "nombre": "CELESTE MARIA ISOLINA",
+        "dni": "5315651",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1220706",
+        "nombre": "MEJIAS ENRIQUE IGNACIO",
+        "dni": "22981854",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1227156",
+        "nombre": "SIERRA FEDERICO LUIS",
+        "dni": "34117611",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1228032",
+        "nombre": "SARQUIS EDUARDO EZEQUIEL CEFERINO",
+        "dni": "25570552",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1235519",
+        "nombre": "SCHELLINO AHUMADA DAIANA CAROLINA",
+        "dni": "36080886",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1236120",
+        "nombre": "SERANTONI PABLO MARCELO",
+        "dni": "23553964",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1247489",
+        "nombre": "MAJDALANI SILVIA CRISTINA",
+        "dni": "13296836",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1252305",
+        "nombre": "SANTA CRUZ JULIAN BENITO",
+        "dni": "11634988",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1253934",
+        "nombre": "MAZZOCCONE DORA INES",
+        "dni": "20405709",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1255554",
+        "nombre": "SEO JUNG SOOK",
+        "dni": "93280480",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1263374",
+        "nombre": "QUINTANA FRANCO EMANUEL",
+        "dni": "42194278",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1268351",
+        "nombre": "SEQUEIRA OSVALDO",
+        "dni": "35582560",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1274904",
+        "nombre": "RAGGIO ANDREA ELISABET",
+        "dni": "23481218",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1275993",
+        "nombre": "YOMHA CLAUDIO NALLIV",
+        "dni": "21891652",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1276060",
+        "nombre": "CHUN BENJAMIN DEE HYUN",
+        "dni": "93794702",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1276524",
+        "nombre": "FREIRE MARIANO ROQUE",
+        "dni": "18565089",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1286978",
+        "nombre": "BERGEROT LUJAN",
+        "dni": "28626605",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1288552",
+        "nombre": "FERRARA TONINO",
+        "dni": "93194888",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1290935",
+        "nombre": "IMBERTI OSCAR AMERICO CAYETANO",
+        "dni": "8276710",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1291420",
+        "nombre": "IBA„EZ MERCEDES",
+        "dni": "12616488",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1292179",
+        "nombre": "PEDACE JORGE LUIS",
+        "dni": "11386710",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1298450",
+        "nombre": "DE SOUZA DANIELA MAYRA",
+        "dni": "13704222",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1300404",
+        "nombre": "FUNGUEIRO CARLOS",
+        "dni": "24061986",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1304542",
+        "nombre": "BALEZTENA WALTER SEBASTIAN",
+        "dni": "21478194",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1305217",
+        "nombre": "ROMERO NEBY YANET",
+        "dni": "34617278",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1319369",
+        "nombre": "GALGANO GUILLERMO CESAR",
+        "dni": "17332416",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1319940",
+        "nombre": "ZHENG QUNXING",
+        "dni": "94031369",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1340137",
+        "nombre": "PEYROUTON ALAN",
+        "dni": "69340785",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
+    },
+    {
+        "id": "1344740",
+        "nombre": "MARTINEZ ALICIA",
+        "dni": "11488698",
+        "categoria": "Diamond Seg.",
+        "tarjeta": "",
+        "foto": "",
+        "acompanantes": [],
+        "enVip": false,
+        "historial": [],
+        "novedades": []
     }
 ];
 
@@ -57,6 +2906,21 @@ clientes.forEach(cliente => {
 
 });
 
+let formIngreso = {
+    activo: false,
+
+    nombre: "",
+    dni: "",
+    email: "",
+    celular: "",
+    categoria: "",
+    tarjeta: "",
+    foto: "",
+
+    pesos: false,
+    dolares: false
+};
+
 
 
 const formulario = document.getElementById("form-busqueda");
@@ -64,6 +2928,175 @@ const buscador = document.getElementById("buscador");
 const resultadoCliente = document.getElementById("resultado-cliente");
 const panelDinamico = document.getElementById("panel-dinamico");
 const panelEstadisticas = document.getElementById("panel-estadisticas");
+
+// =====================
+// SUGERENCIAS EN VIVO DEL BUSCADOR
+// =====================
+
+const estilosSugerencias = document.createElement("style");
+estilosSugerencias.textContent = `
+    .contenedor-sugerencias {
+        position: relative;
+    }
+    #lista-sugerencias {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background: #1a1a1a;
+        border: 1.5px solid #daa520;
+        border-top: none;
+        border-radius: 0 0 10px 10px;
+        max-height: 260px;
+        overflow-y: auto;
+        display: none;
+    }
+    #lista-sugerencias .item-sugerencia {
+        padding: 8px 14px;
+        cursor: pointer;
+        color: #f0f0f0;
+        border-bottom: 1px solid #2a2a2a;
+        font-size: 14px;
+    }
+    #lista-sugerencias .item-sugerencia:last-child {
+        border-bottom: none;
+    }
+    #lista-sugerencias .item-sugerencia:hover,
+    #lista-sugerencias .item-sugerencia.activa {
+        background: rgba(218, 165, 32, 0.15);
+    }
+    #lista-sugerencias .item-sugerencia .dato-secundario {
+        color: #999;
+        font-size: 12px;
+    }
+`;
+estilosSugerencias.textContent += `
+    .acomp-toolbar {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+    .btn-agregar-acomp {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 20px;
+        border-radius: 999px;
+        border: 1.5px solid #daa520;
+        background: transparent;
+        color: #daa520;
+        font-weight: 600;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.2s, color 0.2s;
+    }
+    .btn-agregar-acomp:hover {
+        background: #daa520;
+        color: #1a1a1a;
+    }
+    .lista-acompanantes {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+    }
+`;
+document.head.appendChild(estilosSugerencias);
+
+// Envolvemos el input del buscador en un contenedor propio para poder
+// posicionar la lista de sugerencias justo debajo, sin tocar el HTML.
+const contenedorSugerencias = document.createElement("div");
+contenedorSugerencias.className = "contenedor-sugerencias";
+buscador.parentNode.insertBefore(contenedorSugerencias, buscador);
+contenedorSugerencias.appendChild(buscador);
+
+const listaSugerencias = document.createElement("div");
+listaSugerencias.id = "lista-sugerencias";
+contenedorSugerencias.appendChild(listaSugerencias);
+
+function normalizarTexto(texto) {
+    return String(texto || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .trim();
+}
+
+function textoBusquedaCliente(cliente) {
+    return normalizarTexto(`
+        ${cliente.nombre}
+        ${cliente.dni}
+        ${cliente.id}
+        ${cliente.tarjeta}
+    `);
+}
+
+function ocultarSugerencias() {
+    listaSugerencias.style.display = "none";
+    listaSugerencias.innerHTML = "";
+}
+
+function seleccionarClienteDesdeSugerencia(cliente) {
+    clienteActual = cliente;
+    vistaActual = "historial";
+    cambiarVista("cliente");
+
+    buscador.value = "";
+    ocultarSugerencias();
+}
+
+buscador.addEventListener("input", function () {
+
+    const termino = normalizarTexto(buscador.value);
+
+    if (!termino) {
+        ocultarSugerencias();
+        return;
+    }
+
+    const coincidencias = clientes
+        .filter(cliente => textoBusquedaCliente(cliente).includes(termino))
+        .slice(0, 8);
+
+    if (coincidencias.length === 0) {
+        listaSugerencias.innerHTML = `<div class="item-sugerencia dato-secundario">Sin coincidencias</div>`;
+        listaSugerencias.style.display = "block";
+        return;
+    }
+
+    listaSugerencias.innerHTML = coincidencias.map(cliente => `
+        <div class="item-sugerencia" data-id="${cliente.id}">
+            ${cliente.nombre}
+            <div class="dato-secundario">
+                DNI: ${cliente.dni || "-"} · Tarjeta: ${cliente.tarjeta || "-"} · ${cliente.categoria || ""}
+            </div>
+        </div>
+    `).join("");
+
+    listaSugerencias.style.display = "block";
+});
+
+listaSugerencias.addEventListener("click", function (e) {
+    const item = e.target.closest(".item-sugerencia[data-id]");
+    if (!item) return;
+
+    const cliente = clientes.find(c => String(c.id) === item.dataset.id);
+    if (cliente) seleccionarClienteDesdeSugerencia(cliente);
+});
+
+document.addEventListener("click", function (e) {
+    if (!contenedorSugerencias.contains(e.target)) {
+        ocultarSugerencias();
+    }
+});
+
+buscador.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") ocultarSugerencias();
+});
 const btnExportar = document.getElementById("btn-exportar");
 const btnImportar = document.getElementById("btn-importar");
 const inputImportar = document.getElementById("input-importar");
@@ -84,7 +3117,6 @@ btnMetricas.addEventListener("click", () => {
 
 document.getElementById("fechaDesde")
     .addEventListener("change", () => {
-        console.log("CAMBIO DESDE");
 
         panelEstadisticas.style.display = "block";
         resultadoCliente.style.display = "none";
@@ -94,7 +3126,6 @@ document.getElementById("fechaDesde")
 
 document.getElementById("fechaHasta")
     .addEventListener("change", () => {
-        console.log("CAMBIO HASTA");
 
         panelEstadisticas.style.display = "block";
         resultadoCliente.style.display = "none";
@@ -108,7 +3139,7 @@ const btnSupervisor = document.getElementById("btn-supervisor");
 const btnLogout = document.getElementById("btn-logout");
 const panelAdmin = document.getElementById("panel-admin");
 const anioMinimo = 2026;
-const mesMinimoPorAnio = 6; 
+const mesMinimoPorAnio = 6;
 
 
 let clienteActual = null;
@@ -121,6 +3152,9 @@ let categoriaExpandida = null;
 let acompananteEditIndex = null;
 
 let accionPendiente = null;
+let novedadSeleccionada = null;
+let indexNovedadSeleccionada = null;
+let modoEdicionNovedad = false;
 
 
 function getEnSalaAhora() {
@@ -792,7 +3826,7 @@ function getMetricasCruce(lista = clientes) {
             tarde: 0,
             noche: 0
         },
-        "Platinium": {
+        "Platinum": {
             manana: 0,
             tarde: 0,
             noche: 0
@@ -933,7 +3967,6 @@ function getClientesFiltradosPorFecha() {
         })
     );
 
-    console.log("Clientes encontrados:", resultado.length);
 
     return resultado;
 }
@@ -999,7 +4032,7 @@ function obtenerClaseCategoria(categoria) {
     if (categoria === "Bespoke") return "cat-bespoke";
     if (categoria === "Diamond") return "cat-diamond";
     if (categoria === "Diamond Seg.") return "cat-diamondseg";
-    if (categoria === "Platinium") return "cat-platinium";
+    if (categoria === "Platinum") return "cat-platinum";
     if (categoria === "Gold") return "cat-gold";
     if (categoria === "Classic") return "cat-classic";
     if (categoria === "No Socios") return "cat-nosocios";
@@ -1013,10 +4046,21 @@ function obtenerClaseCategoria(categoria) {
 
 function renderCliente(cliente) {
 
-    console.log("ROL ACTUAL:", usuarioActual.rol);
+    const estadoActual = obtenerEstadoActual(cliente);
+    const estadoTexto = formatearEstado(estadoActual);
+    const estadoVisual = getEstadoVisual(cliente);
+
+    const estaEnSala = cliente.enVip;
+    const esEnSala = estadoActual.estado === "EN_SALA";
+
+    const tieneAutoexclusion = cliente.autoexclusion?.activa;
+    const tieneProhibicion = cliente.prohibicion?.activa;
+
+    const cantidadAcompanantes = cliente.acompanantes?.length || 0;
+
+    const esPermanenciaLarga = estaEnPermanenciaLarga(cliente);
 
     let html = `
-
 
 <div class="clientes-wrapper">
 
@@ -1024,82 +4068,81 @@ function renderCliente(cliente) {
 
         <b>CLIENTE</b>
 
-        <div class="card ficha-cliente ${cliente.enVip ? 'vip-activo' : ''} ${obtenerClaseCategoria(cliente.categoria)}">
-            
+        <div class="card ficha-cliente ${estadoVisual} ${obtenerClaseCategoria(cliente.categoria)}">
+
+            <!-- ========================= -->
+            <!-- HEADER (BLOQUE AISLADO) -->
+            <!-- ========================= -->
+
             <div class="card-header">
-                <button class="icon-btn" data-action="ver-foto-cliente">
-    <i class="bi bi-camera-fill"></i>
-</button>
+
+    ${esPermanenciaLarga ? `<div class="punto-alerta-12h"></div>` : ""}
+
+    <button class="icon-btn" data-action="ver-foto-cliente">
+        <i class="bi bi-camera-fill"></i>
+    </button>
+
+</div>
+
+                <div class="cliente-header-datos">
+
+    <div><strong>${cliente.nombre}</strong></div>
+
+    <div>DNI: ${cliente.dni}</div>
+
+    <div>ID: ${cliente.id}</div>
+
+    <div>Tarjeta: ${cliente.tarjeta || "-"}</div>
+
+    <div>Categoría: ${cliente.categoria}</div>
+
+    <div>${estadoTexto}</div>
+
+    ${(cliente.categoria === "Diamond" || cliente.categoria === "Bespoke")
+        ? `<div>Acompañantes: ${cantidadAcompanantes}</div>`
+        : ""}
+
+    ${tieneProhibicion
+        ? `<div>PROHIBICIÓN</div>`
+        : ""}
+
+    ${tieneAutoexclusion
+        ? `<div>AUTOEXCLUSIÓN</div>`
+        : ""}
+
+</div>
+
             </div>
+            <!-- ========================= -->
+            <!-- FIN HEADER -->
+            <!-- ========================= -->
 
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item">
-    Nombre: ${cliente.nombre}
-</li>
+            <div class="acciones-card">
 
-<li class="list-group-item">
-    DNI: ${cliente.dni}
-</li>
+    <button data-action="ingreso" class="icon-btn">IN</button>
+    <button data-action="egreso" class="icon-btn">OUT</button>
 
-<li class="list-group-item">
-    ID: ${cliente.id}
-</li>
-
-<li class="list-group-item">
-    Tarjeta: ${cliente.tarjeta || "-"}
-</li>
-
-<li class="list-group-item">
-    Categoría: ${cliente.categoria}
-</li>
-
-<li class="list-group-item estado-cliente">
-    Autoexclusión:
-    ${cliente.autoexclusion?.activa ? "ACTIVA" : "NO"}
-</li>
-
-<li class="list-group-item estado-cliente">
-    Prohibición:
-    ${cliente.prohibicion?.activa ? "ACTIVA" : "NO"}
-</li>
-
-<li class="list-group-item acciones-ficha">
-
-    <button
-        class="btn btn-outline-dark"
-        data-action="historial">
-        Historial
+    <button data-action="editar" class="icon-btn">
+        <i class="bi bi-pencil"></i>
     </button>
 
-    <button
-        class="btn btn-outline-dark"
-        data-action="novedades">
-        Novedades
+    <button data-action="historial" class="icon-btn">
+        <i class="bi bi-clock-history"></i>
     </button>
 
-</li>
-            </ul>
-        </div>
+    <button data-action="novedades" class="icon-btn">
+        <i class="bi bi-journal-text"></i>
+    </button>
 
-        <div class="acciones-card">
+    ${usuarioActual.rol === "supervisor"
+        ? `<button data-action="eliminar" class="icon-btn">
+                <i class="bi bi-trash3"></i>
+            </button>`
+        : ""
+    }
 
-            <button data-action="ingreso" class="icon-btn">IN</button>
-<button data-action="egreso" class="icon-btn">OUT</button>
-
-            <button data-action="editar" class="icon-btn">
-                <i class="bi bi-pencil"></i>
-            </button>
-
-            ${usuarioActual.rol === "supervisor"
-            ? `<button data-action="eliminar" class="icon-btn">
-                    <i class="bi bi-trash3"></i>
-                </button>`
-            : ""
-        }
-
-        </div>
-
-    </article>
+</div>
+</article>
 `;
 
     const acompanantes = cliente.acompanantes || [];
@@ -1107,8 +4150,9 @@ function renderCliente(cliente) {
     html += `
 <article class="datos-contenedor">
 
-    <div style="margin-bottom:10px;">
-        <button class="btn btn-sm btn-outline-primary" data-action="agregar-acompanante">
+    <div class="acomp-toolbar">
+        <button class="btn-agregar-acomp" data-action="agregar-acompanante">
+            <i class="bi bi-person-plus-fill"></i>
             Agregar acompañante
         </button>
     </div>
@@ -1116,9 +4160,11 @@ function renderCliente(cliente) {
 
     if (acompanantes.length === 0) {
 
-        html += `<div class="text-muted">Sin acompañantes</div>`;
+        html += `<div class="text-muted" style="text-align:center;">Sin acompañantes</div>`;
 
     } else {
+
+        html += `<div class="lista-acompanantes">`;
 
         acompanantes.slice(0, 2).forEach((a, index) => {
 
@@ -1160,9 +4206,12 @@ function renderCliente(cliente) {
 
 </div>`;
         });
+
+        html += `</div>`;
     }
 
     html += `
+    </article>
 
 <div id="form-acompanante-dinamico"
     style="display:none; margin-top:10px; border:1px solid #daa520; padding:10px; border-radius:8px; text-align:center;">
@@ -1200,7 +4249,7 @@ function renderCliente(cliente) {
     </button>
 
 </div>
-</article>
+
 `;
 
     html += `
@@ -1221,19 +4270,7 @@ function renderCliente(cliente) {
 
     resultadoCliente.innerHTML = html;
 }
-
-const preview = document.getElementById("preview-acomp");
-
-if (preview) {
-
-    preview.addEventListener("click", function () {
-
-        document
-            .getElementById("acomp-foto")
-            ?.click();
-
-    });
-}
+        
 
 
 // RENDER PANEL (HISTORIAL / NOVEDADES)//
@@ -1251,6 +4288,43 @@ function formatearFecha(ts) {
     return `${dia}/${mes}/${anio} ${hora}:${min} hs.`;
 }
 
+function refreshUI() {
+    renderCliente(clienteActual);
+}
+
+function actualizarMetricas() {
+
+    const total = clientes.length;
+
+    const enSala = clientes.filter(c => {
+        return obtenerEstadoActual(c)?.estado === "EN_SALA";
+    }).length;
+
+    const fuera = total - enSala;
+
+    document.getElementById("metricas-total").textContent = total;
+    document.getElementById("metricas-en-sala").textContent = enSala;
+    document.getElementById("metricas-fuera").textContent = fuera;
+}
+
+function calcularMetricas() {
+
+    const data = clientes; // SIEMPRE ARRAY GLOBAL
+
+    const resultado = {};
+
+    data.forEach(c => {
+        const cat = c.categoria;
+
+        if (!resultado[cat]) {
+            resultado[cat] = 0;
+        }
+
+        resultado[cat]++;
+    });
+
+    return resultado;
+}
 
 function formatearHora(ts) {
 
@@ -1299,41 +4373,151 @@ function agruparHistorial(historial) {
     });
 
     return Object.values(dias).sort((a, b) => {
-    return new Date(a.fecha.split('/').reverse().join('-')) -
+        return new Date(a.fecha.split('/').reverse().join('-')) -
             new Date(b.fecha.split('/').reverse().join('-'));
-});
+    });
 }
 
-function renderPanel() {
+function obtenerEstadoActual(cliente) {
 
+    if (!cliente) {
+        return {
+            estado: "SIN_DATOS"
+        };
+    }
+
+    const eventos = cliente.historial || [];
+
+    // recorrer de atrás hacia adelante
+    for (let i = eventos.length - 1; i >= 0; i--) {
+        const ev = eventos[i];
+
+        if (ev.tipo === "INGRESO") {
+
+            const tieneEgresoPosterior = eventos
+                .slice(i + 1)
+                .some(e => e.tipo === "EGRESO");
+
+            if (!tieneEgresoPosterior) {
+                return {
+                    estado: "EN_SALA",
+                    hora: ev.fecha
+                };
+            }
+        }
+    }
+
+    return {
+        estado: "FUERA"
+    };
+}
+
+function estaEnPermanenciaLarga(cliente) {
+    const eventos = cliente.historial || [];
+
+    const ultimoIngreso = [...eventos]
+        .reverse()
+        .find(e => e.tipo === "INGRESO");
+
+    if (!ultimoIngreso) return false;
+
+    const ahora = Date.now();
+    const horas = (ahora - ultimoIngreso.fecha) / (1000 * 60 * 60);
+
+    return horas >= 12;
+}
+
+function getEstadoVisual(cliente) {
+
+    if (cliente.prohibicion?.activa || cliente.autoexclusion?.activa) {
+        return "ROJO";
+    }
+
+    if (estaEnPermanenciaLarga(cliente)) {
+        return "NARANJA";
+    }
+
+    if (cliente.enVip) {
+        return "VERDE";
+    }
+
+    return "GRIS";
+}
+
+function formatearEstado(estado) {
+
+    if (estado.estado === "EN_SALA") {
+
+        const fecha = new Date(estado.hora);
+
+        const hoy = new Date();
+
+        const mismoDia =
+            fecha.getDate() === hoy.getDate() &&
+            fecha.getMonth() === hoy.getMonth() &&
+            fecha.getFullYear() === hoy.getFullYear();
+
+        if (mismoDia) {
+            const hora = fecha.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+
+            return `${hora} hs - En sala`;
+        }
+
+        const fechaHora =
+    String(fecha.getDate()).padStart(2, "0") + "/" +
+    String(fecha.getMonth() + 1).padStart(2, "0") + "/" +
+    fecha.getFullYear() + " " +
+    String(fecha.getHours()).padStart(2, "0") + ":" +
+    String(fecha.getMinutes()).padStart(2, "0");
+
+return `${fechaHora} hs - En sala`;
+
+    }
+
+    return "";
+}
+
+
+function renderPanel() {
 
     if (!clienteActual) return;
 
     const div = document.getElementById("panel-extra");
 
+    if (!vistaActual) {
+        div.innerHTML = "";
+        return;
+    }
+
+    const estado = obtenerEstadoActual(clienteActual);
+    const estadoTexto = formatearEstado(estado);
+
 
     /* ================= HISTORIAL ================= */
 
 
-if (vistaActual === "historial") {
+    if (vistaActual === "historial") {
 
-    const historialFiltrado = clienteActual.historial.filter(item => {
-        const fecha = new Date(item.fecha);
+        const historialFiltrado = clienteActual.historial.filter(item => {
+            const fecha = new Date(item.fecha);
 
-        return (
-            String(fecha.getMonth() + 1).padStart(2, "0") === mesHistorialSeleccionado &&
-            String(fecha.getFullYear()) === anioHistorialSeleccionado
-        );
-    });
+            return (
+                String(fecha.getMonth() + 1).padStart(2, "0") === mesHistorialSeleccionado &&
+                String(fecha.getFullYear()) === anioHistorialSeleccionado
+            );
+        });
 
-    const historialAgrupado = agruparHistorial(historialFiltrado)
-    .map(dia => ({
-        ...dia,
-        visitas: dia.visitas.filter(v => v.ingreso && v.egreso)
-    }))
-    .filter(dia => dia.visitas.length > 0);
+        const historialAgrupado = agruparHistorial(historialFiltrado)
+            .map(dia => ({
+                ...dia,
+                visitas: dia.visitas.filter(v => v.ingreso && v.egreso)
+            }))
+            .filter(dia => dia.visitas.length > 0);
 
-    
+
 
         const contenidoHistorial = `
             <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
@@ -1356,9 +4540,8 @@ if (vistaActual === "historial") {
 
             </div>
 
-            ${
-                historialAgrupado.length > 0
-                    ? `
+            ${historialAgrupado.length > 0
+                ? `
                         <div class="row g-2">
                             ${historialAgrupado.map(dia => `
                                 <div class="col-12 col-md-3">
@@ -1371,8 +4554,8 @@ if (vistaActual === "historial") {
 
                                             <div>
                                                 ${dia.visitas
-                                                    .filter(v => v.egreso)
-                                                    .map(v => `
+                        .filter(v => v.egreso)
+                        .map(v => `
                                                         <div style="padding:2px 0;">
                                                             ${formatearHora(v.ingreso)} → ${formatearHora(v.egreso)}
                                                         </div>
@@ -1391,7 +4574,7 @@ if (vistaActual === "historial") {
                             `).join("")}
                         </div>
                     `
-                    : `
+                : `
                         <div class="alert alert-secondary text-center">
     No existen registros para el período seleccionado
 </div>
@@ -1441,11 +4624,11 @@ if (vistaActual === "historial") {
 
     <div class="novedad-actions">
 
-        <button data-action="guardar-edicion-novedad" class="icon-btn">
+        <button data-action="guardar-novedad" class="icon-btn">
     <i class="bi bi-floppy"></i>
 </button>
 
-<button data-action="cancelar-edicion-novedad" class="icon-btn">
+<button data-action="cancelar-novedad" class="icon-btn">
     <i class="bi bi-x-lg"></i>
 </button>
 
@@ -1569,6 +4752,10 @@ if (vistaActual === "historial") {
                         ${fechaFormateada}
                     </small>
 
+                    <div class="estado-cliente">
+    ${estadoTexto}
+</div>
+
                     ${!modoEdicionNovedad ? `
     <p class="mb-0" style="color:#d4af37;">
         ${novedadSeleccionada.texto || ""}
@@ -1635,7 +4822,6 @@ resultadoCliente.addEventListener("click", function (e) {
 
     if (card) {
 
-        console.log("CLICK CLIENTE", card);
 
         const id = card.dataset.id;
         clienteActual = clientes.find(c => c.id === id);
@@ -1652,7 +4838,6 @@ resultadoCliente.addEventListener("click", function (e) {
 
     if (action === "editar") {
 
-        console.log("CLICK EDITAR");
 
         panelNuevo.classList.remove("oculto");
 
@@ -1695,6 +4880,33 @@ resultadoCliente.addEventListener("click", function (e) {
         value="${clienteActual.tarjeta || ""}">
 </div>
 
+<div class="mb-2">
+    <label>Categoría</label>
+    <select id="edit-categoria" class="form-control">
+        <option value="Bespoke">Bespoke</option>
+        <option value="Diamond">Diamond</option>
+        <option value="Diamond Seg.">Diamond Seg.</option>
+        <option value="Platinum">Platinum</option>
+        <option value="Gold">Gold</option>
+        <option value="Classic">Classic</option>
+        </select>
+</div>
+
+<div class="mb-2 foto-edit-container">
+    <label>Foto</label>
+
+    <button
+        type="button"
+        class="icon-btn"
+        onclick="document.getElementById('edit-foto').click()">
+        <i class="bi bi-camera-fill"></i>
+    </button>
+
+    <input type="file" id="edit-foto" class="oculto">
+</div>
+
+
+
             <div class="d-flex gap-2 justify-content-center">
                 <button id="guardar-edicion" class="btn btn-warning">
                     Guardar
@@ -1708,7 +4920,11 @@ resultadoCliente.addEventListener("click", function (e) {
         </div>
     </div>
     `;
+
+    formIngreso.activo = true;
+
     }
+
 
     if (action === "ingreso") {
 
@@ -1741,192 +4957,170 @@ resultadoCliente.addEventListener("click", function (e) {
         renderEstadisticas();
         return;
     }
+});
 
-    document.addEventListener("click", function (e) {
+document.addEventListener("click", function (e) {
 
-        const boton = e.target.closest("[data-action]");
+    const boton = e.target.closest("[data-action]");
+    if (!boton) return;
 
-        if (!boton) return;
-
-        const action = boton.getAttribute("data-action");
-
-        if (action === "historial") {
-            vistaActual = "historial";
-            renderPanel();
-        }
-
-        if (action === "agregar-novedad") {
-            modoCrearNovedad = true;
-            console.log("modoCrearNovedad:", modoCrearNovedad);
-            renderPanel();
-        }
+    const action = boton.getAttribute("data-action");
 
 
-        if (action === "novedades") {
-            vistaActual = "novedades";
-            renderPanel();
+    /* =========================
+    INGRESO / EGRESO
+    ========================== */
 
-        }
+    if (action === "ingreso") {
+        const evento = crearEvento("INGRESO");
 
-        if (action === "guardar-novedad") {
+        clienteActual.historial = clienteActual.historial || [];
+        clienteActual.historial.push(evento);
 
-            const texto = document.getElementById("input-novedad")?.value.trim();
+        renderPanel();
+    }
 
-            if (!texto) return;
+    if (action === "egreso") {
+        const evento = crearEvento("EGRESO");
 
-            clienteActual.novedades.push({
-                texto,
-                fecha: Date.now()
-            });
+        clienteActual.historial = clienteActual.historial || [];
+        clienteActual.historial.push(evento);
 
-            guardarClientes();
+        renderPanel();
+    }
 
-            modoCrearNovedad = false;
-            renderPanel();
-        }
+    /* =========================
+    HISTORIAL / NOVEDADES
+    ========================== */
 
+    if (action === "historial") {
+        vistaActual = (vistaActual === "historial") ? "" : "historial";
+        renderPanel();
+    }
+    
 
-        if (action === "cancelar-novedad") {
-            modoCrearNovedad = false;
-            renderPanel();
-        }
+    if (action === "novedades") {
+        vistaActual = (vistaActual === "novedades") ? "" : "novedades";
+        renderPanel();
+    }
 
-        if (action === "ver-novedad") {
+    if (action === "agregar-novedad") {
+        modoCrearNovedad = true;
+        renderPanel();
+    }
 
-            const fecha = Number(boton.getAttribute("data-fecha"));
+    if (action === "guardar-novedad") {
 
-            const index = clienteActual.novedades.findIndex(
-                n => n.fecha === fecha
-            );
+        const texto = document.getElementById("input-novedad")?.value.trim();
+        if (!texto) return;
 
-            if (index === -1) return;
+        clienteActual.novedades.push({
+            texto,
+            fecha: Date.now()
+        });
 
-            novedadSeleccionada = clienteActual.novedades[index];
-            indexNovedadSeleccionada = index;
+        guardarClientes();
 
-            modoEdicionNovedad = false;
-            vistaActual = "ver-novedad";
+        modoCrearNovedad = false;
+        renderPanel();
+    }
 
-            renderPanel();
-        }
+    if (action === "cancelar-novedad") {
+        modoCrearNovedad = false;
+        renderPanel();
+    }
 
-        if (action === "volver-novedades") {
-            vistaActual = "novedades";
-            renderPanel();
-        }
+    if (action === "ver-novedad") {
 
-        if (action === "editar-novedad") {
+        const fecha = Number(boton.getAttribute("data-fecha"));
 
-            const fecha = Number(boton.getAttribute("data-fecha"));
+        const index = clienteActual.novedades.findIndex(n => n.fecha === fecha);
+        if (index === -1) return;
 
-            const index = clienteActual.novedades.findIndex(
-                n => n.fecha === fecha
-            );
+        novedadSeleccionada = clienteActual.novedades[index];
+        indexNovedadSeleccionada = index;
 
-            if (index === -1) return;
+        modoEdicionNovedad = false;
+        vistaActual = "ver-novedad";
 
-            novedadSeleccionada = clienteActual.novedades[index];
-            indexNovedadSeleccionada = index;
+        renderPanel();
+    }
 
-            modoEdicionNovedad = true;
-            vistaActual = "ver-novedad";
+    if (action === "volver-novedades") {
+        vistaActual = "novedades";
+        renderPanel();
+    }
 
-            renderPanel();
+    if (action === "editar-novedad") {
 
-            if (action === "editar-novedad") {
+        const fecha = Number(boton.getAttribute("data-fecha"));
 
-                const fecha = Number(boton.getAttribute("data-fecha"));
+        const index = clienteActual.novedades.findIndex(n => n.fecha === fecha);
+        if (index === -1) return;
 
-                const index = clienteActual.novedades.findIndex(
-                    n => n.fecha === fecha
-                );
+        novedadSeleccionada = clienteActual.novedades[index];
+        indexNovedadSeleccionada = index;
 
-                if (index === -1) return;
+        modoEdicionNovedad = true;
+        vistaActual = "ver-novedad";
 
-                novedadSeleccionada = clienteActual.novedades[index];
-                indexNovedadSeleccionada = index;
+        setTimeout(() => {
+            document.getElementById("input-novedad").value =
+                novedadSeleccionada.texto || "";
+        }, 0);
 
-                modoEdicionNovedad = true;
-                vistaActual = "ver-novedad";
+        renderPanel();
+    }
 
-                setTimeout(() => {
-                    document.getElementById("input-novedad").value = novedadSeleccionada.texto || "";
-                }, 0);
+    if (action === "guardar-edicion-novedad") {
 
+        const texto = document.getElementById("input-novedad")?.value.trim();
+        if (!texto) return;
+
+        novedadSeleccionada.texto = texto;
+
+        guardarClientes();
+        modoEdicionNovedad = false;
+
+        renderPanel();
+    }
+
+    if (action === "eliminar-novedad") {
+
+        const fecha = Number(boton.getAttribute("data-fecha"));
+
+        const index = clienteActual.novedades.findIndex(n => n.fecha === fecha);
+        if (index === -1) return;
+
+        abrirModalConfirmacion(
+            "Eliminar novedad",
+            "¿Desea eliminar esta novedad?",
+            (confirmado) => {
+
+                if (!confirmado) return;
+
+                clienteActual.novedades.splice(index, 1);
+
+                guardarClientes();
                 renderPanel();
             }
-        }
-
-
-        if (action === "guardar-edicion-novedad") {
-
-            const texto = document
-                .getElementById("input-novedad")
-                ?.value.trim();
-
-            if (!texto) return;
-
-            novedadSeleccionada.texto = texto;
-
-            guardarClientes();
-
-            modoEdicionNovedad = false;
-
-            renderPanel();
-        }
-
-        if (action === "eliminar-novedad") {
-
-            const fecha = Number(
-                boton.getAttribute("data-fecha")
-            );
-
-            const index = clienteActual.novedades.findIndex(
-                n => n.fecha === fecha
-            );
-
-            if (index === -1) return;
-
-            abrirModalConfirmacion(
-                "Eliminar novedad",
-                "¿Desea eliminar esta novedad?",
-                (confirmado) => {
-
-                    if (!confirmado) return;
-
-                    clienteActual.novedades.splice(index, 1);
-
-                    guardarClientes();
-
-                    renderPanel();
-                }
-            );
-        }
-
-    });
-
-    if (action === "toggle-acompanante") {
-        clienteActual.acompanante.ingresa = e.target.checked;
-        guardarClientes();
-        return;
+        );
     }
+
+    /* =========================
+    CLIENTE
+    ========================== */
 
     if (action === "eliminar") {
 
         const confirmar = confirm("¿Seguro que querés eliminar este cliente?");
-
         if (!confirmar) return;
 
-        // eliminar del array
         clientes = clientes.filter(c => c.id !== clienteActual.id);
 
-        // guardar en storage
         guardarClientes();
 
-        // 3. limpiar estado 
         clienteActual = null;
-
-        // volver a inicio limpio
         volverInicio();
     }
 
@@ -1935,64 +5129,40 @@ resultadoCliente.addEventListener("click", function (e) {
         const boton = e.target.closest("button");
 
         boton.innerHTML = `
-        <img 
-            src="${clienteActual.foto}" 
-            style="
-                width:110px;
-                height:110px;
-                object-fit:cover;
-                border-radius:50%;
-                border:3px solid #daa520;
-            ">
-    `;
-
-        boton.style.background = "transparent";
-        boton.style.border = "none";
-        boton.style.width = "120px";
-        boton.style.height = "120px";
+            <img src="${clienteActual.foto}"
+                style="width:110px;height:110px;object-fit:cover;border-radius:50%;border:3px solid #daa520;">
+        `;
 
         setTimeout(() => {
             boton.innerHTML = `<i class="bi bi-camera-fill"></i>`;
-            boton.style.width = "";
-            boton.style.height = "";
-            boton.style.background = "";
-            boton.style.border = "";
         }, 4000);
     }
-
-
 
     if (action === "ver-foto") {
 
         const boton = e.target.closest("button");
 
         boton.innerHTML = `
-        <img 
-            src="${clienteActual.acompanantes[0].foto}" 
-            style="
-                width:110px;
-                height:110px;
-                object-fit:cover;
-                border-radius:50%;
-                border:3px solid #daa520;
-            ">
-    `;
-
-        boton.style.background = "transparent";
-        boton.style.border = "none";
-        boton.style.width = "120px";
-        boton.style.height = "120px";
+            <img src="${clienteActual.acompanantes?.[0]?.foto || ''}"
+                style="width:110px;height:110px;object-fit:cover;border-radius:50%;border:3px solid #daa520;">
+        `;
 
         setTimeout(() => {
             boton.innerHTML = `<i class="bi bi-camera-fill"></i>`;
-            boton.style.width = "";
-            boton.style.height = "";
-            boton.style.background = "";
-            boton.style.border = "";
         }, 4000);
     }
 
+    /* =========================
+    ACOMPAÑANTE
+    ========================== */
+
+    if (action === "toggle-acompanante") {
+        clienteActual.acompanante.ingresa = e.target.checked;
+        guardarClientes();
+    }
+
 });
+
 
 
 function volverInicio() {
@@ -2184,6 +5354,7 @@ document.addEventListener("click", function (e) {
     }
 
     /* GUARDAR */
+    
     if (action === "guardar-acompanante") {
 
         const nombre = document.getElementById("acomp-nombre").value.trim();
@@ -2286,6 +5457,39 @@ document.addEventListener("input", function (e) {
         e.target.style.border = "";
     }
 
+// =====================
+    // FORM INGRESO NUEVO
+    // =====================
+
+
+    if (!formIngreso.activo) return;
+
+    switch (e.target.id) {
+
+        case "nuevo-nombre":
+            formIngreso.nombre = e.target.value;
+            break;
+
+        case "nuevo-dni":
+            formIngreso.dni = e.target.value;
+            break;
+
+        case "nuevo-email":
+            formIngreso.email = e.target.value;
+            break;
+
+        case "nuevo-celular":
+            formIngreso.celular = e.target.value;
+            break;
+
+        case "nuevo-categoria":
+            formIngreso.categoria = e.target.value;
+            break;
+
+        case "nuevo-tarjeta":
+            formIngreso.tarjeta = e.target.value;
+            break;
+    }
 });
 
 
@@ -2316,6 +5520,8 @@ document.addEventListener("DOMContentLoaded", function () {
             if (pass === supervisor.pass) {
                 usuarioActual = supervisor;
                 actualizarVistaUsuario();
+
+                refreshUI();
 
                 document.getElementById("login-supervisor").classList.add("oculto");
             } else {
@@ -2472,108 +5678,183 @@ btnNuevo.addEventListener("click", function () {
     resultadoCliente.innerHTML = "";
     clienteActual = null;
 
+    formIngreso = {
+        activo: true,
+        nombre: "",
+        dni: "",
+        email: "",
+        celular: "",
+        categoria: "",
+        tarjeta: "",
+        foto: "",
+        pesos: false,
+        dolares: false
+    };
+
     panelNuevo.classList.remove("oculto");
 
     panelNuevo.innerHTML = `
-        <div class="card p-4">
-            <h4>Nuevo ingreso</h4>
+        <div class="modal-edicion-overlay">
+            <div class="modal-edicion">
 
-            <input id="nuevo-nombre" class="form-control mb-2" placeholder="Apellido y nombre">
+                <h4>Nuevo ingreso</h4>
 
-            <input id="nuevo-dni" class="form-control mb-2" placeholder="DNI">
+                <div class="mb-2">
+                    <label>Nombre y Apellido</label>
+                    <input
+                        id="nuevo-nombre"
+                        class="form-control"
+                        autocomplete="off">
+                </div>
 
-            <input id="nuevo-email" class="form-control mb-2" placeholder="Email">
+                <div class="mb-2">
+                    <label>DNI</label>
+                    <input
+                        id="nuevo-dni"
+                        class="form-control"
+                        autocomplete="off">
+                </div>
 
-            <input id="nuevo-celular" class="form-control mb-2" placeholder="Celular">
+                <div class="mb-2">
+                    <label>Email</label>
+                    <input
+                        id="nuevo-email"
+                        class="form-control"
+                        autocomplete="off">
+                </div>
 
-            <div class="mb-3">
-                <label>
-                    <input type="checkbox" id="chk-pesos"> Pesos
-                </label>
+                <div class="mb-2">
+                    <label>Celular</label>
+                    <input
+                        id="nuevo-celular"
+                        class="form-control"
+                        autocomplete="off">
+                </div>
 
-                <label class="ms-3">
-                    <input type="checkbox" id="chk-dolares"> Dólares
-                </label>
+                <div class="mb-2">
+                    <label>Categoría</label>
+                    <select id="nuevo-categoria" class="form-control">
+                        <option value="">Seleccione...</option>
+                        <option value="No Socios">No Socios</option>
+                        <option value="Classic">Classic</option>
+                        <option value="Gold">Gold</option>
+                        <option value="Platinum">Platinum</option>
+                        <option value="Diamond">Diamond</option>
+                        <option value="Diamond Seg.">Diamond Seg.</option>
+                        <option value="Bespoke">Bespoke</option>
+                    </select>
+                </div>
+
+                <div class="mb-2">
+                    <label>Número de Tarjeta</label>
+                    <input
+                        id="nuevo-tarjeta"
+                        class="form-control"
+                        autocomplete="off">
+                </div>
+
+                <div class="mb-2 foto-edit-container">
+                    <label>Foto</label>
+
+                    <button
+                        type="button"
+                        class="icon-btn"
+                        onclick="document.getElementById('nuevo-foto').click()">
+                        <i class="bi bi-camera-fill"></i>
+                    </button>
+
+                    <input
+                        type="file"
+                        id="nuevo-foto"
+                        class="oculto"
+                        accept="image/*">
+                </div>
+
+                <style>
+                    .moneda-grupo {
+                        display: flex;
+                        gap: 12px;
+                        justify-content: center;
+                    }
+                    .chip-moneda {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        padding: 8px 18px;
+                        border: 1.5px solid #daa520;
+                        border-radius: 999px;
+                        background: transparent;
+                        color: #daa520;
+                        cursor: pointer;
+                        user-select: none;
+                        transition: background 0.2s, color 0.2s;
+                    }
+                    .chip-moneda:hover {
+                        background: rgba(218, 165, 32, 0.12);
+                    }
+                    .chip-moneda input {
+                        accent-color: #daa520;
+                        width: 16px;
+                        height: 16px;
+                        cursor: pointer;
+                    }
+                    .chip-moneda:has(input:checked) {
+                        background: #daa520;
+                        color: #1a1a1a;
+                        font-weight: 600;
+                    }
+                </style>
+
+                <div class="mb-3 moneda-grupo">
+                    <label class="chip-moneda">
+                        <input type="checkbox" id="chk-pesos">
+                        Pesos
+                    </label>
+
+                    <label class="chip-moneda">
+                        <input type="checkbox" id="chk-dolares">
+                        Dólares
+                    </label>
+                </div>
+
+                <div class="d-flex gap-2 justify-content-center">
+                    <button id="guardar-nuevo" class="btn btn-success">
+                        Guardar
+                    </button>
+                    
+
+                    <button id="cancelar-nuevo" class="btn btn-secondary">
+                        Cancelar
+                    </button>
+                </div>
+
             </div>
-
-            <button id="guardar-nuevo" class="btn btn-success">
-                Guardar cliente
-            </button>
         </div>
     `;
 });
 
+// =====================
+// EDITAR / NUEVO CLIENTE (delegación de eventos)
+// =====================
+
 document.addEventListener("click", function (e) {
 
+    // --- EDITAR CLIENTE ---
 
-    // =====================
-    // CREAR CLIENTE
-    // =====================
-
-    if (e.target.id === "guardar-nuevo") {
-
-        const nombre = document.getElementById("nuevo-nombre").value.trim();
-        const dni = document.getElementById("nuevo-dni").value.trim();
-        const email = document.getElementById("nuevo-email").value.trim();
-        const celular = document.getElementById("nuevo-celular").value.trim();
-
-        const pesos = document.getElementById("chk-pesos").checked;
-        const dolares = document.getElementById("chk-dolares").checked;
-
-        if (!nombre || !dni) {
-            alert("Nombre y DNI son obligatorios");
-            return;
-        }
-        const clienteExistente = clientes.find(c => c.dni === dni);
-
-        if (clienteExistente) {
-            alert("Ese cliente ya existe");
-            return;
-        }
-
-        const nuevoCliente = {
-            id: "NS" + Date.now(),
-            nombre: nombre,
-            dni: dni,
-            email: email,
-            celular: celular,
-            categoria: "No Socios",
-            moneda: {
-                pesos: pesos,
-                dolares: dolares
-            },
-            foto: "/img/foto1.PNG",
-            enVip: false,
-            historial: [],
-            novedades: [],
-            acompanantes: []
-        };
-
-
-        clientes.push(nuevoCliente);
-
-        guardarClientes();
-
+    if (e.target.id === "cancelar-edicion") {
+        formIngreso.activo = false;
         panelNuevo.innerHTML = "";
         panelNuevo.classList.add("oculto");
-
-        alert("Cliente creado correctamente");
-        volverInicio();
+        return;
     }
 
-
-    // =====================
-    // EDITAR CLIENTE
-    // =====================
-
-
     if (e.target.id === "guardar-edicion") {
+        formIngreso.activo = false;
 
         if (!clienteActual) return;
 
         const nombre = document.getElementById("edit-nombre").value.trim();
         const dni = document.getElementById("edit-dni").value.trim();
-        const idCliente = document.getElementById("edit-id").value.trim();
         const tarjeta = document.getElementById("edit-tarjeta").value.trim();
 
         if (!nombre || !dni) {
@@ -2585,28 +5866,113 @@ document.addEventListener("click", function (e) {
         clienteActual.dni = dni;
         clienteActual.tarjeta = tarjeta;
 
-        if (usuarioActual.rol === "supervisor") {
-            clienteActual.id = idCliente;
+        const file = document.getElementById("edit-foto")?.files?.[0];
+
+        const continuar = () => {
+            clienteActual.categoria =
+                document.getElementById("edit-categoria")?.value || clienteActual.categoria;
+
+            const index = clientes.findIndex(c => c.id === clienteActual.id);
+
+            if (index !== -1) {
+                clientes[index] = { ...clienteActual };
+            }
+
+            guardarClientes();
+
+            panelNuevo.innerHTML = "";
+            panelNuevo.classList.add("oculto");
+
+            renderCliente(clienteActual);
+        };
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (ev) {
+                clienteActual.foto = ev.target.result;
+                continuar();
+            };
+
+            reader.readAsDataURL(file);
+
+        } else {
+            continuar();
         }
 
-        const index = clientes.findIndex(c => c.id === clienteActual.id);
-
-        if (index !== -1) {
-            clientes[index] = { ...clienteActual };
-        }
-
-        guardarClientes();
-
-        panelNuevo.innerHTML = "";
-        panelNuevo.classList.add("oculto");
-
-        renderCliente(clienteActual);
+        return;
     }
 
+    // --- NUEVO CLIENTE ---
 
-    if (e.target.id === "cancelar-edicion") {
+    if (e.target.id === "cancelar-nuevo") {
+        formIngreso.activo = false;
         panelNuevo.innerHTML = "";
         panelNuevo.classList.add("oculto");
+        return;
+    }
+
+    if (e.target.id === "guardar-nuevo") {
+
+        const nombre = document.getElementById("nuevo-nombre").value.trim();
+        const dni = document.getElementById("nuevo-dni").value.trim();
+        const email = document.getElementById("nuevo-email").value.trim();
+        const celular = document.getElementById("nuevo-celular").value.trim();
+        const categoria = document.getElementById("nuevo-categoria").value;
+        const tarjeta = document.getElementById("nuevo-tarjeta").value.trim();
+
+        if (!nombre || !dni) {
+            alert("Nombre y DNI son obligatorios");
+            return;
+        }
+
+        const pesos = document.getElementById("chk-pesos").checked;
+        const dolares = document.getElementById("chk-dolares").checked;
+
+        const nuevoCliente = {
+            id: Date.now().toString(),
+            nombre,
+            dni,
+            email,
+            celular,
+            categoria,
+            tarjeta,
+            foto: "",
+            acompanantes: [],
+            enVip: false,
+            historial: [],
+            novedades: [],
+            pesos,
+            dolares
+        };
+
+        const file = document.getElementById("nuevo-foto")?.files?.[0];
+
+        const finalizar = () => {
+            clientes.push(nuevoCliente);
+            guardarClientes();
+
+            formIngreso.activo = false;
+            panelNuevo.innerHTML = "";
+            panelNuevo.classList.add("oculto");
+
+            clienteActual = nuevoCliente;
+            renderCliente(clienteActual);
+        };
+
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (ev) {
+                nuevoCliente.foto = ev.target.result;
+                finalizar();
+            };
+
+            reader.readAsDataURL(file);
+
+        } else {
+            finalizar();
+        }
     }
 });
 
@@ -2673,10 +6039,6 @@ function tieneProhibicionActiva(cliente) {
 
 
 /*ICONO DE IMAGEN DEL ACOMPAÑANTE*/
-
-document.addEventListener("click", (e) => {
-    console.log("CLICK EN:", e.target);
-});
 
 document.addEventListener("click", (e) => {
 
