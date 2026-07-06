@@ -22,7 +22,9 @@ const categoriasBase = [
 let usuarioActual = operador;
 
 
-let clientes = JSON.parse(localStorage.getItem("clientes")) || [
+// Estos son los datos de arranque que se ven un instante, mientras se
+// consulta la base de datos compartida (ver cargarClientesDesdeServidor más abajo).
+let clientes = [
     {
         "id": "100003",
         "nombre": "LIN JIAN",
@@ -2976,6 +2978,7 @@ estilosSugerencias.textContent += `
         display: flex;
         flex-direction: column;
         align-items: center;
+        width: 100%;
         gap: 10px;
         margin-bottom: 14px;
     }
@@ -3231,9 +3234,37 @@ iniciarApp();
 
 
 function guardarClientes() {
-    localStorage.setItem("clientes", JSON.stringify(clientes));
-
+    fetch("/api/clientes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(clientes)
+    }).catch(error => {
+        console.error("No se pudo guardar en la base de datos compartida:", error);
+    });
 }
+
+async function cargarClientesDesdeServidor() {
+    try {
+        const respuesta = await fetch("/api/clientes");
+        const datos = await respuesta.json();
+
+        if (Array.isArray(datos) && datos.length > 0) {
+            // Ya hay datos guardados en la base compartida: los usamos.
+            clientes = datos;
+        } else {
+            // La base todavía está vacía (primera vez): la sembramos
+            // con los clientes que ya veníamos usando de arranque.
+            guardarClientes();
+        }
+
+    } catch (error) {
+        console.error("No se pudo conectar con la base de datos compartida, se sigue usando la copia local:", error);
+    } finally {
+        if (typeof renderPanel === "function") renderPanel();
+    }
+}
+
+cargarClientesDesdeServidor();
 
 function abrirModalConfirmacion(titulo, mensaje, callback) {
 
@@ -4066,7 +4097,7 @@ function renderCliente(cliente) {
 
     <article class="datos-contenedor">
 
-        <b>CLIENTE</b>
+        <b style="display:block; text-align:center;">CLIENTE</b>
 
         <div class="card ficha-cliente ${estadoVisual} ${obtenerClaseCategoria(cliente.categoria)}">
 
@@ -4968,28 +4999,6 @@ document.addEventListener("click", function (e) {
 
 
     /* =========================
-    INGRESO / EGRESO
-    ========================== */
-
-    if (action === "ingreso") {
-        const evento = crearEvento("INGRESO");
-
-        clienteActual.historial = clienteActual.historial || [];
-        clienteActual.historial.push(evento);
-
-        renderPanel();
-    }
-
-    if (action === "egreso") {
-        const evento = crearEvento("EGRESO");
-
-        clienteActual.historial = clienteActual.historial || [];
-        clienteActual.historial.push(evento);
-
-        renderPanel();
-    }
-
-    /* =========================
     HISTORIAL / NOVEDADES
     ========================== */
 
@@ -5264,7 +5273,6 @@ document.addEventListener("click", function (e) {
 
         const index = parseInt(boton.dataset.index);
 
-        const clientes = JSON.parse(localStorage.getItem("clientes")) || [];
         const clienteIndex = clientes.findIndex(c => c.id == clienteActual.id);
 
         if (clienteIndex === -1) return;
