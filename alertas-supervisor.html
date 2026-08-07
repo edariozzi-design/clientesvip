@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Alertas - Supervisor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+    :root {
+        --dorado: #daa520;
+        --fondo: #0d0d0d;
+        --card: #1a1a1a;
+        --texto: #f0f0f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background-image: url(/img/fondo-vip.avif);
+        background-size: cover;
+        background-repeat: repeat-y;
+        background-position: center;
+        color: var(--texto);
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    /* ---- LOGIN ---- */
+    #pantalla-login {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+    }
+
+    #pantalla-login .card-login {
+        background: var(--card);
+        border: 2px solid var(--dorado);
+        border-radius: 16px;
+        padding: 30px 24px;
+        width: 100%;
+        max-width: 340px;
+        text-align: center;
+    }
+
+    .logo-login {
+        width: 9rem;
+        max-width: 100%;
+        border-radius: 2rem;
+        border: 0.1rem solid var(--dorado);
+        margin-bottom: 10px;
+    }
+
+    .reloj-login {
+        font-size: 2.6rem;
+        font-weight: bold;
+        color: gold;
+        margin: 4px 0;
+    }
+
+    .fecha-login {
+        font-size: 1rem;
+        color: #d4af37;
+        letter-spacing: 2px;
+        margin-bottom: 14px;
+    }
+
+    #pantalla-login h1 {
+        color: var(--dorado);
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    #pantalla-login input {
+        width: 100%;
+        padding: 14px;
+        font-size: 18px;
+        border-radius: 10px;
+        border: 2px solid var(--dorado);
+        background: #000;
+        color: white;
+        text-align: center;
+        margin-bottom: 14px;
+    }
+
+    #pantalla-login button {
+        width: 100%;
+        padding: 14px;
+        font-size: 18px;
+        font-weight: 700;
+        border-radius: 10px;
+        border: none;
+        background: var(--dorado);
+        color: #1a1a1a;
+    }
+
+    #error-login {
+        color: #ff6b6b;
+        margin-top: 10px;
+        min-height: 20px;
+        font-size: 14px;
+    }
+
+    /* ---- ALERTAS ---- */
+    #pantalla-alertas {
+        display: none;
+        padding: 16px;
+        padding-bottom: 60px;
+    }
+
+    header.top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 16px;
+    }
+
+    header.top h1 {
+        color: var(--dorado);
+        font-size: 20px;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    #btn-actualizar {
+        background: transparent;
+        border: 1.5px solid var(--dorado);
+        color: var(--dorado);
+        border-radius: 10px;
+        padding: 10px 14px;
+        font-size: 18px;
+    }
+
+    #estado-conexion {
+        text-align: center;
+        color: #888;
+        font-size: 13px;
+        margin-bottom: 12px;
+        min-height: 16px;
+    }
+
+    #lista-alertas {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .alerta-card {
+        background: var(--card);
+        border: 1.5px solid var(--dorado);
+        border-radius: 14px;
+        padding: 16px;
+    }
+
+    .alerta-card .tipo {
+        display: inline-block;
+        background: rgba(218,165,32,0.15);
+        color: var(--dorado);
+        font-weight: 700;
+        font-size: 13px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        margin-bottom: 10px;
+    }
+
+    .alerta-card .cliente {
+        font-size: 19px;
+        font-weight: 700;
+        color: white;
+        margin-bottom: 6px;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .alerta-card .motivo {
+        font-size: 15px;
+        color: #ccc;
+        margin-bottom: 8px;
+    }
+
+    .alerta-card .fecha {
+        font-size: 12px;
+        color: #888;
+        margin-bottom: 12px;
+    }
+
+    .alerta-card button {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        border: none;
+        background: var(--dorado);
+        color: #1a1a1a;
+    }
+
+    #sin-alertas {
+        text-align: center;
+        color: #888;
+        padding: 60px 20px;
+        font-size: 16px;
+    }
+</style>
+</head>
+<body>
+
+    <div id="pantalla-login">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h2 id="reloj-digital" class="reloj-login"></h2>
+            <p id="fecha-digital" class="fecha-login"></p>
+            <h1>Jefe VIP</h1>
+            <input type="password" id="input-pass" placeholder="Contraseña" inputmode="numeric">
+            <button id="btn-entrar">Entrar</button>
+            <div id="error-login"></div>
+        </div>
+    </div>
+
+    <div id="pantalla-alertas">
+        <header class="top">
+            <h1><i class="bi bi-bell-fill"></i> Alertas</h1>
+            <button id="btn-actualizar"><i class="bi bi-arrow-clockwise"></i></button>
+        </header>
+
+        <div id="estado-conexion"></div>
+
+        <div id="lista-alertas"></div>
+        <div id="sin-alertas" style="display:none;">Sin alertas pendientes 🎉</div>
+    </div>
+
+    <script src="alertas-supervisor.js"></script>
+</body>
+</html>

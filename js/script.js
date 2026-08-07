@@ -3008,6 +3008,82 @@ estilosSugerencias.textContent += `
         width: 100%;
     }
 `;
+estilosSugerencias.textContent += `
+    .overlay-categoria-fondo {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.6);
+        z-index: 2000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .overlay-categoria-card {
+        background: #111;
+        border: 2px solid #daa520;
+        border-radius: 16px;
+        padding: 20px;
+        width: 360px;
+        max-width: 90%;
+        max-height: 70vh;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .overlay-categoria-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        color: #daa520;
+    }
+    .overlay-categoria-card .lista-categoria {
+        overflow-y: auto;
+    }
+`;
+estilosSugerencias.textContent += `
+    .icon-btn:hover {
+        background: #daa520 !important;
+        color: #1a1a1a !important;
+        box-shadow: 0 0 10px rgba(218,165,32,0.5) !important;
+        transform: scale(1.05) !important;
+    }
+    .icon-btn:hover i {
+        color: #1a1a1a !important;
+    }
+    .icon-btn img {
+        aspect-ratio: 1 / 1;
+        object-fit: cover;
+        border-radius: 50%;
+    }
+    .fotos,
+    #preview-acomp,
+    .acompanante-item img,
+    .ficha-cliente img {
+        aspect-ratio: 1 / 1 !important;
+        object-fit: cover !important;
+        border-radius: 50% !important;
+    }
+    .btn-accion-principal {
+        background: transparent !important;
+        border: 1.5px solid #daa520 !important;
+        color: #daa520 !important;
+        border-radius: 10px !important;
+        padding: 10px 18px !important;
+        font-weight: 600 !important;
+        white-space: nowrap !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+        width: auto !important;
+        min-width: 0 !important;
+        transition: background 0.2s, color 0.2s !important;
+    }
+    .btn-accion-principal:hover {
+        background: #daa520 !important;
+        color: #1a1a1a !important;
+    }
+`;
 document.head.appendChild(estilosSugerencias);
 
 // Envolvemos el input del buscador en un contenedor propio para poder
@@ -3148,7 +3224,8 @@ const mesMinimoPorAnio = 6;
 let clienteActual = null;
 let vistaActual = "historial";
 let modoCrearNovedad = false;
-let anioHistorialSeleccionado = "2026";
+let historialDesde = "";
+let historialHasta = "";
 let mesHistorialSeleccionado = "06";
 
 let categoriaExpandida = null;
@@ -3260,11 +3337,23 @@ async function cargarClientesDesdeServidor() {
     } catch (error) {
         console.error("No se pudo conectar con la base de datos compartida, se sigue usando la copia local:", error);
     } finally {
-        if (typeof renderPanel === "function") renderPanel();
+        // Si hay un formulario de alta/edición abierto, no lo pisamos con un
+        // refresco automático — solo actualizamos la campana de alertas.
+        const hayFormularioAbierto = panelNuevo && panelNuevo.innerHTML.trim() !== "";
+
+        if (!hayFormularioAbierto && typeof renderPanel === "function") {
+            renderPanel();
+        }
+
+        if (typeof renderCampanaAlertas === "function") renderCampanaAlertas();
     }
 }
 
 cargarClientesDesdeServidor();
+
+// Cada 30 segundos volvemos a consultar la base compartida, así el
+// supervisor ve alertas nuevas generadas por otra persona sin recargar.
+setInterval(cargarClientesDesdeServidor, 30000);
 
 function abrirModalConfirmacion(titulo, mensaje, callback) {
 
@@ -3317,6 +3406,32 @@ function actualizarVistaUsuario() {
 
     if (!panelAdmin || !btnLogout || !controlesHistorico) return;
 
+    // El botón de métricas tiene que verse para cualquier rol, y además
+    // ubicado justo al lado del botón de "Nuevo ingreso" (en ese orden).
+    if (btnMetricas && btnNuevo && btnMetricas.previousElementSibling !== btnNuevo) {
+        btnNuevo.parentNode.insertBefore(btnMetricas, btnNuevo.nextSibling);
+    }
+    if (btnMetricas) btnMetricas.style.display = "inline-flex";
+
+    // Buscar / Nuevo ingreso / Métricas: mismo formato visual.
+    const btnBuscar = formulario?.querySelector("button[type='submit'], button");
+    [btnBuscar, btnNuevo, btnMetricas].forEach(btn => {
+        if (btn) btn.classList.add("btn-accion-principal");
+    });
+
+    // "Nuevo Ingreso" en una sola línea, por si el HTML trae un <br> forzado.
+    if (btnNuevo) {
+        btnNuevo.innerHTML = btnNuevo.textContent.trim().replace(/\s+/g, " ");
+    }
+
+    // Campana de alertas: se crea una sola vez, junto al botón de logout.
+    let campanaContenedor = document.getElementById("campana-alertas-contenedor");
+    if (!campanaContenedor && btnLogout) {
+        campanaContenedor = document.createElement("span");
+        campanaContenedor.id = "campana-alertas-contenedor";
+        btnLogout.parentNode.insertBefore(campanaContenedor, btnLogout);
+    }
+
     if (usuarioActual.rol === "supervisor") {
 
         panelAdmin.style.display = "block";
@@ -3326,7 +3441,6 @@ function actualizarVistaUsuario() {
         }
 
         btnLogout.style.display = "block";
-        controlesHistorico.style.display = "flex";
 
     } else {
 
@@ -3337,10 +3451,13 @@ function actualizarVistaUsuario() {
         }
 
         btnLogout.style.display = "none";
-        controlesHistorico.style.display = "none";
     }
 
+    renderCampanaAlertas();
 
+    // Los calendarios solo se muestran dentro de la vista de métricas
+    // (eso lo controla cambiarVista); acá los ocultamos por defecto.
+    controlesHistorico.style.display = "none";
 }
 
 
@@ -3484,6 +3601,15 @@ function getMovimientosHoy() {
 
 }
 
+function getFechaOperativa(fecha) {
+    const f = new Date(fecha);
+    if (f.getHours() < 6) {
+        f.setDate(f.getDate() - 1);
+    }
+    f.setHours(0, 0, 0, 0);
+    return f;
+}
+
 function getMovimientoDiarioPorCategoria() {
 
     const resultado = {};
@@ -3494,6 +3620,8 @@ function getMovimientoDiarioPorCategoria() {
             egresos: 0
         };
     });
+
+    const jornadaActual = getFechaOperativa(new Date()).getTime();
 
     clientes.forEach(cliente => {
 
@@ -3508,16 +3636,9 @@ function getMovimientoDiarioPorCategoria() {
 
             if (isNaN(fecha.getTime())) return;
 
-            const hora = fecha.getHours();
-
-            // Jornada operativa 06:00 -> 06:00
-            const fechaOperativa = new Date(fecha);
-
-            if (hora < 6) {
-                fechaOperativa.setDate(
-                    fechaOperativa.getDate() - 1
-                );
-            }
+            // Jornada operativa 06:00 -> 06:00: solo contamos lo que
+            // pasó dentro de la jornada de HOY, no el historial entero.
+            if (getFechaOperativa(fecha).getTime() !== jornadaActual) return;
 
             if (!resultado[categoria]) {
                 resultado[categoria] = {
@@ -3755,26 +3876,6 @@ function renderEstadisticas() {
     <strong>${cat}</strong>
     <span>${total}</span>
 </div>
-
-            ${categoriaExpandida === cat ? `
-
-    <div class="lista-categoria">
-
-        ${(clientesEnSala[cat] || [])
-                .filter(c => c && c.nombre)
-                .map(cliente => `
-            <div class="cliente-en-sala"
-    onclick="abrirCliente('${cliente.id}')"
-    style="cursor:pointer;"
->
-    ${cliente.nombre || ""} ${cliente.apellido || ""}
-</div>
-            `).join("")}
-
-    </div>
-
-` : ""}
-
         `).join("")}
     </div>
 
@@ -3836,67 +3937,116 @@ function renderEstadisticas() {
 </div>
 </div>
 `;
+
+    renderOverlayCategoria(clientesEnSala);
+}
+
+function renderOverlayCategoria(clientesEnSala) {
+
+    let overlay = document.getElementById("overlay-categoria");
+
+    if (!categoriaExpandida) {
+        if (overlay) overlay.remove();
+        return;
+    }
+
+    if (!overlay) {
+        overlay = document.createElement("div");
+        overlay.id = "overlay-categoria";
+        overlay.className = "overlay-categoria-fondo";
+        document.body.appendChild(overlay);
+
+        overlay.addEventListener("click", function (e) {
+            if (e.target === overlay) {
+                categoriaExpandida = null;
+                renderEstadisticas();
+            }
+        });
+    }
+
+    const lista = (clientesEnSala[categoriaExpandida] || []).filter(c => c && c.nombre);
+
+    overlay.innerHTML = `
+        <div class="overlay-categoria-card">
+            <div class="overlay-categoria-header">
+                <strong>${categoriaExpandida} en sala (${lista.length})</strong>
+                <button type="button" id="cerrar-overlay-categoria" class="icon-btn">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="lista-categoria">
+                ${lista.length === 0
+            ? `<div class="text-muted" style="text-align:center;">No hay clientes de esta categoría en sala</div>`
+            : lista.map(cliente => `
+                        <div class="cliente-en-sala"
+                            onclick="abrirCliente('${cliente.id}')"
+                            style="cursor:pointer;">
+                            ${cliente.nombre || ""} ${cliente.apellido || ""}
+                        </div>
+                    `).join("")}
+            </div>
+        </div>
+    `;
+
+    document.getElementById("cerrar-overlay-categoria").addEventListener("click", function () {
+        categoriaExpandida = null;
+        renderEstadisticas();
+    });
 }
 
 function getMetricasCruce(lista = clientes) {
 
     const metricas = {
 
-        "Bespoke": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-        "Diamond": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-        "Diamond Seg.": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-        "Platinum": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-        "Gold": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-        "Classic": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        },
-
-        "No socios": {
-            manana: 0,
-            tarde: 0,
-            noche: 0
-        }
+        "Bespoke": { manana: 0, tarde: 0, noche: 0 },
+        "Diamond": { manana: 0, tarde: 0, noche: 0 },
+        "Diamond Seg.": { manana: 0, tarde: 0, noche: 0 },
+        "Platinum": { manana: 0, tarde: 0, noche: 0 },
+        "Gold": { manana: 0, tarde: 0, noche: 0 },
+        "Classic": { manana: 0, tarde: 0, noche: 0 },
+        "No socios": { manana: 0, tarde: 0, noche: 0 }
     };
+
+    const desdeInput = document.getElementById("fechaDesde")?.value;
+    const hastaInput = document.getElementById("fechaHasta")?.value;
+
+    let fechaDesde = null;
+    let fechaHasta = null;
+
+    if (desdeInput && hastaInput) {
+        fechaDesde = new Date(desdeInput);
+        fechaHasta = new Date(hastaInput);
+        fechaHasta.setHours(23, 59, 59, 999);
+    }
 
     lista.forEach(cliente => {
 
         const categoria = cliente.categoria || "Sin categoría";
-        const turno = cliente.turno?.toLowerCase();
 
         if (!metricas[categoria]) {
-            metricas[categoria] = {
-                manana: 0,
-                tarde: 0,
-                noche: 0
-            };
+            metricas[categoria] = { manana: 0, tarde: 0, noche: 0 };
         }
 
-        if (turno && metricas[categoria][turno] !== undefined) {
+        (cliente.historial || []).forEach(registro => {
+
+            const e = normalizarEvento(registro);
+            if (!e || e.tipo !== "INGRESO") return;
+
+            const fecha = new Date(Number(e.fecha));
+            if (isNaN(fecha.getTime())) return;
+
+            if (fechaDesde && (fecha < fechaDesde || fecha > fechaHasta)) return;
+
+            const hora = fecha.getHours();
+            let turno;
+
+            if (hora >= 6 && hora <= 13) turno = "manana";
+            else if (hora >= 14 && hora <= 20) turno = "tarde";
+            else turno = "noche";
+
             metricas[categoria][turno]++;
-        }
-
+        });
     });
 
     return metricas;
@@ -4095,7 +4245,7 @@ function renderCliente(cliente) {
 
 <div class="clientes-wrapper">
 
-    <article class="datos-contenedor">
+    <article class="datos-contenedor" style="align-items:center;">
 
         <b style="display:block; text-align:center;">CLIENTE</b>
 
@@ -4109,7 +4259,7 @@ function renderCliente(cliente) {
 
     ${esPermanenciaLarga ? `<div class="punto-alerta-12h"></div>` : ""}
 
-    <button class="icon-btn" data-action="ver-foto-cliente">
+    <button class="icon-btn" data-action="ver-foto-cliente" title="Ver foto">
         <i class="bi bi-camera-fill"></i>
     </button>
 
@@ -4126,6 +4276,10 @@ function renderCliente(cliente) {
     <div>Tarjeta: ${cliente.tarjeta || "-"}</div>
 
     <div>Categoría: ${cliente.categoria}</div>
+
+    ${(cliente.pesos || cliente.dolares)
+        ? `<div>Ingresó con: ${[cliente.pesos ? "Pesos" : null, cliente.dolares ? "Dólares" : null].filter(Boolean).join(" y ")}</div>`
+        : ""}
 
     <div>${estadoTexto}</div>
 
@@ -4150,23 +4304,30 @@ function renderCliente(cliente) {
 
             <div class="acciones-card">
 
-    <button data-action="ingreso" class="icon-btn">IN</button>
-    <button data-action="egreso" class="icon-btn">OUT</button>
+    <button data-action="ingreso" class="icon-btn" title="Entró">IN</button>
+    <button data-action="egreso" class="icon-btn" title="Salió">OUT</button>
 
-    <button data-action="editar" class="icon-btn">
+    <button data-action="editar" class="icon-btn" title="Editar cliente">
         <i class="bi bi-pencil"></i>
     </button>
 
-    <button data-action="historial" class="icon-btn">
+    <button data-action="historial" class="icon-btn" title="Historial">
         <i class="bi bi-clock-history"></i>
     </button>
 
-    <button data-action="novedades" class="icon-btn">
+    <button data-action="novedades" class="icon-btn" title="Novedades">
         <i class="bi bi-journal-text"></i>
     </button>
 
     ${usuarioActual.rol === "supervisor"
-        ? `<button data-action="eliminar" class="icon-btn">
+        ? `<button data-action="generar-alerta" class="icon-btn" title="Generar alerta para el próximo ingreso">
+                <i class="bi bi-bell-fill"></i>
+            </button>`
+        : ""
+    }
+
+    ${usuarioActual.rol === "supervisor"
+        ? `<button data-action="eliminar" class="icon-btn" title="Eliminar cliente">
                 <i class="bi bi-trash3"></i>
             </button>`
         : ""
@@ -4179,10 +4340,10 @@ function renderCliente(cliente) {
     const acompanantes = cliente.acompanantes || [];
 
     html += `
-<article class="datos-contenedor">
+<article class="datos-contenedor" style="align-items:center;">
 
     <div class="acomp-toolbar">
-        <button class="btn-agregar-acomp" data-action="agregar-acompanante">
+        <button class="btn-agregar-acomp" data-action="agregar-acompanante" title="Agregar acompañante">
             <i class="bi bi-person-plus-fill"></i>
             Agregar acompañante
         </button>
@@ -4205,7 +4366,8 @@ function renderCliente(cliente) {
 
     <button class="icon-btn"
         data-action="ver-foto-acompanante"
-        data-index="${index}">
+        data-index="${index}"
+        title="Ver foto">
         <i class="bi bi-camera-fill"></i>
     </button>
 
@@ -4222,14 +4384,16 @@ function renderCliente(cliente) {
         <button
             class="btn-editar-acomp"
             data-action="editar-acompanante"
-            data-index="${index}">
+            data-index="${index}"
+            title="Editar acompañante">
             <i class="bi bi-pencil"></i>
         </button>
 
         <button
             class="btn-eliminar-acomp"
             data-action="eliminar-acompanante"
-            data-index="${index}">
+            data-index="${index}"
+            title="Eliminar acompañante">
             <i class="bi bi-trash"></i>
         </button>
 
@@ -4533,12 +4697,20 @@ function renderPanel() {
     if (vistaActual === "historial") {
 
         const historialFiltrado = clienteActual.historial.filter(item => {
+
+            if (!historialDesde && !historialHasta) return true;
+
             const fecha = new Date(item.fecha);
 
-            return (
-                String(fecha.getMonth() + 1).padStart(2, "0") === mesHistorialSeleccionado &&
-                String(fecha.getFullYear()) === anioHistorialSeleccionado
-            );
+            if (historialDesde && fecha < new Date(historialDesde)) return false;
+
+            if (historialHasta) {
+                const hasta = new Date(historialHasta);
+                hasta.setHours(23, 59, 59, 999);
+                if (fecha > hasta) return false;
+            }
+
+            return true;
         });
 
         const historialAgrupado = agruparHistorial(historialFiltrado)
@@ -4551,23 +4723,23 @@ function renderPanel() {
 
 
         const contenidoHistorial = `
-            <div class="d-flex justify-content-center align-items-center gap-2 mb-3">
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3" style="flex-wrap:wrap;">
 
-                <button
-                    onclick="anioHistorialSeleccionado=String(Number(anioHistorialSeleccionado)-1);renderPanel();"
-                    style="all:unset; cursor:pointer; font-size:28px; color:#d4af37; padding:0 12px;">
-                    −
-                </button>
+                <input type="date" id="historial-desde" value="${historialDesde}"
+                    onchange="historialDesde=this.value;renderPanel();">
 
-                <div class="px-3 py-2 border border-warning rounded text-warning fw-bold fs-4">
-                    ${anioHistorialSeleccionado}
-                </div>
+                <span style="color:#d4af37;">a</span>
 
-                <button
-                    onclick="anioHistorialSeleccionado=String(Number(anioHistorialSeleccionado)+1);renderPanel();"
-                    style="all:unset; cursor:pointer; font-size:28px; color:#d4af37; padding:0 12px;">
-                    +
-                </button>
+                <input type="date" id="historial-hasta" value="${historialHasta}"
+                    onchange="historialHasta=this.value;renderPanel();">
+
+                ${(historialDesde || historialHasta) ? `
+                    <button type="button" class="icon-btn"
+                        onclick="historialDesde='';historialHasta='';renderPanel();"
+                        title="Quitar filtro de fechas">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                ` : ""}
 
             </div>
 
@@ -4622,7 +4794,9 @@ function renderPanel() {
 
     else if (vistaActual === "novedades") {
 
-        const novedades = clienteActual.novedades || [];
+        const novedades = (clienteActual.novedades || []).filter(n =>
+            usuarioActual.rol === "supervisor" || n.autor !== "supervisor"
+        );
 
         let html = `
             <div class="d-flex align-items-center gap-1 mb-2">
@@ -4641,9 +4815,15 @@ function renderPanel() {
 
             html += `
         <div class="card mb-2"
-            style="border:1px solid #d4af37;border-radius:10px;background:#fff;overflow:hidden;">
+            style="border:1.5px solid #daa520;border-radius:10px;background:#1a1a1a;overflow:hidden;">
 
-        <textarea id="input-novedad" class="novedad-textarea" placeholder="Escribí la novedad..."></textarea>
+        <textarea id="input-novedad" class="novedad-textarea" placeholder="Escribí la novedad..."
+            style="background:#1a1a1a; color:#f0f0f0; border:none;"></textarea>
+
+        <label style="display:flex; align-items:center; gap:6px; padding:6px 10px; color:#daa520; font-size:14px;">
+            <input type="checkbox" id="chk-novedad-atencion">
+            Requiere hablar con el cliente (avisar al supervisor)
+        </label>
 
         <div class="p-2">
 
@@ -4682,11 +4862,14 @@ function renderPanel() {
                 .sort((a, b) => b.fecha - a.fecha)
                 .map(item => `
                     <div class="card mt-2">
-                        <div class="card-body d-flex justify-content-between align-items-center">
+                        <div class="card-body d-flex justify-content-start align-items-center gap-3">
 
-                            <div>
+                            <div style="flex:1;">
                                 <small style="color:#d4af37;">
                                     ${formatearFecha(item.fecha)}
+                                    ${(item.autor === "supervisor" && usuarioActual.rol === "supervisor")
+                        ? ` · <span style="opacity:.7;">(solo supervisor)</span>`
+                        : ""}
                                 </small>
 
                                 <p class="mb-0" style="color:#d4af37;">
@@ -4725,7 +4908,7 @@ function renderPanel() {
 
                 `).join("");
         } else {
-            html += `<p class="text-muted">Sin novedades registradas</p>`;
+            html += `<p style="color:#daa520; text-align:center;">Sin novedades registradas</p>`;
         }
         div.innerHTML = html;
 
@@ -4792,7 +4975,8 @@ function renderPanel() {
         ${novedadSeleccionada.texto || ""}
     </p>
 ` : `
-    <textarea id="input-novedad" class="novedad-textarea">${novedadSeleccionada.texto || ""}</textarea>
+    <textarea id="input-novedad" class="novedad-textarea"
+        style="background:#1a1a1a; color:#f0f0f0; border:1.5px solid #daa520; border-radius:8px;">${novedadSeleccionada.texto || ""}</textarea>
 
     <small id="contador-novedad" class="d-block text-center" style="color:#d4af37;">0 / 50 palabras</small>
 `}
@@ -4936,6 +5120,28 @@ resultadoCliente.addEventListener("click", function (e) {
     <input type="file" id="edit-foto" class="oculto">
 </div>
 
+${usuarioActual.rol === "supervisor" ? `
+<div class="mb-2" style="border-top:1px solid rgba(218,165,32,0.3); padding-top:12px; margin-top:8px;">
+
+    <label style="display:flex; align-items:center; gap:8px; justify-content:center;">
+        <input type="checkbox" id="edit-prohibicion" ${clienteActual.prohibicion?.activa ? "checked" : ""}>
+        Prohibición
+    </label>
+
+    <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:6px;">
+        <input type="checkbox" id="edit-autoexclusion" ${clienteActual.autoexclusion?.activa ? "checked" : ""}>
+        Autoexclusión
+    </label>
+
+    <input
+        id="edit-motivo-restriccion"
+        class="form-control"
+        placeholder="Motivo (opcional)"
+        style="margin-top:8px;"
+        value="${clienteActual.prohibicion?.motivo || clienteActual.autoexclusion?.motivo || ""}">
+</div>
+` : ""}
+
 
 
             <div class="d-flex gap-2 justify-content-center">
@@ -4960,16 +5166,58 @@ resultadoCliente.addEventListener("click", function (e) {
     if (action === "ingreso") {
 
         if (tieneProhibicionActiva(clienteActual)) {
-            alert("PROHIBICIÓN ACTIVA - COMUNICARSE CON JEFE VIP");
-            registrarEventoCliente(clienteActual.id, "ALERTA_PROHIBICION", {
-                motivo: "Prohibición activa detectada"
-            });
+
+            const esProhibicion = clienteActual.prohibicion?.activa;
+            const tipoAlerta = esProhibicion ? "PROHIBICIÓN" : "AUTOEXCLUSIÓN";
+
+            alert(`${tipoAlerta} ACTIVA - COMUNICARSE CON JEFE VIP`);
+
+            registrarAlerta(
+                clienteActual.id,
+                esProhibicion ? "PROHIBICION" : "AUTOEXCLUSION",
+                `Intento de ingreso con ${tipoAlerta.toLowerCase()} activa`
+            );
+
+            renderCampanaAlertas();
+
             return;
         }
 
         clienteActual.enVip = true;
 
         registrarEventoCliente(clienteActual.id, "INGRESO");
+
+        // Alerta: novedades marcadas "requiere atención" que todavía no avisaron
+        (clienteActual.novedades || []).forEach(nov => {
+            if (nov.requiereAtencion && !nov.alertaEnviada) {
+                registrarAlerta(clienteActual.id, "NOVEDAD", `Novedad: ${nov.texto}`);
+                nov.alertaEnviada = true;
+            }
+        });
+
+        // Alerta: avisos manuales cargados por el supervisor, todavía sin enviar
+        (clienteActual.alertasCliente || []).forEach(av => {
+            if (!av.alertaEnviada) {
+                registrarAlerta(clienteActual.id, "MANUAL", av.motivo);
+                av.alertaEnviada = true;
+            }
+        });
+
+        // Alerta: ingreso de un cliente "No socios"
+        if (clienteActual.categoria === "No socios") {
+            const moneda = [
+                clienteActual.pesos ? "Pesos" : null,
+                clienteActual.dolares ? "Dólares" : null
+            ].filter(Boolean).join(" y ") || "sin especificar";
+
+            registrarAlerta(
+                clienteActual.id,
+                "NO_SOCIO",
+                `Ingresó un cliente sin membresía (No socios) - Moneda: ${moneda}`
+            );
+        }
+
+        renderCampanaAlertas();
 
         guardarClientes();
         renderCliente(clienteActual);
@@ -5023,9 +5271,14 @@ document.addEventListener("click", function (e) {
         const texto = document.getElementById("input-novedad")?.value.trim();
         if (!texto) return;
 
+        const requiereAtencion = document.getElementById("chk-novedad-atencion")?.checked || false;
+
         clienteActual.novedades.push({
             texto,
-            fecha: Date.now()
+            fecha: Date.now(),
+            autor: usuarioActual.rol,
+            requiereAtencion,
+            alertaEnviada: false
         });
 
         guardarClientes();
@@ -5119,6 +5372,14 @@ document.addEventListener("click", function (e) {
     /* =========================
     CLIENTE
     ========================== */
+
+    if (action === "generar-alerta") {
+
+        if (usuarioActual.rol !== "supervisor") return;
+
+        abrirModalAlertaManual(clienteActual);
+        return;
+    }
 
     if (action === "eliminar") {
 
@@ -5874,6 +6135,39 @@ document.addEventListener("click", function (e) {
         clienteActual.dni = dni;
         clienteActual.tarjeta = tarjeta;
 
+        if (usuarioActual.rol === "supervisor") {
+
+            const yaTeniaProhibicion = !!clienteActual.prohibicion?.activa;
+            const yaTeniaAutoexclusion = !!clienteActual.autoexclusion?.activa;
+
+            const prohibicionMarcada = document.getElementById("edit-prohibicion")?.checked || false;
+            const autoexclusionMarcada = document.getElementById("edit-autoexclusion")?.checked || false;
+            const motivo = document.getElementById("edit-motivo-restriccion")?.value.trim() || "";
+
+            clienteActual.prohibicion = {
+                activa: prohibicionMarcada,
+                motivo,
+                fecha: prohibicionMarcada ? Date.now() : (clienteActual.prohibicion?.fecha || null)
+            };
+
+            clienteActual.autoexclusion = {
+                activa: autoexclusionMarcada,
+                motivo,
+                fecha: autoexclusionMarcada ? Date.now() : (clienteActual.autoexclusion?.fecha || null)
+            };
+
+            // Si recién ahora se activa (no estaba activa antes), avisamos.
+            if (prohibicionMarcada && !yaTeniaProhibicion) {
+                alert(`ALERTA SUPERVISOR: se activó PROHIBICIÓN para ${nombre}.`);
+                registrarEventoCliente(clienteActual.id, "ALERTA_PROHIBICION", { motivo });
+            }
+
+            if (autoexclusionMarcada && !yaTeniaAutoexclusion) {
+                alert(`ALERTA SUPERVISOR: se activó AUTOEXCLUSIÓN para ${nombre}.`);
+                registrarEventoCliente(clienteActual.id, "ALERTA_AUTOEXCLUSION", { motivo });
+            }
+        }
+
         const file = document.getElementById("edit-foto")?.files?.[0];
 
         const continuar = () => {
@@ -5992,6 +6286,15 @@ function cambiarVista(vista) {
     resultadoCliente.style.display = "none";
     panelEstadisticas.style.display = "none";
 
+    const controlesHistorico = document.getElementById("controles-historico");
+
+    // Los calendarios de fecha solo tienen sentido junto a las métricas,
+    // así que se muestran únicamente en esa vista (y solo para supervisor).
+    if (controlesHistorico) {
+        controlesHistorico.style.display =
+            (vista === "metricas" && usuarioActual.rol === "supervisor") ? "flex" : "none";
+    }
+
     if (vista === "lista") {
         resultadoCliente.style.display = "block";
         renderListaClientes(clientes);
@@ -6040,9 +6343,224 @@ function registrarEventoCliente(clienteId, tipo, datos = {}) {
     return evento;
 }
 
+// =====================
+// ALERTAS AL SUPERVISOR
+// =====================
+
+const NOMBRES_ALERTA = {
+    ALERTA_PROHIBICION: "Prohibición activa",
+    ALERTA_AUTOEXCLUSION: "Autoexclusión activa",
+    ALERTA_NOVEDAD: "Novedad pendiente",
+    ALERTA_NO_SOCIO: "Ingreso de no socio",
+    ALERTA_MANUAL: "Alerta del supervisor"
+};
+
+function abrirModalAlertaManual(cliente) {
+
+    document.getElementById("modal-alerta-manual")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-alerta-manual";
+    overlay.className = "login-overlay";
+
+    overlay.innerHTML = `
+        <div class="login-card" style="width:360px; text-align:left;">
+            <h4 style="text-align:center; color:#daa520; margin-bottom:1rem;">
+                Generar alerta
+            </h4>
+
+            <p style="color:#d4af37; font-size:14px; text-align: center;">
+                Cliente
+                <strong>${cliente.nombre}</strong>.
+            </p>
+
+            <textarea id="input-alerta-manual"
+                class="form-control"
+                placeholder="Motivo de la alerta..."
+                style="background:#1a1a1a; color:#f0f0f0; border:1.5px solid #daa520; min-height:90px; width:100%; text-align:left; padding:10px;">
+            </textarea>
+
+            <div class="d-flex justify-content-center gap-2 mt-3">
+                <button id="btn-guardar-alerta-manual" class="btn-accion-principal">
+                    Guardar
+                </button>
+                <button id="btn-cancelar-alerta-manual" class="btn-accion-principal">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("input-alerta-manual").focus();
+
+    document.getElementById("btn-cancelar-alerta-manual").addEventListener("click", () => overlay.remove());
+
+    overlay.addEventListener("click", (e) => {
+        if (e.target === overlay) overlay.remove();
+    });
+
+    document.getElementById("btn-guardar-alerta-manual").addEventListener("click", () => {
+
+        const motivo = document.getElementById("input-alerta-manual").value.trim();
+        if (!motivo) return;
+
+        if (!cliente.alertasCliente) cliente.alertasCliente = [];
+
+        cliente.alertasCliente.push({
+            motivo,
+            fecha: Date.now(),
+            alertaEnviada: false
+        });
+
+        guardarClientes();
+        overlay.remove();
+        renderCliente(cliente);
+    });
+}
+
+function registrarAlerta(clienteId, tipoCorto, motivo) {
+
+    const cliente = clientes.find(c => c.id === clienteId);
+    if (!cliente) return;
+
+    if (!cliente.historial) cliente.historial = [];
+
+    cliente.historial.push({
+        tipo: `ALERTA_${tipoCorto}`,
+        fecha: Date.now(),
+        operador: usuarioActual?.rol || "operador",
+        motivo,
+        revisada: false
+    });
+
+    guardarClientes();
+}
+
+function getAlertasPendientes() {
+
+    const alertas = [];
+
+    clientes.forEach(cliente => {
+        (cliente.historial || []).forEach((evento, index) => {
+
+            if (!evento.tipo || !evento.tipo.startsWith("ALERTA_")) return;
+            if (evento.revisada) return;
+
+            alertas.push({
+                clienteId: cliente.id,
+                clienteNombre: cliente.nombre,
+                indice: index,
+                tipo: evento.tipo,
+                nombreTipo: NOMBRES_ALERTA[evento.tipo] || evento.tipo,
+                motivo: evento.motivo || "",
+                fecha: evento.fecha
+            });
+        });
+    });
+
+    return alertas.sort((a, b) => b.fecha - a.fecha);
+}
+
+function marcarAlertaRevisada(clienteId, indice) {
+
+    const cliente = clientes.find(c => c.id === clienteId);
+    if (!cliente || !cliente.historial || !cliente.historial[indice]) return;
+
+    cliente.historial[indice].revisada = true;
+
+    guardarClientes();
+    renderCampanaAlertas();
+}
+
+function renderCampanaAlertas() {
+
+    const contenedor = document.getElementById("campana-alertas-contenedor");
+    if (!contenedor) return;
+
+    if (usuarioActual.rol !== "supervisor") {
+        contenedor.innerHTML = "";
+        return;
+    }
+
+    const alertas = getAlertasPendientes();
+
+    contenedor.innerHTML = `
+        <div style="position:relative; display:inline-block;">
+            <button id="btn-campana-alertas" class="icon-btn" title="Alertas">
+                <i class="bi bi-bell-fill"></i>
+            </button>
+            ${alertas.length > 0 ? `
+                <span style="
+                    position:absolute; top:-6px; right:-6px;
+                    background:#d33; color:white; border-radius:50%;
+                    font-size:11px; min-width:18px; height:18px;
+                    display:flex; align-items:center; justify-content:center;
+                    padding:0 4px; font-weight:bold;">
+                    ${alertas.length}
+                </span>
+            ` : ""}
+        </div>
+    `;
+
+    document.getElementById("btn-campana-alertas").addEventListener("click", function (e) {
+        e.stopPropagation();
+        toggleListaAlertas(alertas);
+    });
+}
+
+function toggleListaAlertas(alertas) {
+
+    let lista = document.getElementById("lista-alertas-flotante");
+
+    if (lista) {
+        lista.remove();
+        return;
+    }
+
+    lista = document.createElement("div");
+    lista.id = "lista-alertas-flotante";
+    lista.style.cssText = `
+        position:absolute; top:60px; right:20px; z-index:3000;
+        background:#111; border:2px solid #daa520; border-radius:12px;
+        width:320px; max-width:90vw; max-height:60vh; overflow-y:auto;
+        padding:10px; box-shadow:0 0 25px rgba(0,0,0,0.5);
+    `;
+
+    lista.innerHTML = alertas.length === 0
+        ? `<div style="color:#d4af37; text-align:center; padding:10px;">Sin alertas pendientes</div>`
+        : alertas.map(a => `
+            <div style="border-bottom:1px solid rgba(218,165,32,0.25); padding:8px 4px;">
+                <strong style="color:#daa520;">${a.nombreTipo}</strong><br>
+                <span style="color:#f0f0f0; cursor:pointer;" onclick="abrirCliente('${a.clienteId}')">
+                    ${a.clienteNombre}
+                </span><br>
+                <small style="color:#999;">${a.motivo}</small><br>
+                <small style="color:#666;">${new Date(a.fecha).toLocaleString("es-AR")}</small><br>
+                <button
+                    class="btn-accion-principal"
+                    style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
+                    onclick="marcarAlertaRevisada('${a.clienteId}', ${a.indice}); this.closest('#lista-alertas-flotante').remove();">
+                    Marcar como revisada
+                </button>
+            </div>
+        `).join("");
+
+    document.body.appendChild(lista);
+
+    setTimeout(() => {
+        document.addEventListener("click", function cerrar(e) {
+            if (!lista.contains(e.target)) {
+                lista.remove();
+                document.removeEventListener("click", cerrar);
+            }
+        });
+    }, 0);
+}
 
 function tieneProhibicionActiva(cliente) {
-    return false;
+    return !!(cliente?.prohibicion?.activa || cliente?.autoexclusion?.activa);
 }
 
 
