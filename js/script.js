@@ -5133,12 +5133,26 @@ ${usuarioActual.rol === "supervisor" ? `
         Autoexclusión
     </label>
 
+    <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:6px;">
+        <input type="checkbox" id="edit-excepcion-lavado" ${clienteActual.excepcionLavado?.activa ? "checked" : ""}>
+        Excepción: beneficio de lavado de auto
+    </label>
+
     <input
         id="edit-motivo-restriccion"
         class="form-control"
         placeholder="Motivo (opcional)"
         style="margin-top:8px;"
         value="${clienteActual.prohibicion?.motivo || clienteActual.autoexclusion?.motivo || ""}">
+
+    <div style="text-align:center; margin-top:12px;">
+        <button type="button" id="btn-resetear-pin-cliente" class="btn-accion-principal">
+            Resetear PIN del beneficio
+        </button>
+        <div style="color:#999; font-size:12px; margin-top:4px;">
+            PIN actual: ${clienteActual.pin ? "●●●●●●" : "sin generar"}
+        </div>
+    </div>
 </div>
 ` : ""}
 
@@ -6110,6 +6124,19 @@ document.addEventListener("click", function (e) {
 
     // --- EDITAR CLIENTE ---
 
+    if (e.target.id === "btn-resetear-pin-cliente") {
+        if (!clienteActual || usuarioActual.rol !== "supervisor") return;
+
+        clienteActual.pin = generarPin(6);
+        guardarClientes();
+
+        alert(
+            "Nuevo PIN de " + clienteActual.nombre + ": " + clienteActual.pin +
+            "\n\nComunicáselo directamente, no queda guardado en ningún otro lado."
+        );
+        return;
+    }
+
     if (e.target.id === "cancelar-edicion") {
         formIngreso.activo = false;
         panelNuevo.innerHTML = "";
@@ -6166,6 +6193,15 @@ document.addEventListener("click", function (e) {
                 alert(`ALERTA SUPERVISOR: se activó AUTOEXCLUSIÓN para ${nombre}.`);
                 registrarEventoCliente(clienteActual.id, "ALERTA_AUTOEXCLUSION", { motivo });
             }
+
+            const excepcionLavadoMarcada = document.getElementById("edit-excepcion-lavado")?.checked || false;
+
+            clienteActual.excepcionLavado = {
+                activa: excepcionLavadoMarcada,
+                motivo,
+                autorizadoPor: usuarioActual.rol,
+                fecha: excepcionLavadoMarcada ? Date.now() : (clienteActual.excepcionLavado?.fecha || null)
+            };
         }
 
         const file = document.getElementById("edit-foto")?.files?.[0];
@@ -6245,7 +6281,8 @@ document.addEventListener("click", function (e) {
             historial: [],
             novedades: [],
             pesos,
-            dolares
+            dolares,
+            pin: generarPin(6)
         };
 
         const file = document.getElementById("nuevo-foto")?.files?.[0];
@@ -6325,6 +6362,12 @@ function crearEvento(tipo, datos = {}) {
     };
 }
 
+function generarPin(cantidadDigitos) {
+    const min = Math.pow(10, cantidadDigitos - 1);
+    const max = Math.pow(10, cantidadDigitos) - 1;
+    return String(Math.floor(min + Math.random() * (max - min + 1)));
+}
+
 function registrarEventoCliente(clienteId, tipo, datos = {}) {
 
     const cliente = clientes.find(c => c.id === clienteId);
@@ -6369,9 +6412,9 @@ function abrirModalAlertaManual(cliente) {
                 Generar alerta
             </h4>
 
-            <p style="color:#d4af37; font-size:14px; text-align: center;">
-                Cliente
-                <strong>${cliente.nombre}</strong>.
+            <p style="color:#d4af37; font-size:14px;">
+                Se va a avisar al supervisor la próxima vez que
+                <strong>${cliente.nombre}</strong> vuelva a ingresar.
             </p>
 
             <textarea id="input-alerta-manual"

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Lavadero</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+    :root {
+        --dorado: #daa520;
+        --card: #1a1a1a;
+        --texto: #f0f0f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background-image: url(/img/fondo-vip.avif);
+        background-size: cover;
+        background-repeat: repeat-y;
+        background-position: center;
+        color: var(--texto);
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        padding-bottom: 40px;
+    }
+
+    .pantalla { display: none; padding: 20px 16px; }
+    .pantalla.activa { display: block; }
+
+    .card-login {
+        background: var(--card);
+        border: 2px solid var(--dorado);
+        border-radius: 16px;
+        padding: 30px 24px;
+        width: 100%;
+        max-width: 360px;
+        margin: 40px auto;
+        text-align: center;
+    }
+
+    .logo-login {
+        width: 8rem;
+        max-width: 100%;
+        border-radius: 2rem;
+        border: 0.1rem solid var(--dorado);
+        margin-bottom: 14px;
+    }
+
+    h1.titulo-login {
+        color: var(--dorado);
+        font-size: 22px;
+        margin: 10px 0 20px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 14px;
+        font-size: 17px;
+        border-radius: 10px;
+        border: 2px solid var(--dorado);
+        background: #000;
+        color: white;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+    button.btn-principal {
+        width: 100%;
+        padding: 14px;
+        font-size: 17px;
+        font-weight: 700;
+        border-radius: 10px;
+        border: none;
+        background: var(--dorado);
+        color: #1a1a1a;
+        cursor: pointer;
+    }
+
+    button.btn-secundario {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        border: 1.5px solid var(--dorado);
+        background: transparent;
+        color: var(--dorado);
+        cursor: pointer;
+        margin-top: 8px;
+    }
+
+    .msg-error {
+        color: #ff6b6b;
+        margin-top: 8px;
+        min-height: 20px;
+        font-size: 14px;
+    }
+
+    .msg-ok {
+        color: #6bff8f;
+        margin-top: 8px;
+        font-size: 14px;
+    }
+
+    header.top {
+        text-align: center;
+        margin-bottom: 16px;
+    }
+
+    header.top h2 {
+        color: var(--dorado);
+        margin: 0;
+    }
+
+    .pedido-card {
+        background: var(--card);
+        border: 1.5px solid var(--dorado);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 14px;
+    }
+
+    .pedido-card .modelo {
+        font-size: 18px;
+        font-weight: 700;
+        font-family: 'Times New Roman', Times, serif;
+        color: white;
+    }
+
+    .pedido-card .patente {
+        font-size: 15px;
+        color: #ccc;
+        margin-bottom: 6px;
+    }
+
+    .pedido-card .estado {
+        display: inline-block;
+        background: rgba(218,165,32,0.15);
+        color: var(--dorado);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 999px;
+        margin-bottom: 8px;
+    }
+
+    .pedido-card .autorizado {
+        font-size: 13px;
+        color: #999;
+        margin-bottom: 10px;
+    }
+
+    .vacio {
+        text-align: center;
+        color: #888;
+        padding: 40px 20px;
+    }
+
+    .estado-final {
+        text-align: center;
+        padding: 40px 20px;
+    }
+
+    .estado-final i {
+        font-size: 48px;
+        color: var(--dorado);
+    }
+
+    .estado-final p {
+        font-size: 18px;
+        margin-top: 14px;
+    }
+</style>
+</head>
+<body>
+
+    <!-- ============ VISTA: CLIENTE - LOGIN ============ -->
+    <div id="cliente-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Lavado de Auto</h1>
+            <input type="text" id="cliente-dni" placeholder="DNI" inputmode="numeric">
+            <input type="password" id="cliente-pin" placeholder="PIN" inputmode="numeric" maxlength="6">
+            <button class="btn-principal" id="btn-cliente-entrar">Ingresar</button>
+            <div class="msg-error" id="cliente-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: CLIENTE - FORMULARIO ============ -->
+    <div id="cliente-form" class="pantalla">
+        <div class="card-login">
+            <h1 class="titulo-login">Datos del vehículo</h1>
+            <p style="color:#d4af37; font-size:14px;">Hola, <strong id="cliente-nombre-saludo"></strong></p>
+            <input type="text" id="auto-modelo" placeholder="Modelo del vehículo">
+            <input type="text" id="auto-patente" placeholder="Patente" maxlength="8" style="text-transform:uppercase;">
+            <button class="btn-principal" id="btn-enviar-pedido">Enviar</button>
+            <div class="msg-error" id="form-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: CLIENTE - ESPERANDO / ESTADO ============ -->
+    <div id="cliente-estado" class="pantalla">
+        <div class="estado-final">
+            <i class="bi bi-car-front-fill"></i>
+            <p id="texto-estado-cliente">Tu pedido fue enviado. Esperando autorización...</p>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: AUTORIZAR - LOGIN ============ -->
+    <div id="autorizar-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Autorización de Lavado</h1>
+            <input type="text" id="autorizar-legajo" placeholder="Legajo" inputmode="numeric">
+            <input type="password" id="autorizar-pin" placeholder="PIN" inputmode="numeric" maxlength="4">
+            <button class="btn-principal" id="btn-autorizar-entrar">Ingresar</button>
+            <div class="msg-error" id="autorizar-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: AUTORIZAR - LISTADO ============ -->
+    <div id="autorizar-lista" class="pantalla">
+        <header class="top">
+            <h2>Pedidos pendientes</h2>
+        </header>
+        <div id="lista-pendientes-autorizar"></div>
+        <div id="vacio-autorizar" class="vacio" style="display:none;">Sin pedidos pendientes</div>
+    </div>
+
+    <!-- ============ VISTA: LAVADOR - LOGIN ============ -->
+    <div id="lavador-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Lavadero</h1>
+            <input type="text" id="lavador-dni" placeholder="DNI" inputmode="numeric">
+            <input type="password" id="lavador-pin" placeholder="PIN" inputmode="numeric" maxlength="4">
+            <button class="btn-principal" id="btn-lavador-entrar">Ingresar</button>
+            <div class="msg-error" id="lavador-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: LAVADOR - TRABAJOS ============ -->
+    <div id="lavador-trabajos" class="pantalla">
+        <header class="top">
+            <h2>Autorizados</h2>
+        </header>
+        <div id="lista-autorizados"></div>
+        <div id="vacio-autorizados" class="vacio" style="display:none;">Sin trabajos autorizados</div>
+
+        <header class="top" style="margin-top:26px;">
+            <h2>En curso</h2>
+        </header>
+        <div id="lista-en-curso"></div>
+        <div id="vacio-en-curso" class="vacio" style="display:none;">Sin trabajos en curso</div>
+    </div>
+
+    <script src="lavadero.js"></script>
+</body>
+</html>
