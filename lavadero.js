@@ -439,7 +439,7 @@ async function finalizarTrabajo(id) {
 // =====================================================
 
 // ⚠️ Misma contraseña que ya tenés en script.js -> const supervisor = { pass: "..." }
-const SUPERVISOR_PASS = "";
+const SUPERVISOR_PASS = "Operaciones2026";
 
 function initVistaAdmin() {
     mostrarPantalla("admin-login");
