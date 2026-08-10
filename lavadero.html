@@ -172,6 +172,40 @@
         font-size: 18px;
         margin-top: 14px;
     }
+
+    .persona-card {
+        background: var(--card);
+        border: 1px solid var(--dorado);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .persona-card .datos {
+        font-size: 14px;
+    }
+
+    .persona-card .datos strong {
+        color: white;
+    }
+
+    .persona-card .pin {
+        color: var(--dorado);
+        font-weight: 700;
+    }
+
+    .persona-card button {
+        background: transparent;
+        border: 1px solid #ff6b6b;
+        color: #ff6b6b;
+        border-radius: 8px;
+        padding: 6px 10px;
+        font-size: 13px;
+    }
 </style>
 </head>
 <body>
@@ -254,6 +288,45 @@
         </header>
         <div id="lista-en-curso"></div>
         <div id="vacio-en-curso" class="vacio" style="display:none;">Sin trabajos en curso</div>
+    </div>
+
+    <!-- ============ VISTA: ADMIN PERSONAL - LOGIN ============ -->
+    <div id="admin-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Personal del Lavadero</h1>
+            <input type="password" id="admin-pass" placeholder="Contraseña de supervisor">
+            <button class="btn-principal" id="btn-admin-entrar">Ingresar</button>
+            <div class="msg-error" id="admin-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: ADMIN PERSONAL - GESTIÓN ============ -->
+    <div id="admin-gestion" class="pantalla">
+        <header class="top">
+            <h2>Personal que lava los autos</h2>
+        </header>
+
+        <div class="card-login" style="margin:0 0 20px;">
+            <input type="text" id="nuevo-lavador-dni" placeholder="DNI">
+            <input type="text" id="nuevo-lavador-nombre" placeholder="Nombre y apellido">
+            <button class="btn-principal" id="btn-agregar-lavador">Agregar (genera PIN)</button>
+        </div>
+
+        <div id="lista-personal-lavadero"></div>
+
+        <header class="top" style="margin-top:30px;">
+            <h2>Personal que autoriza (empresa)</h2>
+        </header>
+
+        <div class="card-login" style="margin:0 0 20px;">
+            <input type="text" id="nuevo-empresa-legajo" placeholder="Legajo">
+            <input type="text" id="nuevo-empresa-nombre" placeholder="Nombre">
+            <input type="text" id="nuevo-empresa-apellido" placeholder="Apellido">
+            <button class="btn-principal" id="btn-agregar-empresa">Agregar (genera PIN)</button>
+        </div>
+
+        <div id="lista-personal-empresa"></div>
     </div>
 
     <script src="lavadero.js"></script>
