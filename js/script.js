@@ -3413,6 +3413,15 @@ function actualizarVistaUsuario() {
     }
     if (btnMetricas) btnMetricas.style.display = "inline-flex";
 
+    // "Lavados del día" ahora vive como ítem del menú "Informe" en el HTML
+    // (junto a Métricas), dentro de #panel-admin -> ya queda oculto solo
+    // para quien no sea supervisor, sin que haga falta código extra acá.
+    const btnLavadosDia = document.getElementById("btn-lavados-dia");
+    if (btnLavadosDia && !btnLavadosDia.dataset.conectado) {
+        btnLavadosDia.addEventListener("click", abrirLavadosDelDia);
+        btnLavadosDia.dataset.conectado = "true";
+    }
+
     // Buscar / Nuevo ingreso / Métricas: mismo formato visual.
     const btnBuscar = formulario?.querySelector("button[type='submit'], button");
     [btnBuscar, btnNuevo, btnMetricas].forEach(btn => {
@@ -4320,6 +4329,13 @@ function renderCliente(cliente) {
     </button>
 
     ${usuarioActual.rol === "supervisor"
+        ? `<button data-action="lavados" class="icon-btn" title="Lavados de auto">
+                <i class="bi bi-droplet-fill"></i>
+            </button>`
+        : ""
+    }
+
+    ${usuarioActual.rol === "supervisor"
         ? `<button data-action="generar-alerta" class="icon-btn" title="Generar alerta para el próximo ingreso">
                 <i class="bi bi-bell-fill"></i>
             </button>`
@@ -4931,6 +4947,51 @@ function renderPanel() {
         }
     }
 
+    /* ================= LAVADOS ================= */
+
+    else if (vistaActual === "lavados") {
+
+        let html = `
+            <div class="d-flex align-items-center gap-1 mb-2">
+                <h5 class="m-0">Lavados de auto</h5>
+            </div>
+        `;
+
+        if (lavadosClienteActual.length === 0) {
+            html += `<p style="color:#daa520; text-align:center;">Sin lavados registrados</p>`;
+        } else {
+            html += `<div class="row g-2">`;
+
+            lavadosClienteActual.forEach(l => {
+                const fecha = new Date(l.fechaCreacion).toLocaleDateString("es-AR");
+
+                const horaTexto = (etiqueta, valor) => valor
+                    ? `${etiqueta}: ${new Date(valor).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}`
+                    : `${etiqueta}: -`;
+
+                html += `
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body" style="color:#d4af37; text-align:center;">
+                                <strong>${l.modelo} — ${l.patente}</strong><br>
+                                <small>${fecha} · Estado: ${l.estado}</small><br>
+                                <small>Autorizó: ${l.autorizadoPorApellido || "-"}</small><br>
+                                <small>${horaTexto("Autorización", l.horaAutorizacion)}</small><br>
+                                <small>${horaTexto("Aceptación", l.horaAceptacion)}</small><br>
+                                <small>${horaTexto("Finalización", l.horaFinalizacion)}</small><br>
+                                <small>Llavero: ${l.numeroLlavero || "-"}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        }
+
+        div.innerHTML = html;
+    }
+
     /* ================= VER NOVEDAD ================= */
 
 
@@ -5146,12 +5207,17 @@ ${usuarioActual.rol === "supervisor" ? `
         value="${clienteActual.prohibicion?.motivo || clienteActual.autoexclusion?.motivo || ""}">
 
     <div style="text-align:center; margin-top:12px;">
-        <button type="button" id="btn-resetear-pin-cliente" class="btn-accion-principal">
-            Resetear PIN del beneficio
+        <label style="color:#999; font-size:12px;">PIN del beneficio (4 dígitos)</label>
+        <input
+            id="edit-pin"
+            class="form-control"
+            style="max-width:160px; margin:6px auto;"
+            maxlength="4"
+            inputmode="numeric"
+            value="${clienteActual.pin || ""}">
+        <button type="button" id="btn-pin-aleatorio" class="btn-accion-principal" style="padding:6px 14px !important; font-size:13px;">
+            Generar uno al azar
         </button>
-        <div style="color:#999; font-size:12px; margin-top:4px;">
-            PIN actual: ${clienteActual.pin ? "●●●●●●" : "sin generar"}
-        </div>
     </div>
 </div>
 ` : ""}
@@ -5184,7 +5250,7 @@ ${usuarioActual.rol === "supervisor" ? `
             const esProhibicion = clienteActual.prohibicion?.activa;
             const tipoAlerta = esProhibicion ? "PROHIBICIÓN" : "AUTOEXCLUSIÓN";
 
-            alert(`${tipoAlerta} ACTIVA - COMUNICARSE CON JEFE VIP`);
+            mostrarAviso(`${tipoAlerta} ACTIVA - COMUNICARSE CON JEFE VIP`);
 
             registrarAlerta(
                 clienteActual.id,
@@ -5252,7 +5318,7 @@ ${usuarioActual.rol === "supervisor" ? `
     }
 });
 
-document.addEventListener("click", function (e) {
+document.addEventListener("click", async function (e) {
 
     const boton = e.target.closest("[data-action]");
     if (!boton) return;
@@ -5273,6 +5339,16 @@ document.addEventListener("click", function (e) {
     if (action === "novedades") {
         vistaActual = (vistaActual === "novedades") ? "" : "novedades";
         renderPanel();
+    }
+
+    if (action === "lavados") {
+        if (vistaActual === "lavados") {
+            vistaActual = "";
+            renderPanel();
+        } else {
+            vistaActual = "lavados";
+            cargarLavadosDelCliente(clienteActual.id);
+        }
     }
 
     if (action === "agregar-novedad") {
@@ -5397,7 +5473,7 @@ document.addEventListener("click", function (e) {
 
     if (action === "eliminar") {
 
-        const confirmar = confirm("¿Seguro que querés eliminar este cliente?");
+        const confirmar = await mostrarConfirmacion("¿Seguro que querés eliminar este cliente?");
         if (!confirmar) return;
 
         clientes = clientes.filter(c => c.id !== clienteActual.id);
@@ -5808,7 +5884,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 document.getElementById("login-supervisor").classList.add("oculto");
             } else {
-                alert("Contraseña incorrecta");
+                mostrarAviso("Contraseña incorrecta");
             }
         });
     }
@@ -6100,6 +6176,20 @@ btnNuevo.addEventListener("click", function () {
                     </label>
                 </div>
 
+                <div class="mb-3" style="text-align:center;">
+                    <input
+                        id="nuevo-pin"
+                        class="form-control"
+                        style="max-width:200px; margin:0 auto; text-align:center;"
+                        maxlength="4"
+                        inputmode="numeric"
+                        placeholder="PIN del beneficio (4 dígitos)">
+                    <div style="color:#999; font-size:12px; margin-top:4px;">
+                        Si es Bespoke o Diamond y lo dejás vacío, se genera uno al azar.
+                        Otras categorías quedan sin PIN salvo que lo cargues vos.
+                    </div>
+                </div>
+
                 <div class="d-flex gap-2 justify-content-center">
                     <button id="guardar-nuevo" class="btn btn-success">
                         Guardar
@@ -6124,16 +6214,9 @@ document.addEventListener("click", function (e) {
 
     // --- EDITAR CLIENTE ---
 
-    if (e.target.id === "btn-resetear-pin-cliente") {
-        if (!clienteActual || usuarioActual.rol !== "supervisor") return;
-
-        clienteActual.pin = generarPin(6);
-        guardarClientes();
-
-        alert(
-            "Nuevo PIN de " + clienteActual.nombre + ": " + clienteActual.pin +
-            "\n\nComunicáselo directamente, no queda guardado en ningún otro lado."
-        );
+    if (e.target.id === "btn-pin-aleatorio") {
+        const input = document.getElementById("edit-pin");
+        if (input) input.value = generarPin(4);
         return;
     }
 
@@ -6154,13 +6237,16 @@ document.addEventListener("click", function (e) {
         const tarjeta = document.getElementById("edit-tarjeta").value.trim();
 
         if (!nombre || !dni) {
-            alert("Nombre y DNI son obligatorios");
+            mostrarAviso("Nombre y DNI son obligatorios");
             return;
         }
 
         clienteActual.nombre = nombre;
         clienteActual.dni = dni;
         clienteActual.tarjeta = tarjeta;
+
+        const pinEditado = document.getElementById("edit-pin")?.value.trim();
+        if (pinEditado) clienteActual.pin = pinEditado;
 
         if (usuarioActual.rol === "supervisor") {
 
@@ -6185,12 +6271,12 @@ document.addEventListener("click", function (e) {
 
             // Si recién ahora se activa (no estaba activa antes), avisamos.
             if (prohibicionMarcada && !yaTeniaProhibicion) {
-                alert(`ALERTA SUPERVISOR: se activó PROHIBICIÓN para ${nombre}.`);
+                mostrarAviso(`ALERTA SUPERVISOR: se activó PROHIBICIÓN para ${nombre}.`);
                 registrarEventoCliente(clienteActual.id, "ALERTA_PROHIBICION", { motivo });
             }
 
             if (autoexclusionMarcada && !yaTeniaAutoexclusion) {
-                alert(`ALERTA SUPERVISOR: se activó AUTOEXCLUSIÓN para ${nombre}.`);
+                mostrarAviso(`ALERTA SUPERVISOR: se activó AUTOEXCLUSIÓN para ${nombre}.`);
                 registrarEventoCliente(clienteActual.id, "ALERTA_AUTOEXCLUSION", { motivo });
             }
 
@@ -6260,7 +6346,7 @@ document.addEventListener("click", function (e) {
         const tarjeta = document.getElementById("nuevo-tarjeta").value.trim();
 
         if (!nombre || !dni) {
-            alert("Nombre y DNI son obligatorios");
+            mostrarAviso("Nombre y DNI son obligatorios");
             return;
         }
 
@@ -6282,7 +6368,13 @@ document.addEventListener("click", function (e) {
             novedades: [],
             pesos,
             dolares,
-            pin: generarPin(6)
+            pin: (() => {
+                const pinManual = document.getElementById("nuevo-pin")?.value.trim();
+                if (pinManual) return pinManual;
+
+                const categoriasConBeneficioAutomatico = ["Bespoke", "Diamond"];
+                return categoriasConBeneficioAutomatico.includes(categoria) ? generarPin(4) : "";
+            })()
         };
 
         const file = document.getElementById("nuevo-foto")?.files?.[0];
@@ -6362,6 +6454,110 @@ function crearEvento(tipo, datos = {}) {
     };
 }
 
+let lavadosClienteActual = [];
+
+async function abrirLavadosDelDia() {
+
+    let lavados = [];
+
+    try {
+        const respuesta = await fetch("/api/lavados");
+        lavados = await respuesta.json();
+    } catch (error) {
+        mostrarAviso("No se pudo cargar el listado de lavados");
+        return;
+    }
+
+    const hoy = new Date();
+    const esHoy = fecha => {
+        const f = new Date(fecha);
+        return f.getFullYear() === hoy.getFullYear()
+            && f.getMonth() === hoy.getMonth()
+            && f.getDate() === hoy.getDate();
+    };
+
+    const lavadosHoy = (Array.isArray(lavados) ? lavados : [])
+        .filter(l => esHoy(l.fechaCreacion))
+        .sort((a, b) => a.fechaCreacion - b.fechaCreacion);
+
+    const hora = valor => valor
+        ? new Date(valor).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
+        : "-";
+
+    const filas = lavadosHoy.map(l => `
+        <tr>
+            <td>${l.clienteNombre}</td>
+            <td>${l.modelo}</td>
+            <td>${l.patente}</td>
+            <td>${l.autorizadoPorApellido || "-"}</td>
+            <td>${hora(l.horaAutorizacion)}</td>
+            <td>${hora(l.horaAceptacion)}</td>
+            <td>${hora(l.horaFinalizacion)}</td>
+            <td>${l.numeroLlavero || "-"}</td>
+        </tr>
+    `).join("");
+
+    const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Lavados del día - ${hoy.toLocaleDateString("es-AR")}</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; color: #111; }
+                h1 { text-align: center; font-size: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+                th, td { border: 1px solid #999; padding: 6px 8px; font-size: 13px; text-align: center; }
+                th { background: #eee; }
+            </style>
+        </head>
+        <body>
+            <h1>Lavados del día — ${hoy.toLocaleDateString("es-AR")}</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Modelo</th>
+                        <th>Patente</th>
+                        <th>Autorizó</th>
+                        <th>Hora autorización</th>
+                        <th>Hora aceptación</th>
+                        <th>Hora finalización</th>
+                        <th>Llavero</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${filas || `<tr><td colspan="8">Sin lavados registrados hoy</td></tr>`}
+                </tbody>
+            </table>
+        </body>
+        </html>
+    `;
+
+    const ventana = window.open("", "_blank");
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.focus();
+    ventana.print();
+}
+
+async function cargarLavadosDelCliente(clienteId) {
+    try {
+        const respuesta = await fetch("/api/lavados");
+        const todos = await respuesta.json();
+
+        lavadosClienteActual = (Array.isArray(todos) ? todos : [])
+            .filter(l => l.clienteId === clienteId)
+            .sort((a, b) => b.fechaCreacion - a.fechaCreacion);
+
+    } catch (error) {
+        console.error("No se pudieron cargar los lavados:", error);
+        lavadosClienteActual = [];
+    }
+
+    renderPanel();
+}
+
 function generarPin(cantidadDigitos) {
     const min = Math.pow(10, cantidadDigitos - 1);
     const max = Math.pow(10, cantidadDigitos) - 1;
@@ -6397,6 +6593,66 @@ const NOMBRES_ALERTA = {
     ALERTA_NO_SOCIO: "Ingreso de no socio",
     ALERTA_MANUAL: "Alerta del supervisor"
 };
+
+function mostrarAviso(mensaje) {
+
+    document.getElementById("modal-aviso")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-aviso";
+    overlay.className = "login-overlay";
+
+    overlay.innerHTML = `
+        <div class="login-card" style="width:340px; text-align:center;">
+            <p style="color:#f0f0f0; font-size:15px; white-space:pre-line; margin-bottom:1.2rem;">
+                ${mensaje}
+            </p>
+            <button id="btn-aviso-ok" class="btn-accion-principal">Aceptar</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cerrar = () => overlay.remove();
+
+    document.getElementById("btn-aviso-ok").addEventListener("click", cerrar);
+    overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+}
+
+function mostrarConfirmacion(mensaje) {
+
+    return new Promise(resolve => {
+
+        document.getElementById("modal-confirm")?.remove();
+
+        const overlay = document.createElement("div");
+        overlay.id = "modal-confirm";
+        overlay.className = "login-overlay";
+
+        overlay.innerHTML = `
+            <div class="login-card" style="width:340px; text-align:center;">
+                <p style="color:#f0f0f0; font-size:15px; white-space:pre-line; margin-bottom:1.2rem;">
+                    ${mensaje}
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    <button id="btn-confirm-si" class="btn-accion-principal">Sí</button>
+                    <button id="btn-confirm-no" class="btn-accion-principal">No</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const responder = valor => {
+            overlay.remove();
+            resolve(valor);
+        };
+
+        document.getElementById("btn-confirm-si").addEventListener("click", () => responder(true));
+        document.getElementById("btn-confirm-no").addEventListener("click", () => responder(false));
+        overlay.addEventListener("click", e => { if (e.target === overlay) responder(false); });
+    });
+}
 
 function abrirModalAlertaManual(cliente) {
 

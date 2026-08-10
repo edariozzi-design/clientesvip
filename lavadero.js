@@ -39,6 +39,63 @@ async function apiPost(url, datos) {
 // MODAL CHICO PROPIO (reemplaza prompt() nativo)
 // =====================
 
+function mostrarAviso(mensaje) {
+
+    document.getElementById("modal-aviso")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-aviso";
+    overlay.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,0.75);
+        display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+    `;
+
+    overlay.innerHTML = `
+        <div style="background:#1a1a1a; border:2px solid #daa520; border-radius:16px; padding:24px; width:100%; max-width:320px; text-align:center;">
+            <p style="color:#f0f0f0; font-size:15px; white-space:pre-line; margin-bottom:1.2rem;">${mensaje}</p>
+            <button id="btn-aviso-ok" class="btn-principal">Aceptar</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const cerrar = () => overlay.remove();
+    document.getElementById("btn-aviso-ok").addEventListener("click", cerrar);
+    overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(); });
+}
+
+function mostrarConfirmacion(mensaje) {
+    return new Promise(resolve => {
+
+        document.getElementById("modal-confirm")?.remove();
+
+        const overlay = document.createElement("div");
+        overlay.id = "modal-confirm";
+        overlay.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.75);
+            display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+        `;
+
+        overlay.innerHTML = `
+            <div style="background:#1a1a1a; border:2px solid #daa520; border-radius:16px; padding:24px; width:100%; max-width:320px; text-align:center;">
+                <p style="color:#f0f0f0; font-size:15px; white-space:pre-line; margin-bottom:1.2rem;">${mensaje}</p>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-confirm-si" class="btn-principal">Sí</button>
+                    <button id="btn-confirm-no" class="btn-secundario">No</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const responder = valor => { overlay.remove(); resolve(valor); };
+
+        document.getElementById("btn-confirm-si").addEventListener("click", () => responder(true));
+        document.getElementById("btn-confirm-no").addEventListener("click", () => responder(false));
+        overlay.addEventListener("click", e => { if (e.target === overlay) responder(false); });
+    });
+}
+
 function pedirDato({ titulo, placeholder, maxLength }) {
     return new Promise(resolve => {
 
@@ -439,7 +496,7 @@ async function finalizarTrabajo(id) {
 // =====================================================
 
 // ⚠️ Misma contraseña que ya tenés en script.js -> const supervisor = { pass: "..." }
-const SUPERVISOR_PASS = "Operaciones2026";
+const SUPERVISOR_PASS = "";
 
 function initVistaAdmin() {
     mostrarPantalla("admin-login");
@@ -505,22 +562,27 @@ async function agregarLavador() {
     const nombre = document.getElementById("nuevo-lavador-nombre").value.trim();
 
     if (!dni || !nombre) {
-        alert("Completá DNI y nombre");
+        mostrarAviso("Completá DNI y nombre");
         return;
     }
 
     const lista = await apiGet("/api/personal?tipo=lavadero");
 
     if (lista.some(p => p.dni === dni)) {
-        alert("Ya existe una persona con ese DNI");
+        mostrarAviso("Ya existe una persona con ese DNI");
         return;
     }
 
-    lista.push({ dni, nombre, pin: generarPinLocal(4) });
+    lista.push({
+        dni,
+        nombre,
+        pin: document.getElementById("nuevo-lavador-pin").value.trim() || generarPinLocal(4)
+    });
     await apiPost("/api/personal?tipo=lavadero", lista);
 
     document.getElementById("nuevo-lavador-dni").value = "";
     document.getElementById("nuevo-lavador-nombre").value = "";
+    document.getElementById("nuevo-lavador-pin").value = "";
 
     cargarListaLavadero();
 }
@@ -531,29 +593,35 @@ async function agregarEmpresa() {
     const apellido = document.getElementById("nuevo-empresa-apellido").value.trim();
 
     if (!legajo || !nombre || !apellido) {
-        alert("Completá legajo, nombre y apellido");
+        mostrarAviso("Completá legajo, nombre y apellido");
         return;
     }
 
     const lista = await apiGet("/api/personal?tipo=empresa");
 
     if (lista.some(p => p.legajo === legajo)) {
-        alert("Ya existe una persona con ese legajo");
+        mostrarAviso("Ya existe una persona con ese legajo");
         return;
     }
 
-    lista.push({ legajo, nombre, apellido, pin: generarPinLocal(4) });
+    lista.push({
+        legajo,
+        nombre,
+        apellido,
+        pin: document.getElementById("nuevo-empresa-pin").value.trim() || generarPinLocal(4)
+    });
     await apiPost("/api/personal?tipo=empresa", lista);
 
     document.getElementById("nuevo-empresa-legajo").value = "";
     document.getElementById("nuevo-empresa-nombre").value = "";
     document.getElementById("nuevo-empresa-apellido").value = "";
+    document.getElementById("nuevo-empresa-pin").value = "";
 
     cargarListaEmpresa();
 }
 
 async function eliminarLavador(dni) {
-    if (!confirm("¿Borrar esta persona?")) return;
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
 
     let lista = await apiGet("/api/personal?tipo=lavadero");
     lista = lista.filter(p => p.dni !== dni);
@@ -562,7 +630,7 @@ async function eliminarLavador(dni) {
 }
 
 async function eliminarEmpresa(legajo) {
-    if (!confirm("¿Borrar esta persona?")) return;
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
 
     let lista = await apiGet("/api/personal?tipo=empresa");
     lista = lista.filter(p => p.legajo !== legajo);
