@@ -496,6 +496,10 @@ function initVistaAdmin() {
         document.getElementById("admin-error").textContent = "";
         mostrarPantalla("admin-login");
     });
+
+    document.getElementById("btn-volver-admin-login").addEventListener("click", () => {
+        window.location.href = "index.html";
+    });
 }
 
 function generarPinLocal(cantidadDigitos) {
@@ -512,10 +516,8 @@ async function cargarListaLavadero() {
         ? `<p style="color:#888;">Sin personal cargado todavía</p>`
         : lista.map(p => `
             <div class="persona-card">
-                <div class="datos">
-                    <strong>${p.nombre}</strong><br>
-                    DNI: ${p.dni} · PIN: <span class="pin">${p.pin}</span>
-                </div>
+                <div class="nombre">${p.nombre}</div>
+                <div class="datos">DNI: ${p.dni} · PIN: <span class="pin">${p.pin}</span></div>
                 <button onclick="eliminarLavador('${p.dni}')">Borrar</button>
             </div>
         `).join("");
@@ -529,10 +531,8 @@ async function cargarListaEmpresa() {
         ? `<p style="color:#888;">Sin personal cargado todavía</p>`
         : lista.map(p => `
             <div class="persona-card">
-                <div class="datos">
-                    <strong>${p.nombre} ${p.apellido}</strong><br>
-                    Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span>
-                </div>
+                <div class="nombre">${p.nombre} ${p.apellido}</div>
+                <div class="datos">Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span></div>
                 <button onclick="eliminarEmpresa('${p.legajo}')">Borrar</button>
             </div>
         `).join("");

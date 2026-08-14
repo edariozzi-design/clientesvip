@@ -3083,6 +3083,17 @@ estilosSugerencias.textContent += `
         background: #daa520 !important;
         color: #1a1a1a !important;
     }
+    .dashboard .metric-card {
+        min-height: auto !important;
+        padding: 14px !important;
+    }
+    .dashboard .metric-card h5 {
+        font-size: 14px !important;
+        margin-bottom: 8px !important;
+    }
+    .dashboard .fila-cruce {
+        padding: 3px 0 !important;
+    }
 `;
 document.head.appendChild(estilosSugerencias);
 
@@ -3874,7 +3885,7 @@ function renderEstadisticas() {
     </div>
 
     <!-- EN SALA -->
-    <div class="card metric-card full">
+    <div class="card metric-card">
         <h5>EN SALA AHORA</h5>
 
         <div class="fila-cruce">
@@ -3922,7 +3933,7 @@ function renderEstadisticas() {
 
 
 <!-- CRUCE -->
-<div class="card metric-card full">
+<div class="card metric-card">
     <h5>CATEGORÍA × TURNO</h5>
 
     <div class="fila-cruce encabezado">
@@ -4006,9 +4017,12 @@ async function renderTarjetaLavados() {
         ${enCurso.length === 0
             ? `<div style="color:#888; text-align:center; font-size:13px;">Sin autos en lavado ahora</div>`
             : enCurso.map(l => `
-                <div style="display:flex; justify-content:space-between; font-size:13px; color:#d4af37; border-top:1px solid rgba(218,165,32,0.2); padding:4px 0;">
-                    <span>${l.modelo} — ${l.patente}</span>
-                    <span>${l.estado === "aceptado" ? `Llavero ${l.numeroLlavero}` : "Esperando aceptar"}</span>
+                <div style="font-size:13px; color:#d4af37; border-top:1px solid rgba(218,165,32,0.2); padding:6px 0;">
+                    <div style="font-weight:600;">${l.clienteNombre}</div>
+                    <div style="display:flex; justify-content:space-between;">
+                        <span>Auto: ${l.modelo} — ${l.patente}</span>
+                        <span>${l.estado === "aceptado" ? `Llavero ${l.numeroLlavero}` : "Esperando aceptar"}</span>
+                    </div>
                 </div>
             `).join("")
         }
@@ -4268,9 +4282,16 @@ formulario.addEventListener("submit", function (e) {
 
     } else if (resultados.length > 1) {
         vistaActual = "lista";
+        panelEstadisticas.style.display = "none";
+        resultadoCliente.style.display = "block";
+        document.getElementById("controles-historico").style.display = "none";
         renderListaClientes(resultados);
 
     } else {
+
+        panelEstadisticas.style.display = "none";
+        document.getElementById("controles-historico").style.display = "none";
+        resultadoCliente.style.display = "block";
 
         resultadoCliente.innerHTML = `
             <div class="card p-3">

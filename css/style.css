@@ -1,18 +1,19 @@
 /* =========================================================
-   VIP CLUB - HOJA DE ESTILOS
-   Reorganizado por secciones. Mismo resultado visual que antes,
-   con las reglas duplicadas fusionadas y 3 errores de tipeo corregidos:
-   - .cat-platinium -> .cat-platinum (coincide con el JS)
-   - .metric-card.full -> .metric-card--full (coincide con la clase real)
-   - font-size: 1,5rem -> 1.5rem (coma por punto)
+VIP CLUB - HOJA DE ESTILOS
+Reorganizado por secciones. Mismo resultado visual que antes,
+con las reglas duplicadas fusionadas y 3 errores de tipeo corregidos:
+- .cat-platinium -> .cat-platinum (coincide con el JS)
+- .metric-card.full -> .metric-card--full (coincide con la clase real)
+- font-size: 1,5rem -> 1.5rem (coma por punto)
    ========================================================= */
 
 
 /* =========================
-   BASE / GLOBAL
+BASE / GLOBAL
    ========================= */
 
-html, body {
+html,
+body {
     height: 100%;
 }
 
@@ -49,7 +50,7 @@ h1 {
 
 
 /* =========================
-   NAVBAR / BUSCADOR
+NAVBAR / BUSCADOR
    ========================= */
 
 .navbar-vip {
@@ -57,9 +58,9 @@ h1 {
     justify-content: space-between;
     align-items: center;
     padding: 12px 20px;
-    background: rgba(10,10,10,0.85);
+    background: rgba(10, 10, 10, 0.85);
     backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(218,165,32,0.25);
+    border-bottom: 1px solid rgba(218, 165, 32, 0.25);
 }
 
 .nav-block {
@@ -98,7 +99,7 @@ h1 {
 .search-box input {
     width: 400px;
     padding: 10px 14px;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     border: 2px solid #daa520;
     border-radius: 10px;
     color: white;
@@ -115,7 +116,7 @@ h1 {
 
 
 /* =========================
-   BOTONES GENÉRICOS
+BOTONES GENÉRICOS
    ========================= */
 
 .btn-vip {
@@ -133,7 +134,7 @@ h1 {
 .btn-vip:active {
     background: #daa520;
     color: black;
-    box-shadow: 0 0 12px rgba(218,165,32,0.4);
+    box-shadow: 0 0 12px rgba(218, 165, 32, 0.4);
 }
 
 .btn-dorado {
@@ -193,18 +194,18 @@ h1 {
     background: #1a1a1a;
     color: black;
     transform: scale(1.08);
-    box-shadow: 0 0 6px rgba(212,175,55,0.4);
+    box-shadow: 0 0 6px rgba(212, 175, 55, 0.4);
 }
 
 
 /* =========================
-   LOGIN (MODAL SUPERVISOR)
+LOGIN (MODAL SUPERVISOR)
    ========================= */
 
 .login-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -233,7 +234,7 @@ h1 {
 
 
 /* =========================
-   CONTENIDO PRINCIPAL / ESPERA
+CONTENIDO PRINCIPAL / ESPERA
    ========================= */
 
 .contenido-principal {
@@ -302,7 +303,7 @@ h1 {
 
 
 /* =========================
-   CATEGORÍAS (BADGES)
+CATEGORÍAS (BADGES)
    ========================= */
 
 .cat-bespoke {
@@ -339,7 +340,7 @@ h1 {
 
 
 /* =========================
-   FICHA DE CLIENTE
+FICHA DE CLIENTE
    ========================= */
 
 .clientes-wrapper {
@@ -354,7 +355,7 @@ h1 {
     background: rgba(15, 15, 15, 0.92);
     border: 2px solid #daa520;
     border-radius: 18px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     overflow: hidden;
     transition: all 0.3s ease;
 }
@@ -417,7 +418,7 @@ h1 {
     border-radius: 50%;
     border: 3px solid #daa520;
     margin: 1.5rem;
-    box-shadow: 0 0 18px rgba(218,165,32,0.35);
+    box-shadow: 0 0 18px rgba(218, 165, 32, 0.35);
 }
 
 .acciones-card {
@@ -425,12 +426,12 @@ h1 {
     justify-content: center;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(255,255,255,0.04);
-    border-top: 1px solid rgba(218,165,32,0.25);
+    background: rgba(255, 255, 255, 0.04);
+    border-top: 1px solid rgba(218, 165, 32, 0.25);
 }
 
 .vip-activo {
-    box-shadow: 0 0 25px rgba(0,255,136,0.5);
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.5);
 }
 
 .estado-operativo {
@@ -450,7 +451,7 @@ h1 {
     height: auto;
     padding: 3px 8px;
     border-radius: 12px;
-    background: rgba(255,165,0,.15);
+    background: rgba(255, 165, 0, .15);
     border: 1px solid orange;
     color: orange;
     font-size: .75rem;
@@ -473,7 +474,7 @@ h1 {
 
 
 /* =========================
-   ACOMPAÑANTES
+ACOMPAÑANTES
    ========================= */
 
 .cliente-acompañante {
@@ -490,10 +491,10 @@ h1 {
     justify-content: space-between;
     gap: 1rem;
     padding: 1rem;
-    background: rgba(255,255,255,0.05);
+    background: rgba(255, 255, 255, 0.05);
     border-radius: 16px;
     min-width: 320px;
-    border: 1px solid rgba(218,165,32,0.15);
+    border: 1px solid rgba(218, 165, 32, 0.15);
 }
 
 .nombre-acompanante {
@@ -538,13 +539,13 @@ h1 {
 
 
 /* =========================
-   MODALES (EDICIÓN / CONFIRMACIÓN)
+MODALES (EDICIÓN / CONFIRMACIÓN)
    ========================= */
 
 .modal-edicion-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.75);
+    background: rgba(0, 0, 0, 0.75);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -558,7 +559,7 @@ h1 {
     border: 2px solid #daa520;
     border-radius: 18px;
     padding: 2rem;
-    box-shadow: 0 0 35px rgba(218,165,32,0.25);
+    box-shadow: 0 0 35px rgba(218, 165, 32, 0.25);
 }
 
 .modal-edicion h4 {
@@ -602,7 +603,7 @@ h1 {
 .modal-confirmacion {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,.55);
+    background: rgba(0, 0, 0, .55);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -615,7 +616,7 @@ h1 {
     border-radius: 12px;
     min-width: 320px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(0,0,0,.25);
+    box-shadow: 0 0 20px rgba(0, 0, 0, .25);
 }
 
 .modal-botones {
@@ -627,7 +628,7 @@ h1 {
 
 
 /* =========================
-   NOVEDADES
+NOVEDADES
    ========================= */
 
 .novedad-footer {
@@ -663,7 +664,7 @@ h1 {
 
 
 /* =========================
-   DASHBOARD / MÉTRICAS
+DASHBOARD / MÉTRICAS
    ========================= */
 
 .dashboard {
@@ -676,7 +677,7 @@ h1 {
 .metric-card {
     padding: 20px;
     border-radius: 18px;
-    background: rgba(15,15,15,0.95);
+    background: rgba(15, 15, 15, 0.95);
     border: 1px solid #daa520;
     color: white;
     transition: 0.25s ease;
@@ -697,8 +698,8 @@ h1 {
 }
 
 .metric-box {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(218,165,32,0.3);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(218, 165, 32, 0.3);
     border-radius: 12px;
     padding: 1rem;
     text-align: center;
@@ -727,8 +728,8 @@ h1 {
     letter-spacing: 1px;
 }
 
-.metric-block + .metric-block {
-    border-top: 1px solid rgba(255,255,255,0.1);
+.metric-block+.metric-block {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
     padding-top: 15px;
 }
 
@@ -745,7 +746,7 @@ h1 {
 
 
 /* =========================
-   GRÁFICO DE BARRAS
+GRÁFICO DE BARRAS
    ========================= */
 
 .grafico-principal {
@@ -792,7 +793,7 @@ h1 {
 
 
 /* =========================
-   HISTÓRICO / CRUCE DE DATOS
+HISTÓRICO / CRUCE DE DATOS
    ========================= */
 
 .controles-historico {
@@ -813,13 +814,13 @@ h1 {
     grid-template-columns: 2fr 60px 60px 60px;
     align-items: center;
     padding: 6px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .fila-cruce.encabezado {
     font-weight: bold;
     color: gold;
-    border-bottom: 2px solid rgba(218,165,32,0.4);
+    border-bottom: 2px solid rgba(218, 165, 32, 0.4);
     margin-bottom: 8px;
 }
 
@@ -858,7 +859,7 @@ h1 {
     background: #0f0f0f;
     padding: 15px;
     border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
     max-height: 300px;
     overflow-y: auto;
 }
@@ -875,7 +876,7 @@ h1 {
     padding: 10px;
     margin-bottom: 6px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
     border-left: 4px solid #daa520;
     color: #daa520;
     font-weight: 600;
@@ -895,7 +896,7 @@ h1 {
 .categoria-click:hover {
     cursor: pointer;
     transform: translateX(4px);
-    background: rgba(255,255,255,0.08);
+    background: rgba(255, 255, 255, 0.08);
 }
 
 .categoria-activa {
@@ -904,7 +905,7 @@ h1 {
 }
 
 input[type="date"] {
-    background: rgba(15,15,15,0.92);
+    background: rgba(15, 15, 15, 0.92);
     border: 2px solid #daa520;
     color: white;
     border-radius: 12px;
@@ -922,12 +923,12 @@ input[type="date"]:hover {
 
 input[type="date"]:focus {
     border-color: gold;
-    box-shadow: 0 0 8px rgba(218,165,32,0.4);
+    box-shadow: 0 0 8px rgba(218, 165, 32, 0.4);
 }
 
 
 /* =========================
-   MENÚ INFORME (DROPDOWN)
+MENÚ INFORME (DROPDOWN)
    ========================= */
 
 .dropdown-menu {
@@ -948,9 +949,14 @@ input[type="date"]:focus {
     color: black;
 }
 
+#btn-metricas {
+    border: none !important;
+    background: transparent !important;
+}
+
 
 /* =========================
-   RESPONSIVE
+RESPONSIVE
    ========================= */
 
 @media (max-width: 768px) {
