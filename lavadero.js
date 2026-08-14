@@ -157,17 +157,50 @@ function tieneIngresoReciente(cliente, minutos) {
     return minutosPasados <= minutos;
 }
 
-async function registrarAlertaVerificacion(cliente) {
-    if (!cliente.historial) cliente.historial = [];
+// Revisa los pedidos que ya pasaron los 30 min desde que se pidieron,
+// y todavía no fueron chequeados. Corre sola cada vez que cualquiera
+// de las 3 pantallas (cliente/autorizar/lavador) hace su sondeo normal.
+async function verificarPedidosVencidos() {
 
-    cliente.historial.push({
-        tipo: "ALERTA_VERIFICACION",
-        fecha: Date.now(),
-        motivo: "Uso del beneficio de lavado sin ingreso registrado en los últimos 30 minutos",
-        revisada: false
-    });
+    const MINUTOS_ESPERA = 30;
+    const ahora = Date.now();
 
-    await apiPost("/api/clientes", clientesCache);
+    const lavados = await apiGet("/api/lavados");
+    const pendientesDeVerificar = lavados.filter(p =>
+        !p.verificacionRealizada &&
+        (ahora - p.fechaCreacion) >= MINUTOS_ESPERA * 60000
+    );
+
+    if (pendientesDeVerificar.length === 0) return;
+
+    const clientesActuales = await apiGet("/api/clientes");
+    let huboCambiosEnClientes = false;
+
+    for (const pedido of pendientesDeVerificar) {
+
+        const cliente = clientesActuales.find(c => c.id === pedido.clienteId);
+
+        if (cliente && !tieneIngresoReciente(cliente, MINUTOS_ESPERA)) {
+            if (!cliente.historial) cliente.historial = [];
+
+            cliente.historial.push({
+                tipo: "ALERTA_VERIFICACION",
+                fecha: Date.now(),
+                motivo: `Pidió lavado de auto sin ingreso registrado en los ${MINUTOS_ESPERA} minutos posteriores`,
+                revisada: false
+            });
+
+            huboCambiosEnClientes = true;
+        }
+
+        pedido.verificacionRealizada = true;
+    }
+
+    await apiPost("/api/lavados", lavados);
+
+    if (huboCambiosEnClientes) {
+        await apiPost("/api/clientes", clientesActuales);
+    }
 }
 
 // =====================================================
@@ -204,12 +237,6 @@ function initVistaCliente() {
         if (!tieneBeneficioLavado(cliente)) {
             errorEl.textContent = "No tenés el beneficio de lavado de auto habilitado";
             return;
-        }
-
-        // Control silencioso: si no hay ingreso reciente, avisa solo al supervisor,
-        // pero igual deja continuar al cliente con su pedido.
-        if (!tieneIngresoReciente(cliente, 30)) {
-            registrarAlertaVerificacion(cliente);
         }
 
         clienteLogueado = cliente;
@@ -251,7 +278,8 @@ function initVistaCliente() {
             horaAceptacion: null,
             numeroLlavero: null,
             horaFinalizacion: null,
-            fechaCreacion: Date.now()
+            fechaCreacion: Date.now(),
+            verificacionRealizada: false
         };
 
         lavadosCache.push(pedido);
@@ -264,6 +292,7 @@ function initVistaCliente() {
             "Tu pedido fue enviado. Esperando autorización...";
 
         setInterval(actualizarEstadoCliente, 8000);
+        setInterval(verificarPedidosVencidos, 60000);
     });
 }
 
@@ -319,6 +348,7 @@ function initVistaAutorizar() {
         mostrarPantalla("autorizar-lista");
         cargarPendientesAutorizar();
         setInterval(cargarPendientesAutorizar, 15000);
+        setInterval(verificarPedidosVencidos, 60000);
     });
 }
 
@@ -404,6 +434,7 @@ function initVistaLavador() {
         mostrarPantalla("lavador-trabajos");
         cargarTrabajosLavador();
         setInterval(cargarTrabajosLavador, 15000);
+        setInterval(verificarPedidosVencidos, 60000);
     });
 }
 
