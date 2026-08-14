@@ -3403,13 +3403,6 @@ function actualizarVistaUsuario() {
 
     if (!panelAdmin || !btnLogout || !controlesHistorico) return;
 
-    // El botón de métricas tiene que verse para cualquier rol, y además
-    // ubicado justo al lado del botón de "Nuevo ingreso" (en ese orden).
-    if (btnMetricas && btnNuevo && btnMetricas.previousElementSibling !== btnNuevo) {
-        btnNuevo.parentNode.insertBefore(btnMetricas, btnNuevo.nextSibling);
-    }
-    if (btnMetricas) btnMetricas.style.display = "inline-flex";
-
     // "Lavados del día" ahora vive como ítem del menú "Informe" en el HTML
     // (junto a Métricas), dentro de #panel-admin -> ya queda oculto solo
     // para quien no sea supervisor, sin que haga falta código extra acá.
@@ -3438,9 +3431,15 @@ function actualizarVistaUsuario() {
         btnLogout.parentNode.insertBefore(campanaContenedor, btnLogout);
     }
 
-    if (usuarioActual.rol === "supervisor") {
+    // El menú "Informe" se ve para ambos roles (adentro tiene "Métricas",
+    // que el operador también necesita). "Lavados del día" y
+    // "Administrador" quedan restringidos solo a supervisor.
+    panelAdmin.style.display = "block";
 
-        panelAdmin.style.display = "block";
+    const btnLavadosDiaItem = document.getElementById("btn-lavados-dia")?.closest("li");
+    const btnAdministradorItem = document.querySelector('a[href*="vista=admin"]')?.closest("li");
+
+    if (usuarioActual.rol === "supervisor") {
 
         if (btnSupervisor) {
             btnSupervisor.style.display = "none";
@@ -3449,11 +3448,12 @@ function actualizarVistaUsuario() {
         btnLogout.style.display = "block";
 
         // "Nuevo Ingreso" es tarea del operador, el supervisor no lo necesita.
-        if (btnNuevo) btnNuevo.style.display = "none";
+        if (btnNuevo) btnNuevo.style.setProperty("display", "none", "important");
+
+        if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "block";
+        if (btnAdministradorItem) btnAdministradorItem.style.display = "block";
 
     } else {
-
-        panelAdmin.style.display = "none";
 
         if (btnSupervisor) {
             btnSupervisor.style.display = "block";
@@ -3462,6 +3462,9 @@ function actualizarVistaUsuario() {
         btnLogout.style.display = "none";
 
         if (btnNuevo) btnNuevo.style.display = "inline-flex";
+
+        if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "none";
+        if (btnAdministradorItem) btnAdministradorItem.style.display = "none";
     }
 
     renderCampanaAlertas();
@@ -3864,6 +3867,12 @@ function renderEstadisticas() {
 
 <div class="dashboard">
 
+    <!-- LAVADOS -->
+    <div class="metric-card" id="tarjeta-lavados-metricas">
+        <h5>LAVADO DE AUTOS</h5>
+        <div style="color:#d4af37; text-align:center;">Cargando...</div>
+    </div>
+
     <!-- EN SALA -->
     <div class="card metric-card full">
         <h5>EN SALA AHORA</h5>
@@ -3950,6 +3959,60 @@ function renderEstadisticas() {
 `;
 
     renderOverlayCategoria(clientesEnSala);
+    renderTarjetaLavados();
+}
+
+async function renderTarjetaLavados() {
+
+    const tarjeta = document.getElementById("tarjeta-lavados-metricas");
+    if (!tarjeta) return;
+
+    let lavados = [];
+
+    try {
+        const respuesta = await fetch("/api/lavados");
+        lavados = await respuesta.json();
+    } catch (error) {
+        tarjeta.innerHTML += `<div style="color:#ff6b6b; text-align:center;">No se pudo cargar</div>`;
+        return;
+    }
+
+    if (!Array.isArray(lavados)) lavados = [];
+
+    const enCurso = lavados.filter(l => l.estado === "aceptado" || l.estado === "autorizado");
+    const finalizadosHoy = lavados.filter(l => {
+        if (l.estado !== "finalizado" || !l.horaFinalizacion) return false;
+        const f = new Date(l.horaFinalizacion);
+        const hoy = new Date();
+        return f.getFullYear() === hoy.getFullYear()
+            && f.getMonth() === hoy.getMonth()
+            && f.getDate() === hoy.getDate();
+    });
+
+    tarjeta.innerHTML = `
+        <h5>LAVADO DE AUTOS</h5>
+
+        <div class="d-flex justify-content-around" style="margin-bottom:10px;">
+            <div style="text-align:center;">
+                <div style="font-size:22px; color:gold; font-weight:bold;">${enCurso.length}</div>
+                <div style="font-size:12px; color:#d4af37;">En curso</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:22px; color:gold; font-weight:bold;">${finalizadosHoy.length}</div>
+                <div style="font-size:12px; color:#d4af37;">Finalizados hoy</div>
+            </div>
+        </div>
+
+        ${enCurso.length === 0
+            ? `<div style="color:#888; text-align:center; font-size:13px;">Sin autos en lavado ahora</div>`
+            : enCurso.map(l => `
+                <div style="display:flex; justify-content:space-between; font-size:13px; color:#d4af37; border-top:1px solid rgba(218,165,32,0.2); padding:4px 0;">
+                    <span>${l.modelo} — ${l.patente}</span>
+                    <span>${l.estado === "aceptado" ? `Llavero ${l.numeroLlavero}` : "Esperando aceptar"}</span>
+                </div>
+            `).join("")
+        }
+    `;
 }
 
 function renderOverlayCategoria(clientesEnSala) {
@@ -6465,14 +6528,39 @@ async function abrirLavadosDelDia() {
             <title>Lavados del día - ${hoy.toLocaleDateString("es-AR")}</title>
             <style>
                 body { font-family: Arial, sans-serif; padding: 20px; color: #111; }
-                h1 { text-align: center; font-size: 20px; }
+                .encabezado {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                }
+                .encabezado h1 { font-size: 20px; margin: 0; }
+                .encabezado img { height: 60px; border-radius: 8px; }
                 table { width: 100%; border-collapse: collapse; margin-top: 16px; }
                 th, td { border: 1px solid #999; padding: 6px 8px; font-size: 13px; text-align: center; }
                 th { background: #eee; }
+                #btn-imprimir-lavados {
+                    display: block;
+                    margin: 20px auto 0;
+                    padding: 10px 24px;
+                    font-size: 15px;
+                    font-weight: 600;
+                    border-radius: 8px;
+                    border: 1.5px solid #daa520;
+                    background: #daa520;
+                    color: #1a1a1a;
+                    cursor: pointer;
+                }
+                @media print {
+                    #btn-imprimir-lavados { display: none; }
+                }
             </style>
         </head>
         <body>
-            <h1>Lavados del día — ${hoy.toLocaleDateString("es-AR")}</h1>
+            <div class="encabezado">
+                <h1>Lavados del día — ${hoy.toLocaleDateString("es-AR")}</h1>
+                <img src="/img/Logo-ingreso.jpeg" alt="Logo">
+            </div>
             <table>
                 <thead>
                     <tr>
@@ -6490,6 +6578,8 @@ async function abrirLavadosDelDia() {
                     ${filas || `<tr><td colspan="8">Sin lavados registrados hoy</td></tr>`}
                 </tbody>
             </table>
+
+            <button id="btn-imprimir-lavados" onclick="window.print()">Imprimir</button>
         </body>
         </html>
     `;
@@ -6498,7 +6588,6 @@ async function abrirLavadosDelDia() {
     ventana.document.write(html);
     ventana.document.close();
     ventana.focus();
-    ventana.print();
 }
 
 async function cargarLavadosDelCliente(clienteId) {
@@ -6551,7 +6640,8 @@ const NOMBRES_ALERTA = {
     ALERTA_AUTOEXCLUSION: "Autoexclusión activa",
     ALERTA_NOVEDAD: "Novedad pendiente",
     ALERTA_NO_SOCIO: "Ingreso de no socio",
-    ALERTA_MANUAL: "Alerta del supervisor"
+    ALERTA_MANUAL: "Alerta del supervisor",
+    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado"
 };
 
 function mostrarAviso(mensaje) {
@@ -6768,7 +6858,7 @@ async function abrirModalAutorizarLavado(pedidoId) {
         <div class="login-card" style="width:320px;">
             <h4 style="color:#daa520; margin-bottom:1rem;">Autorizar lavado</h4>
             <input id="autorizar-legajo-modal" class="form-control mb-2" placeholder="Legajo" inputmode="numeric">
-            <input id="autorizar-pin-modal" class="form-control mb-2" placeholder="PIN" type="password" inputmode="numeric" maxlength="4">
+            <input id="autorizar-pin-modal" class="form-control mb-2" placeholder="PIN" type="text" inputmode="numeric" maxlength="4" autocomplete="off">
             <div id="autorizar-lavado-error" style="color:#ff6b6b; font-size:13px; min-height:18px; margin-bottom:8px;"></div>
             <div class="d-flex justify-content-center gap-2">
                 <button id="btn-confirmar-autorizar-lavado" class="btn-accion-principal">Autorizar</button>
@@ -6846,7 +6936,7 @@ async function renderCampanaAlertas() {
     // El operador solo ve los pedidos de lavado por autorizar — el resto
     // de las alertas (prohibición, novedades, etc.) son solo para supervisor.
     if (usuarioActual.rol === "operador") {
-        alertas = alertas.filter(a => a.origen === "lavado");
+        alertas = alertas.filter(a => a.origen === "lavado" || a.tipo === "ALERTA_LAVADO_FINALIZADO");
     }
 
     contenedor.innerHTML = `

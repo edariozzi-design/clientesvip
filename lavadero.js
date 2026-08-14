@@ -441,6 +441,28 @@ async function finalizarTrabajo(id) {
     pedido.horaFinalizacion = Date.now();
 
     await apiPost("/api/lavados", lavadosCache);
+
+    // Avisa al supervisor y al operador que el auto ya está listo.
+    try {
+        const clientesActuales = await apiGet("/api/clientes");
+        const cliente = clientesActuales.find(c => c.id === pedido.clienteId);
+
+        if (cliente) {
+            if (!cliente.historial) cliente.historial = [];
+
+            cliente.historial.push({
+                tipo: "ALERTA_LAVADO_FINALIZADO",
+                fecha: Date.now(),
+                motivo: `${pedido.modelo} — ${pedido.patente} · listo`,
+                revisada: false
+            });
+
+            await apiPost("/api/clientes", clientesActuales);
+        }
+    } catch (error) {
+        console.error("No se pudo avisar la finalización del lavado:", error);
+    }
+
     cargarTrabajosLavador();
 }
 
@@ -468,6 +490,12 @@ function initVistaAdmin() {
 
     document.getElementById("btn-agregar-lavador").addEventListener("click", agregarLavador);
     document.getElementById("btn-agregar-empresa").addEventListener("click", agregarEmpresa);
+
+    document.getElementById("btn-volver-admin").addEventListener("click", () => {
+        document.getElementById("admin-pass").value = "";
+        document.getElementById("admin-error").textContent = "";
+        mostrarPantalla("admin-login");
+    });
 }
 
 function generarPinLocal(cantidadDigitos) {

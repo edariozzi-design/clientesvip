@@ -216,7 +216,7 @@
             <img src="img/Logo-ingreso.jpeg" class="logo-login">
             <h1 class="titulo-login">Lavado de Auto</h1>
             <input type="text" id="cliente-dni" placeholder="DNI" inputmode="numeric">
-            <input type="password" id="cliente-pin" placeholder="PIN" inputmode="numeric" maxlength="6">
+            <input type="text" id="cliente-pin" placeholder="PIN" inputmode="numeric" maxlength="6" autocomplete="off">
             <button class="btn-principal" id="btn-cliente-entrar">Ingresar</button>
             <div class="msg-error" id="cliente-error"></div>
         </div>
@@ -248,7 +248,7 @@
             <img src="img/Logo-ingreso.jpeg" class="logo-login">
             <h1 class="titulo-login">Lavadero</h1>
             <input type="text" id="lavador-dni" placeholder="DNI" inputmode="numeric">
-            <input type="password" id="lavador-pin" placeholder="PIN" inputmode="numeric" maxlength="4">
+            <input type="text" id="lavador-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
             <button class="btn-principal" id="btn-lavador-entrar">Ingresar</button>
             <div class="msg-error" id="lavador-error"></div>
         </div>
@@ -274,7 +274,7 @@
         <div class="card-login">
             <img src="img/Logo-ingreso.jpeg" class="logo-login">
             <h1 class="titulo-login">Personal del Lavadero</h1>
-            <input type="password" id="admin-pass" placeholder="Contraseña de supervisor">
+            <input type="password" id="admin-pass" placeholder="Contraseña de supervisor" autocomplete="off">
             <button class="btn-principal" id="btn-admin-entrar">Ingresar</button>
             <div class="msg-error" id="admin-error"></div>
         </div>
@@ -282,6 +282,10 @@
 
     <!-- ============ VISTA: ADMIN PERSONAL - GESTIÓN ============ -->
     <div id="admin-gestion" class="pantalla">
+        <button class="btn-secundario" id="btn-volver-admin" style="margin-bottom:14px;">
+            <i class="bi bi-arrow-left"></i> Volver
+        </button>
+
         <header class="top">
             <h2>Personal que lava los autos</h2>
         </header>

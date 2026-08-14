@@ -13,7 +13,8 @@ const NOMBRES_ALERTA = {
     ALERTA_AUTOEXCLUSION: "Autoexclusión activa",
     ALERTA_NOVEDAD: "Novedad pendiente",
     ALERTA_NO_SOCIO: "Ingreso de no socio",
-    ALERTA_MANUAL: "Alerta del supervisor"
+    ALERTA_MANUAL: "Alerta del supervisor",
+    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado"
 };
 
 let clientesCache = [];
@@ -196,7 +197,7 @@ function abrirModalAutorizarLavado(pedidoId) {
         <div class="card-login" style="width:100%; max-width:320px; margin:0;">
             <h1 style="color:var(--dorado); font-size:20px; margin-bottom:14px;">Autorizar lavado</h1>
             <input type="text" id="autorizar-legajo-modal" placeholder="Legajo" inputmode="numeric">
-            <input type="password" id="autorizar-pin-modal" placeholder="PIN" inputmode="numeric" maxlength="4">
+            <input type="text" id="autorizar-pin-modal" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
             <div id="autorizar-lavado-error" style="color:#ff6b6b; font-size:13px; min-height:18px; margin-bottom:8px;"></div>
             <button class="btn-principal" id="btn-confirmar-autorizar-lavado" style="margin-bottom:8px;">Autorizar</button>
             <button class="btn-secundario" id="btn-cancelar-autorizar-lavado">Cancelar</button>
