@@ -6,8 +6,11 @@
 //
 // Se accede así:
 //   lavadero.html                 -> vista cliente (default, la que escanea el QR)
-//   lavadero.html?vista=autorizar -> vista para que operador/supervisor autorice
 //   lavadero.html?vista=lavador   -> vista para el personal que lava los autos
+//   lavadero.html?vista=admin     -> alta de personal (lavadero y empresa)
+//
+// La autorización de pedidos ya no es una vista de esta página: se hace
+// desde la campana de alertas del sistema principal (script.js).
 
 const params = new URLSearchParams(window.location.search);
 const vista = params.get("vista") || "cliente";
@@ -314,91 +317,10 @@ async function actualizarEstadoCliente() {
         textos[pedido.estado] || textos.pendiente;
 }
 
-// =====================================================
-// VISTA AUTORIZAR (operador / supervisor)
-// =====================================================
+// La autorización de lavados ya no vive acá — ahora se hace desde la
+// campana de alertas del sistema principal (script.js), que agrega
+// "Lavado pendiente de autorizar" junto con el resto de las alertas.
 
-let autorizadorLogueado = null;
-
-function initVistaAutorizar() {
-    mostrarPantalla("autorizar-login");
-
-    document.getElementById("btn-autorizar-entrar").addEventListener("click", async () => {
-
-        const legajo = document.getElementById("autorizar-legajo").value.trim();
-        const pin = document.getElementById("autorizar-pin").value.trim();
-        const errorEl = document.getElementById("autorizar-error");
-        errorEl.textContent = "";
-
-        if (!legajo || !pin) {
-            errorEl.textContent = "Completá legajo y PIN";
-            return;
-        }
-
-        personalCache = await apiGet("/api/personal?tipo=empresa");
-
-        const persona = personalCache.find(p => String(p.legajo) === legajo && String(p.pin) === pin);
-
-        if (!persona) {
-            errorEl.textContent = "Legajo o PIN incorrecto";
-            return;
-        }
-
-        autorizadorLogueado = persona;
-        mostrarPantalla("autorizar-lista");
-        cargarPendientesAutorizar();
-        setInterval(cargarPendientesAutorizar, 15000);
-        setInterval(verificarPedidosVencidos, 60000);
-    });
-}
-
-async function cargarPendientesAutorizar() {
-
-    lavadosCache = await apiGet("/api/lavados");
-
-    const pendientes = lavadosCache
-        .filter(p => p.estado === "pendiente")
-        .sort((a, b) => a.fechaCreacion - b.fechaCreacion);
-
-    const contenedor = document.getElementById("lista-pendientes-autorizar");
-    const vacio = document.getElementById("vacio-autorizar");
-
-    if (pendientes.length === 0) {
-        contenedor.innerHTML = "";
-        vacio.style.display = "block";
-        return;
-    }
-
-    vacio.style.display = "none";
-
-    contenedor.innerHTML = pendientes.map(p => {
-        const minutosEsperando = Math.floor((Date.now() - p.fechaCreacion) / 60000);
-        const esperandoMucho = minutosEsperando >= 2;
-
-        return `
-        <div class="pedido-card" style="${esperandoMucho ? "border-color:#ff6b6b; box-shadow:0 0 10px rgba(255,107,107,0.5);" : ""}">
-            <div class="estado">PENDIENTE ${esperandoMucho ? `· esperando ${minutosEsperando} min` : ""}</div>
-            <div class="modelo">${p.clienteNombre}</div>
-            <div class="patente">${p.modelo} — ${p.patente}</div>
-            <button class="btn-principal" onclick="autorizarPedido('${p.id}')">Autorizar</button>
-        </div>
-        `;
-    }).join("");
-}
-
-async function autorizarPedido(id) {
-
-    const pedido = lavadosCache.find(p => p.id === id);
-    if (!pedido) return;
-
-    pedido.estado = "autorizado";
-    pedido.autorizadoPorLegajo = autorizadorLogueado.legajo;
-    pedido.autorizadoPorApellido = autorizadorLogueado.apellido;
-    pedido.horaAutorizacion = Date.now();
-
-    await apiPost("/api/lavados", lavadosCache);
-    cargarPendientesAutorizar();
-}
 
 // =====================================================
 // VISTA LAVADOR (personal tercerizado)
@@ -673,9 +595,7 @@ async function eliminarEmpresa(legajo) {
 // ARRANQUE SEGÚN LA VISTA
 // =====================================================
 
-if (vista === "autorizar") {
-    initVistaAutorizar();
-} else if (vista === "lavador") {
+if (vista === "lavador") {
     initVistaLavador();
 } else if (vista === "admin") {
     initVistaAdmin();

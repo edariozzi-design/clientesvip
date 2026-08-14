@@ -3176,9 +3176,6 @@ document.addEventListener("click", function (e) {
 buscador.addEventListener("keydown", function (e) {
     if (e.key === "Escape") ocultarSugerencias();
 });
-const btnExportar = document.getElementById("btn-exportar");
-const btnImportar = document.getElementById("btn-importar");
-const inputImportar = document.getElementById("input-importar");
 const btnMetricas = document.getElementById("btn-metricas");
 
 btnMetricas.addEventListener("click", () => {
@@ -3451,6 +3448,9 @@ function actualizarVistaUsuario() {
 
         btnLogout.style.display = "block";
 
+        // "Nuevo Ingreso" es tarea del operador, el supervisor no lo necesita.
+        if (btnNuevo) btnNuevo.style.display = "none";
+
     } else {
 
         panelAdmin.style.display = "none";
@@ -3460,6 +3460,8 @@ function actualizarVistaUsuario() {
         }
 
         btnLogout.style.display = "none";
+
+        if (btnNuevo) btnNuevo.style.display = "inline-flex";
     }
 
     renderCampanaAlertas();
@@ -5990,48 +5992,6 @@ resultadoCliente.innerHTML = `
 
 actualizarReloj();
 
-btnExportar.addEventListener("click", function () {
-
-    const datos = JSON.stringify(clientes, null, 2);
-
-    const blob = new Blob([datos], { type: "application/json" });
-
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement("a");
-
-    a.href = url;
-    a.download = "backup-clientes.json";
-
-    a.click();
-
-    URL.revokeObjectURL(url);
-});
-
-btnImportar.addEventListener("click", function () {
-    inputImportar.click();
-});
-
-inputImportar.addEventListener("change", function (e) {
-
-    const archivo = e.target.files[0];
-
-    if (!archivo) return;
-
-    const lector = new FileReader();
-
-    lector.onload = function (evento) {
-
-        clientes = JSON.parse(evento.target.result);
-
-        guardarClientes();
-
-        volverInicio();
-    };
-
-    lector.readAsText(archivo);
-});
-
 btnNuevo.addEventListener("click", function () {
 
     resultadoCliente.innerHTML = "";
@@ -6737,7 +6697,7 @@ function registrarAlerta(clienteId, tipoCorto, motivo) {
     guardarClientes();
 }
 
-function getAlertasPendientes() {
+async function getAlertasPendientes() {
 
     const alertas = [];
 
@@ -6748,6 +6708,7 @@ function getAlertasPendientes() {
             if (evento.revisada) return;
 
             alertas.push({
+                origen: "cliente",
                 clienteId: cliente.id,
                 clienteNombre: cliente.nombre,
                 indice: index,
@@ -6758,6 +6719,28 @@ function getAlertasPendientes() {
             });
         });
     });
+
+    try {
+        const respuesta = await fetch("/api/lavados");
+        const lavados = await respuesta.json();
+
+        (Array.isArray(lavados) ? lavados : [])
+            .filter(l => l.estado === "pendiente")
+            .forEach(l => {
+                alertas.push({
+                    origen: "lavado",
+                    pedidoId: l.id,
+                    clienteNombre: l.clienteNombre,
+                    tipo: "LAVADO_PENDIENTE",
+                    nombreTipo: "Lavado pendiente de autorizar",
+                    motivo: `${l.modelo} — ${l.patente}`,
+                    fecha: l.fechaCreacion
+                });
+            });
+
+    } catch (error) {
+        console.error("No se pudieron cargar los lavados pendientes:", error);
+    }
 
     return alertas.sort((a, b) => b.fecha - a.fecha);
 }
@@ -6773,17 +6756,98 @@ function marcarAlertaRevisada(clienteId, indice) {
     renderCampanaAlertas();
 }
 
-function renderCampanaAlertas() {
+async function abrirModalAutorizarLavado(pedidoId) {
+
+    document.getElementById("modal-autorizar-lavado")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-autorizar-lavado";
+    overlay.className = "login-overlay";
+
+    overlay.innerHTML = `
+        <div class="login-card" style="width:320px;">
+            <h4 style="color:#daa520; margin-bottom:1rem;">Autorizar lavado</h4>
+            <input id="autorizar-legajo-modal" class="form-control mb-2" placeholder="Legajo" inputmode="numeric">
+            <input id="autorizar-pin-modal" class="form-control mb-2" placeholder="PIN" type="password" inputmode="numeric" maxlength="4">
+            <div id="autorizar-lavado-error" style="color:#ff6b6b; font-size:13px; min-height:18px; margin-bottom:8px;"></div>
+            <div class="d-flex justify-content-center gap-2">
+                <button id="btn-confirmar-autorizar-lavado" class="btn-accion-principal">Autorizar</button>
+                <button id="btn-cancelar-autorizar-lavado" class="btn-accion-principal">Cancelar</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("btn-cancelar-autorizar-lavado").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+    document.getElementById("btn-confirmar-autorizar-lavado").addEventListener("click", async () => {
+
+        const legajo = document.getElementById("autorizar-legajo-modal").value.trim();
+        const pin = document.getElementById("autorizar-pin-modal").value.trim();
+        const errorEl = document.getElementById("autorizar-lavado-error");
+
+        if (!legajo || !pin) {
+            errorEl.textContent = "Completá legajo y PIN";
+            return;
+        }
+
+        try {
+            const personal = await (await fetch("/api/personal?tipo=empresa")).json();
+            const persona = personal.find(p => String(p.legajo) === legajo && String(p.pin) === pin);
+
+            if (!persona) {
+                errorEl.textContent = "Legajo o PIN incorrecto";
+                return;
+            }
+
+            const lavados = await (await fetch("/api/lavados")).json();
+            const pedido = lavados.find(l => l.id === pedidoId);
+
+            if (!pedido) {
+                errorEl.textContent = "El pedido ya no existe (¿alguien más lo autorizó?)";
+                return;
+            }
+
+            pedido.estado = "autorizado";
+            pedido.autorizadoPorLegajo = persona.legajo;
+            pedido.autorizadoPorApellido = persona.apellido;
+            pedido.horaAutorizacion = Date.now();
+
+            await fetch("/api/lavados", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(lavados)
+            });
+
+            overlay.remove();
+            renderCampanaAlertas();
+
+        } catch (error) {
+            errorEl.textContent = "No se pudo autorizar, probá de nuevo";
+            console.error(error);
+        }
+    });
+}
+
+async function renderCampanaAlertas() {
 
     const contenedor = document.getElementById("campana-alertas-contenedor");
     if (!contenedor) return;
 
-    if (usuarioActual.rol !== "supervisor") {
+    if (usuarioActual.rol !== "supervisor" && usuarioActual.rol !== "operador") {
         contenedor.innerHTML = "";
         return;
     }
 
-    const alertas = getAlertasPendientes();
+    let alertas = await getAlertasPendientes();
+
+    // El operador solo ve los pedidos de lavado por autorizar — el resto
+    // de las alertas (prohibición, novedades, etc.) son solo para supervisor.
+    if (usuarioActual.rol === "operador") {
+        alertas = alertas.filter(a => a.origen === "lavado");
+    }
 
     contenedor.innerHTML = `
         <div style="position:relative; display:inline-block;">
@@ -6829,22 +6893,35 @@ function toggleListaAlertas(alertas) {
 
     lista.innerHTML = alertas.length === 0
         ? `<div style="color:#d4af37; text-align:center; padding:10px;">Sin alertas pendientes</div>`
-        : alertas.map(a => `
+        : alertas.map(a => {
+
+            const accion = a.origen === "lavado"
+                ? `<button
+                        class="btn-accion-principal"
+                        style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
+                        onclick="abrirModalAutorizarLavado('${a.pedidoId}'); this.closest('#lista-alertas-flotante').remove();">
+                        Autorizar
+                    </button>`
+                : `<button
+                        class="btn-accion-principal"
+                        style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
+                        onclick="marcarAlertaRevisada('${a.clienteId}', ${a.indice}); this.closest('#lista-alertas-flotante').remove();">
+                        Marcar como revisada
+                    </button>`;
+
+            return `
             <div style="border-bottom:1px solid rgba(218,165,32,0.25); padding:8px 4px;">
                 <strong style="color:#daa520;">${a.nombreTipo}</strong><br>
-                <span style="color:#f0f0f0; cursor:pointer;" onclick="abrirCliente('${a.clienteId}')">
+                <span style="color:#f0f0f0; ${a.clienteId ? "cursor:pointer;" : ""}"
+                    ${a.clienteId ? `onclick="abrirCliente('${a.clienteId}')"` : ""}>
                     ${a.clienteNombre}
                 </span><br>
                 <small style="color:#999;">${a.motivo}</small><br>
                 <small style="color:#666;">${new Date(a.fecha).toLocaleString("es-AR")}</small><br>
-                <button
-                    class="btn-accion-principal"
-                    style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
-                    onclick="marcarAlertaRevisada('${a.clienteId}', ${a.indice}); this.closest('#lista-alertas-flotante').remove();">
-                    Marcar como revisada
-                </button>
+                ${accion}
             </div>
-        `).join("");
+        `;
+        }).join("");
 
     document.body.appendChild(lista);
 
