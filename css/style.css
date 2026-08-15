@@ -1,12 +1,3 @@
-/* =========================================================
-VIP CLUB - HOJA DE ESTILOS
-Reorganizado por secciones. Mismo resultado visual que antes,
-con las reglas duplicadas fusionadas y 3 errores de tipeo corregidos:
-- .cat-platinium -> .cat-platinum (coincide con el JS)
-- .metric-card.full -> .metric-card--full (coincide con la clase real)
-- font-size: 1,5rem -> 1.5rem (coma por punto)
-   ========================================================= */
-
 
 /* =========================
 BASE / GLOBAL

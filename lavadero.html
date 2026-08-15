@@ -214,14 +214,39 @@
 
     .columnas-personal {
         display: flex;
-        gap: 24px;
+        gap: 30px;
         flex-wrap: wrap;
         align-items: flex-start;
     }
 
-    .columna-personal {
+    .bloque-personal {
         flex: 1;
-        min-width: 300px;
+        min-width: 500px;
+    }
+
+    .bloque-personal .fila-personal {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .bloque-personal .card-login {
+        flex-shrink: 0;
+        width: 260px;
+    }
+
+    .grilla-tarjetas-personal {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        min-width: 220px;
+    }
+
+    .grilla-tarjetas-personal .persona-card {
+        width: 220px;
+        margin-bottom: 0;
     }
 </style>
 </head>
@@ -300,41 +325,47 @@
 
     <!-- ============ VISTA: ADMIN PERSONAL - GESTIÓN ============ -->
     <div id="admin-gestion" class="pantalla">
-        <button class="btn-secundario" id="btn-volver-admin" style="margin-bottom:14px; max-width:160px;">
-            <i class="bi bi-arrow-left"></i> Volver
-        </button>
+        <div style="text-align:right; margin-bottom:14px;">
+            <button class="btn-secundario" id="btn-volver-admin" style="display:inline-block; width:auto; padding:10px 20px;">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
 
         <div class="columnas-personal">
 
-            <div class="columna-personal">
+            <div class="bloque-personal">
                 <header class="top">
                     <h2>Personal que lava los autos</h2>
                 </header>
 
-                <div class="card-login" style="margin:0 0 20px;">
-                    <input type="text" id="nuevo-lavador-dni" placeholder="DNI">
-                    <input type="text" id="nuevo-lavador-nombre" placeholder="Nombre y apellido">
-                    <input type="text" id="nuevo-lavador-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
-                    <button class="btn-principal" id="btn-agregar-lavador">Agregar</button>
-                </div>
+                <div class="fila-personal">
+                    <div class="card-login" style="margin:0;">
+                        <input type="text" id="nuevo-lavador-dni" placeholder="DNI">
+                        <input type="text" id="nuevo-lavador-nombre" placeholder="Nombre y apellido">
+                        <input type="text" id="nuevo-lavador-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                        <button class="btn-principal" id="btn-agregar-lavador">Agregar</button>
+                    </div>
 
-                <div id="lista-personal-lavadero"></div>
+                    <div id="lista-personal-lavadero" class="grilla-tarjetas-personal"></div>
+                </div>
             </div>
 
-            <div class="columna-personal">
+            <div class="bloque-personal">
                 <header class="top">
                     <h2>Personal que autoriza (empresa)</h2>
                 </header>
 
-                <div class="card-login" style="margin:0 0 20px;">
-                    <input type="text" id="nuevo-empresa-legajo" placeholder="Legajo">
-                    <input type="text" id="nuevo-empresa-nombre" placeholder="Nombre">
-                    <input type="text" id="nuevo-empresa-apellido" placeholder="Apellido">
-                    <input type="text" id="nuevo-empresa-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
-                    <button class="btn-principal" id="btn-agregar-empresa">Agregar</button>
-                </div>
+                <div class="fila-personal">
+                    <div class="card-login" style="margin:0;">
+                        <input type="text" id="nuevo-empresa-legajo" placeholder="Legajo">
+                        <input type="text" id="nuevo-empresa-nombre" placeholder="Nombre">
+                        <input type="text" id="nuevo-empresa-apellido" placeholder="Apellido">
+                        <input type="text" id="nuevo-empresa-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                        <button class="btn-principal" id="btn-agregar-empresa">Agregar</button>
+                    </div>
 
-                <div id="lista-personal-empresa"></div>
+                    <div id="lista-personal-empresa" class="grilla-tarjetas-personal"></div>
+                </div>
             </div>
 
         </div>

@@ -3094,6 +3094,9 @@ estilosSugerencias.textContent += `
     .dashboard .fila-cruce {
         padding: 3px 0 !important;
     }
+    .dashboard .chart {
+        height: 160px !important;
+    }
 `;
 document.head.appendChild(estilosSugerencias);
 
@@ -3876,7 +3879,7 @@ function renderEstadisticas() {
 
     panelEstadisticas.innerHTML = `
 
-<div class="dashboard">
+<div class="dashboard" style="grid-template-columns: repeat(4, 1fr);">
 
     <!-- LAVADOS -->
     <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
