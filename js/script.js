@@ -3879,7 +3879,7 @@ function renderEstadisticas() {
 <div class="dashboard">
 
     <!-- LAVADOS -->
-    <div class="metric-card" id="tarjeta-lavados-metricas">
+    <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
         <h5>LAVADO DE AUTOS</h5>
         <div style="color:#d4af37; text-align:center;">Cargando...</div>
     </div>
@@ -4003,28 +4003,41 @@ async function renderTarjetaLavados() {
     tarjeta.innerHTML = `
         <h5>LAVADO DE AUTOS</h5>
 
-        <div class="d-flex justify-content-around" style="margin-bottom:10px;">
+        <div class="d-flex justify-content-around" style="margin-bottom:12px;">
             <div style="text-align:center;">
-                <div style="font-size:22px; color:gold; font-weight:bold;">${enCurso.length}</div>
+                <div style="font-size:26px; color:gold; font-weight:bold;">${enCurso.length}</div>
                 <div style="font-size:12px; color:#d4af37;">En curso</div>
             </div>
             <div style="text-align:center;">
-                <div style="font-size:22px; color:gold; font-weight:bold;">${finalizadosHoy.length}</div>
+                <div style="font-size:26px; color:gold; font-weight:bold;">${finalizadosHoy.length}</div>
                 <div style="font-size:12px; color:#d4af37;">Finalizados hoy</div>
             </div>
         </div>
 
         ${enCurso.length === 0
-            ? `<div style="color:#888; text-align:center; font-size:13px;">Sin autos en lavado ahora</div>`
-            : enCurso.map(l => `
-                <div style="font-size:13px; color:#d4af37; border-top:1px solid rgba(218,165,32,0.2); padding:6px 0;">
-                    <div style="font-weight:600;">${l.clienteNombre}</div>
-                    <div style="display:flex; justify-content:space-between;">
-                        <span>Auto: ${l.modelo} — ${l.patente}</span>
-                        <span>${l.estado === "aceptado" ? `Llavero ${l.numeroLlavero}` : "Esperando aceptar"}</span>
+            ? `<div style="color:#888; text-align:center; font-size:13px; padding:10px 0;">Sin autos en lavado ahora</div>`
+            : enCurso.map(l => {
+                const esAceptado = l.estado === "aceptado";
+                return `
+                <div style="border:1px solid rgba(218,165,32,0.35); border-radius:10px; padding:10px 12px; margin-top:8px; text-align:left;">
+
+                    <span style="
+                        display:inline-block; font-size:11px; font-weight:700;
+                        padding:2px 10px; border-radius:999px; margin-bottom:6px;
+                        background:${esAceptado ? "rgba(46,204,113,0.15)" : "rgba(218,165,32,0.15)"};
+                        color:${esAceptado ? "#2ecc71" : "#daa520"};">
+                        ${esAceptado ? "EN LAVADO" : "ESPERANDO LAVADOR"}
+                    </span>
+
+                    <div style="font-weight:700; color:white; font-size:14px;">${l.clienteNombre}</div>
+                    <div style="font-size:13px; color:#d4af37;">Auto: ${l.modelo} — ${l.patente}</div>
+
+                    <div style="font-size:12px; color:#999; margin-top:4px;">
+                        ${esAceptado ? `Llavero <strong style="color:#daa520;">${l.numeroLlavero}</strong>` : `Autorizó: ${l.autorizadoPorApellido || "-"}`}
                     </div>
                 </div>
-            `).join("")
+            `;
+            }).join("")
         }
     `;
 }
