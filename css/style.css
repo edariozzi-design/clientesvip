@@ -936,8 +936,8 @@ MENÚ INFORME (DROPDOWN)
 }
 
 .dropdown-item:hover {
-    background: #daa520;
-    color: black;
+    background: #daa520 !important;
+    color: black !important;
 }
 
 #btn-metricas {
