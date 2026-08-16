@@ -3881,12 +3881,6 @@ function renderEstadisticas() {
 
 <div class="dashboard" style="grid-template-columns: repeat(4, 1fr);">
 
-    <!-- LAVADOS -->
-    <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
-        <h5>LAVADO DE AUTOS</h5>
-        <div style="color:#d4af37; text-align:center;">Cargando...</div>
-    </div>
-
     <!-- EN SALA -->
     <div class="card metric-card">
         <h5>EN SALA AHORA</h5>
@@ -3955,6 +3949,12 @@ function renderEstadisticas() {
         </div>
     `).join("")}
 </div>
+
+<!-- LAVADOS -->
+    <div class="metric-card" id="tarjeta-lavados-metricas" style="height:100%; overflow-y:auto;">
+        <h5>LAVADO DE AUTOS</h5>
+        <div style="color:#d4af37; text-align:center;">Cargando...</div>
+    </div>
 
 <!-- GRAFICO -->
 <div class="card metric-card grafico-principal">
