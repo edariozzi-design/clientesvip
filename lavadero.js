@@ -498,7 +498,7 @@ function initVistaAdmin() {
     });
 
     document.getElementById("btn-volver-admin-login").addEventListener("click", () => {
-        window.location.href = "index.html";
+        window.history.back();
     });
 }
 
