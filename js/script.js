@@ -3881,6 +3881,11 @@ function renderEstadisticas() {
 
 <div class="dashboard" style="grid-template-columns: repeat(4, 1fr);">
 
+    <!-- LAVADOS -->
+    <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
+        <h5>LAVADO DE AUTOS</h5>
+        <div style="color:#d4af37; text-align:center;">Cargando...</div>
+    </div>
 
     <!-- EN SALA -->
     <div class="card metric-card">
@@ -3951,12 +3956,6 @@ function renderEstadisticas() {
     `).join("")}
 </div>
 
-<!-- LAVADOS -->
-    <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
-        <h5>LAVADO DE AUTOS</h5>
-        <div style="color:#d4af37; text-align:center;">Cargando...</div>
-    </div>
-
 <!-- GRAFICO -->
 <div class="card metric-card grafico-principal">
     <h5>ACTIVIDAD POR HORA</h5>
@@ -3995,13 +3994,11 @@ async function renderTarjetaLavados() {
     if (!Array.isArray(lavados)) lavados = [];
 
     const enCurso = lavados.filter(l => l.estado === "aceptado" || l.estado === "autorizado");
+    const jornadaActual = getFechaOperativa(new Date()).getTime();
+
     const finalizadosHoy = lavados.filter(l => {
         if (l.estado !== "finalizado" || !l.horaFinalizacion) return false;
-        const f = new Date(l.horaFinalizacion);
-        const hoy = new Date();
-        return f.getFullYear() === hoy.getFullYear()
-            && f.getMonth() === hoy.getMonth()
-            && f.getDate() === hoy.getDate();
+        return getFechaOperativa(new Date(l.horaFinalizacion)).getTime() === jornadaActual;
     });
 
     tarjeta.innerHTML = `
@@ -6530,12 +6527,8 @@ async function abrirLavadosDelDia() {
     }
 
     const hoy = new Date();
-    const esHoy = fecha => {
-        const f = new Date(fecha);
-        return f.getFullYear() === hoy.getFullYear()
-            && f.getMonth() === hoy.getMonth()
-            && f.getDate() === hoy.getDate();
-    };
+    const jornadaActual = getFechaOperativa(hoy).getTime();
+    const esHoy = fecha => getFechaOperativa(new Date(fecha)).getTime() === jornadaActual;
 
     const lavadosHoy = (Array.isArray(lavados) ? lavados : [])
         .filter(l => esHoy(l.fechaCreacion))
@@ -6597,7 +6590,7 @@ async function abrirLavadosDelDia() {
         <body>
             <div class="encabezado">
                 <h1>Lavados del día — ${hoy.toLocaleDateString("es-AR")}</h1>
-                <img src="/img/Logo-ingreso.jpeg" alt="Logo">
+                <img src="/img/Encabezado.png" alt="Logo">
             </div>
             <table>
                 <thead>
