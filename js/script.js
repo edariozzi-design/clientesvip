@@ -3426,6 +3426,12 @@ function actualizarVistaUsuario() {
         btnLavadosDia.dataset.conectado = "true";
     }
 
+    const btnGastronomiaInforme = document.getElementById("btn-gastronomia-informe");
+    if (btnGastronomiaInforme && !btnGastronomiaInforme.dataset.conectado) {
+        btnGastronomiaInforme.addEventListener("click", abrirInformeGastronomia);
+        btnGastronomiaInforme.dataset.conectado = "true";
+    }
+
     // Buscar / Nuevo ingreso: mismo formato visual (Métricas ya no —
     // ahora vive como ítem del menú "Informe" y usa el estilo de ese menú).
     const btnBuscar = formulario?.querySelector("button[type='submit'], button");
@@ -3883,6 +3889,18 @@ function renderEstadisticas() {
 
 <div class="dashboard" style="grid-template-columns: repeat(4, 1fr);">
 
+    <!-- LAVADOS -->
+    <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
+        <h5>LAVADO DE AUTOS</h5>
+        <div style="color:#d4af37; text-align:center;">Cargando...</div>
+    </div>
+
+    <!-- GASTRONOMÍA -->
+    <div class="metric-card" id="tarjeta-gastronomia-metricas" style="max-height:340px; overflow-y:auto;">
+        <h5>GASTRONOMÍA</h5>
+        <div style="color:#d4af37; text-align:center;">Cargando...</div>
+    </div>
+
     <!-- EN SALA -->
     <div class="card metric-card">
         <h5>EN SALA AHORA</h5>
@@ -3952,12 +3970,6 @@ function renderEstadisticas() {
     `).join("")}
 </div>
 
-<!-- LAVADOS -->
-    <div class="metric-card" id="tarjeta-lavados-metricas" style="height:100%; overflow-y:auto;">
-        <h5>LAVADO DE AUTOS</h5>
-        <div style="color:#d4af37; text-align:center;">Cargando...</div>
-    </div>
-
 <!-- GRAFICO -->
 <div class="card metric-card grafico-principal">
     <h5>ACTIVIDAD POR HORA</h5>
@@ -3976,6 +3988,7 @@ function renderEstadisticas() {
 
     renderOverlayCategoria(clientesEnSala);
     renderTarjetaLavados();
+    renderTarjetaGastronomia();
 }
 
 async function renderTarjetaLavados() {
@@ -4037,6 +4050,73 @@ async function renderTarjetaLavados() {
 
                     <div style="font-size:12px; color:#999; margin-top:4px;">
                         ${esAceptado ? `Llavero <strong style="color:#daa520;">${l.numeroLlavero}</strong>` : `Autorizó: ${l.autorizadoPorApellido || "-"}`}
+                    </div>
+                </div>
+            `;
+            }).join("")
+        }
+    `;
+}
+
+async function renderTarjetaGastronomia() {
+
+    const tarjeta = document.getElementById("tarjeta-gastronomia-metricas");
+    if (!tarjeta) return;
+
+    let pedidos = [];
+
+    try {
+        const respuesta = await fetch("/api/pedidos");
+        pedidos = await respuesta.json();
+    } catch (error) {
+        tarjeta.innerHTML += `<div style="color:#ff6b6b; text-align:center;">No se pudo cargar</div>`;
+        return;
+    }
+
+    if (!Array.isArray(pedidos)) pedidos = [];
+
+    const enCurso = pedidos.filter(p => p.estado === "pendiente" || p.estado === "confirmado");
+    const jornadaActual = getFechaOperativa(new Date()).getTime();
+
+    const entregadosHoy = pedidos.filter(p => {
+        if (p.estado !== "entregado" || !p.horaEntrega) return false;
+        return getFechaOperativa(new Date(p.horaEntrega)).getTime() === jornadaActual;
+    });
+
+    tarjeta.innerHTML = `
+        <h5>GASTRONOMÍA</h5>
+
+        <div class="d-flex justify-content-around" style="margin-bottom:12px;">
+            <div style="text-align:center;">
+                <div style="font-size:26px; color:gold; font-weight:bold;">${enCurso.length}</div>
+                <div style="font-size:12px; color:#d4af37;">En curso</div>
+            </div>
+            <div style="text-align:center;">
+                <div style="font-size:26px; color:gold; font-weight:bold;">${entregadosHoy.length}</div>
+                <div style="font-size:12px; color:#d4af37;">Entregados hoy</div>
+            </div>
+        </div>
+
+        ${enCurso.length === 0
+            ? `<div style="color:#888; text-align:center; font-size:13px; padding:10px 0;">Sin pedidos en curso</div>`
+            : enCurso.map(p => {
+                const esConfirmado = p.estado === "confirmado";
+                return `
+                <div style="border:1px solid rgba(218,165,32,0.35); border-radius:10px; padding:10px 12px; margin-top:8px; text-align:left;">
+
+                    <span style="
+                        display:inline-block; font-size:11px; font-weight:700;
+                        padding:2px 10px; border-radius:999px; margin-bottom:6px;
+                        background:${esConfirmado ? "rgba(46,204,113,0.15)" : "rgba(218,165,32,0.15)"};
+                        color:${esConfirmado ? "#2ecc71" : "#daa520"};">
+                        ${esConfirmado ? "EN PREPARACIÓN" : "ESPERANDO CAMARERO"}
+                    </span>
+
+                    <div style="font-weight:700; color:white; font-size:14px;">${p.clienteNombre}</div>
+                    <div style="font-size:13px; color:#d4af37;">Punto: ${p.punto}</div>
+
+                    <div style="font-size:12px; color:#999; margin-top:4px;">
+                        ${esConfirmado ? `Confirmó: ${p.confirmadoPorApellido || "-"}` : "Sin confirmar"}
                     </div>
                 </div>
             `;
@@ -4433,6 +4513,13 @@ function renderCliente(cliente) {
     ${usuarioActual.rol === "supervisor"
         ? `<button data-action="lavados" class="icon-btn" title="Lavados de auto">
                 <i class="bi bi-droplet-fill"></i>
+            </button>`
+        : ""
+    }
+
+    ${usuarioActual.rol === "supervisor"
+        ? `<button data-action="gastronomia-historial" class="icon-btn" title="Gastronomía">
+                <i class="bi bi-cup-hot-fill"></i>
             </button>`
         : ""
     }
@@ -5094,6 +5181,47 @@ function renderPanel() {
         div.innerHTML = html;
     }
 
+    /* ================= GASTRONOMÍA ================= */
+
+    else if (vistaActual === "gastronomia-historial") {
+
+        let html = `
+            <div class="d-flex align-items-center gap-1 mb-2">
+                <h5 class="m-0">Gastronomía</h5>
+            </div>
+        `;
+
+        if (pedidosClienteActual.length === 0) {
+            html += `<p style="color:#daa520; text-align:center;">Sin pedidos registrados</p>`;
+        } else {
+            html += `<div class="row g-2">`;
+
+            pedidosClienteActual.forEach(p => {
+                const fecha = new Date(p.fechaCreacion).toLocaleDateString("es-AR");
+                const hora = new Date(p.fechaCreacion).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
+                const detalle = p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ");
+
+                html += `
+                    <div class="col-12 col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body" style="color:#d4af37; text-align:center;">
+                                <strong>Punto ${p.punto}</strong><br>
+                                <small>${fecha} ${hora} · Estado: ${p.estado}</small><br>
+                                <small>${detalle}</small><br>
+                                ${p.total ? `<small>Total: $${p.total}</small><br>` : ""}
+                                <small>Confirmó: ${p.confirmadoPorApellido || "-"}</small>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += `</div>`;
+        }
+
+        div.innerHTML = html;
+    }
+
     /* ================= VER NOVEDAD ================= */
 
 
@@ -5450,6 +5578,16 @@ document.addEventListener("click", async function (e) {
         } else {
             vistaActual = "lavados";
             cargarLavadosDelCliente(clienteActual.id);
+        }
+    }
+
+    if (action === "gastronomia-historial") {
+        if (vistaActual === "gastronomia-historial") {
+            vistaActual = "";
+            renderPanel();
+        } else {
+            vistaActual = "gastronomia-historial";
+            cargarPedidosDelCliente(clienteActual.id);
         }
     }
 
@@ -6592,7 +6730,7 @@ async function abrirLavadosDelDia() {
         <body>
             <div class="encabezado">
                 <h1>Lavados del día — ${hoy.toLocaleDateString("es-AR")}</h1>
-                <img src="/img/Encabezado.png" alt="Logo">
+                <img src="/img/Logo-ingreso.jpeg" alt="Logo">
             </div>
             <table>
                 <thead>
@@ -6623,6 +6761,132 @@ async function abrirLavadosDelDia() {
     ventana.focus();
 }
 
+async function abrirInformeGastronomia() {
+
+    let pedidos = [];
+
+    try {
+        const respuesta = await fetch("/api/pedidos");
+        pedidos = await respuesta.json();
+    } catch (error) {
+        mostrarAviso("No se pudo cargar el informe de gastronomía");
+        return;
+    }
+
+    pedidos = (Array.isArray(pedidos) ? pedidos : []).sort((a, b) => b.fechaCreacion - a.fechaCreacion);
+
+    const hoy = new Date();
+    const jornadaActual = getFechaOperativa(hoy).getTime();
+
+    const filaDe = p => {
+        const hora = new Date(p.fechaCreacion).toLocaleString("es-AR");
+        const detalle = p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ");
+        return `
+            <tr data-jornada="${getFechaOperativa(p.fechaCreacion).getTime()}">
+                <td>${p.clienteNombre}</td>
+                <td>${p.clienteCategoria}</td>
+                <td>${detalle}</td>
+                <td>${hora}</td>
+                <td>${p.confirmadoPorApellido || "-"}</td>
+                <td>${p.punto}</td>
+                <td>${p.autorizadoPorJefe || "-"}</td>
+            </tr>
+        `;
+    };
+
+    const filas = pedidos.map(filaDe).join("");
+
+    const html = `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Gastronomía - Informe</title>
+            <style>
+                body { font-family: Arial, sans-serif; padding: 20px; color: #111; }
+                .encabezado {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    margin-bottom: 10px;
+                }
+                .encabezado h1 { font-size: 20px; margin: 0; }
+                .encabezado img { height: 60px; border-radius: 8px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+                th, td { border: 1px solid #999; padding: 6px 8px; font-size: 12px; text-align: center; }
+                th { background: #eee; }
+                .barra-acciones {
+                    display: flex; gap: 10px; justify-content: center; margin-top: 16px;
+                }
+                .barra-acciones button {
+                    padding: 10px 20px; font-size: 14px; font-weight: 600;
+                    border-radius: 8px; border: 1.5px solid #daa520;
+                    background: transparent; color: #111; cursor: pointer;
+                }
+                .barra-acciones button.activo { background: #daa520; }
+                #btn-imprimir-gastronomia { background: #daa520; }
+                @media print { .barra-acciones { display: none; } }
+            </style>
+        </head>
+        <body>
+            <div class="encabezado">
+                <h1 id="titulo-informe-gastronomia">Gastronomía — Jornada de hoy</h1>
+                <img src="/img/Logo-ingreso.jpeg" alt="Logo">
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Categoría</th>
+                        <th>Pedido</th>
+                        <th>Hora</th>
+                        <th>Camarero</th>
+                        <th>Máquina/Punto</th>
+                        <th>Jefe (si hubo autorización)</th>
+                    </tr>
+                </thead>
+                <tbody id="cuerpo-informe-gastronomia">
+                    ${filas || `<tr><td colspan="7">Sin pedidos registrados</td></tr>`}
+                </tbody>
+            </table>
+
+            <div class="barra-acciones">
+                <button id="btn-vista-dia" class="activo">Jornada de hoy</button>
+                <button id="btn-vista-historico">Histórico general</button>
+                <button id="btn-imprimir-gastronomia">Imprimir</button>
+            </div>
+
+            <script>
+                const jornadaActual = ${jornadaActual};
+
+                function filtrarVista(soloHoy) {
+                    document.querySelectorAll("#cuerpo-informe-gastronomia tr[data-jornada]").forEach(fila => {
+                        const esDeHoy = Number(fila.dataset.jornada) === jornadaActual;
+                        fila.style.display = (!soloHoy || esDeHoy) ? "" : "none";
+                    });
+                    document.getElementById("titulo-informe-gastronomia").textContent =
+                        soloHoy ? "Gastronomía — Jornada de hoy" : "Gastronomía — Histórico general";
+                    document.getElementById("btn-vista-dia").classList.toggle("activo", soloHoy);
+                    document.getElementById("btn-vista-historico").classList.toggle("activo", !soloHoy);
+                }
+
+                document.getElementById("btn-vista-dia").addEventListener("click", () => filtrarVista(true));
+                document.getElementById("btn-vista-historico").addEventListener("click", () => filtrarVista(false));
+                document.getElementById("btn-imprimir-gastronomia").addEventListener("click", () => window.print());
+
+                filtrarVista(true);
+            </script>
+        </body>
+        </html>
+    `;
+
+    const ventana = window.open("", "_blank");
+    ventana.document.write(html);
+    ventana.document.close();
+    ventana.focus();
+}
+
+
 async function cargarLavadosDelCliente(clienteId) {
     try {
         const respuesta = await fetch("/api/lavados");
@@ -6635,6 +6899,25 @@ async function cargarLavadosDelCliente(clienteId) {
     } catch (error) {
         console.error("No se pudieron cargar los lavados:", error);
         lavadosClienteActual = [];
+    }
+
+    renderPanel();
+}
+
+let pedidosClienteActual = [];
+
+async function cargarPedidosDelCliente(clienteId) {
+    try {
+        const respuesta = await fetch("/api/pedidos");
+        const todos = await respuesta.json();
+
+        pedidosClienteActual = (Array.isArray(todos) ? todos : [])
+            .filter(p => p.clienteId === clienteId)
+            .sort((a, b) => b.fechaCreacion - a.fechaCreacion);
+
+    } catch (error) {
+        console.error("No se pudieron cargar los pedidos:", error);
+        pedidosClienteActual = [];
     }
 
     renderPanel();
@@ -6674,7 +6957,9 @@ const NOMBRES_ALERTA = {
     ALERTA_NOVEDAD: "Novedad pendiente",
     ALERTA_NO_SOCIO: "Ingreso de no socio",
     ALERTA_MANUAL: "Alerta del supervisor",
-    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado"
+    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado",
+    ALERTA_VERIFICACION: "Verificación de beneficio",
+    ALERTA_TOPE_GASTRONOMIA: "Tope diario de consumo alcanzado"
 };
 
 function mostrarAviso(mensaje) {
@@ -6865,6 +7150,28 @@ async function getAlertasPendientes() {
         console.error("No se pudieron cargar los lavados pendientes:", error);
     }
 
+    try {
+        const respuesta = await fetch("/api/pedidos");
+        const pedidos = await respuesta.json();
+
+        (Array.isArray(pedidos) ? pedidos : [])
+            .filter(p => p.estado === "pendiente")
+            .forEach(p => {
+                alertas.push({
+                    origen: "pedido",
+                    pedidoId: p.id,
+                    clienteNombre: p.clienteNombre,
+                    tipo: "PEDIDO_PENDIENTE",
+                    nombreTipo: "Pedido de gastronomía pendiente",
+                    motivo: `Punto ${p.punto} — ${p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ")}`,
+                    fecha: p.fechaCreacion
+                });
+            });
+
+    } catch (error) {
+        console.error("No se pudieron cargar los pedidos pendientes:", error);
+    }
+
     return alertas.sort((a, b) => b.fecha - a.fecha);
 }
 
@@ -6954,6 +7261,81 @@ async function abrirModalAutorizarLavado(pedidoId) {
     });
 }
 
+async function abrirModalConfirmarPedido(pedidoId) {
+
+    document.getElementById("modal-confirmar-pedido")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-confirmar-pedido";
+    overlay.className = "login-overlay";
+
+    overlay.innerHTML = `
+        <div class="login-card" style="width:320px;">
+            <h4 style="color:#daa520; margin-bottom:1rem;">Confirmar pedido</h4>
+            <input id="confirmar-pedido-legajo-modal" class="form-control mb-2" placeholder="Legajo" inputmode="numeric">
+            <input id="confirmar-pedido-pin-modal" class="form-control mb-2" placeholder="PIN" type="text" inputmode="numeric" maxlength="4" autocomplete="off">
+            <div id="confirmar-pedido-error" style="color:#ff6b6b; font-size:13px; min-height:18px; margin-bottom:8px;"></div>
+            <div class="d-flex justify-content-center gap-2">
+                <button id="btn-confirmar-pedido-ok" class="btn-accion-principal">Confirmar</button>
+                <button id="btn-confirmar-pedido-cancelar" class="btn-accion-principal">Cancelar</button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("btn-confirmar-pedido-cancelar").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+    document.getElementById("btn-confirmar-pedido-ok").addEventListener("click", async () => {
+
+        const legajo = document.getElementById("confirmar-pedido-legajo-modal").value.trim();
+        const pin = document.getElementById("confirmar-pedido-pin-modal").value.trim();
+        const errorEl = document.getElementById("confirmar-pedido-error");
+
+        if (!legajo || !pin) {
+            errorEl.textContent = "Completá legajo y PIN";
+            return;
+        }
+
+        try {
+            const personal = await (await fetch("/api/personal?tipo=camareros")).json();
+            const persona = personal.find(p => String(p.legajo) === legajo && String(p.pin) === pin);
+
+            if (!persona) {
+                errorEl.textContent = "Legajo o PIN incorrecto";
+                return;
+            }
+
+            const pedidos = await (await fetch("/api/pedidos")).json();
+            const pedido = pedidos.find(p => p.id === pedidoId);
+
+            if (!pedido) {
+                errorEl.textContent = "El pedido ya no existe (¿alguien más lo confirmó?)";
+                return;
+            }
+
+            pedido.estado = "confirmado";
+            pedido.confirmadoPorLegajo = persona.legajo;
+            pedido.confirmadoPorApellido = persona.apellido;
+            pedido.horaConfirmacion = Date.now();
+
+            await fetch("/api/pedidos", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(pedidos)
+            });
+
+            overlay.remove();
+            renderCampanaAlertas();
+
+        } catch (error) {
+            errorEl.textContent = "No se pudo confirmar, probá de nuevo";
+            console.error(error);
+        }
+    });
+}
+
 async function renderCampanaAlertas() {
 
     const contenedor = document.getElementById("campana-alertas-contenedor");
@@ -6969,7 +7351,11 @@ async function renderCampanaAlertas() {
     // El operador solo ve los pedidos de lavado por autorizar — el resto
     // de las alertas (prohibición, novedades, etc.) son solo para supervisor.
     if (usuarioActual.rol === "operador") {
-        alertas = alertas.filter(a => a.origen === "lavado" || a.tipo === "ALERTA_LAVADO_FINALIZADO");
+        alertas = alertas.filter(a =>
+            a.origen === "lavado" ||
+            a.origen === "pedido" ||
+            a.tipo === "ALERTA_LAVADO_FINALIZADO"
+        );
     }
 
     contenedor.innerHTML = `
@@ -7024,6 +7410,13 @@ function toggleListaAlertas(alertas) {
                         style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
                         onclick="abrirModalAutorizarLavado('${a.pedidoId}'); this.closest('#lista-alertas-flotante').remove();">
                         Autorizar
+                    </button>`
+                : a.origen === "pedido"
+                ? `<button
+                        class="btn-accion-principal"
+                        style="margin-top:6px; padding:4px 10px !important; font-size:12px;"
+                        onclick="abrirModalConfirmarPedido('${a.pedidoId}'); this.closest('#lista-alertas-flotante').remove();">
+                        Confirmar
                     </button>`
                 : `<button
                         class="btn-accion-principal"
