@@ -1,11 +1,9 @@
-// api/personal.js
+// api/menu.js
 //
-// Guarda y lee tres listas chicas de personas:
-// - ?tipo=lavadero   -> personal tercerizado que lava los autos (dni, nombre, pin de 4 dígitos)
-// - ?tipo=empresa    -> personal de la empresa que puede autorizar un lavado (legajo, nombre, apellido, pin de 4 dígitos)
-// - ?tipo=camareros  -> personal que confirma pedidos de gastronomía (legajo, nombre, apellido, pin de 4 dígitos)
-//
-// Mismo patrón que api/clientes.js y api/lavados.js.
+// Guarda los 2 menús de gastronomía:
+// - "beneficio" (con horario, sin precios)
+// - "pago" (sin horario, con precios)
+// Y la configuración de horario del menú beneficio.
 
 export default async function handler(req, res) {
 
@@ -17,13 +15,13 @@ export default async function handler(req, res) {
         return;
     }
 
-    const tipo = req.query?.tipo === "empresa" ? "empresa"
-        : req.query?.tipo === "camareros" ? "camareros"
-        : "lavadero";
+    const tipo = req.query?.tipo === "pago" ? "pago"
+        : req.query?.tipo === "horario" ? "horario"
+        : "beneficio";
 
-    const clave = tipo === "empresa" ? "personal_empresa"
-        : tipo === "camareros" ? "personal_camareros"
-        : "personal_lavadero";
+    const clave = tipo === "pago" ? "menu_pago"
+        : tipo === "horario" ? "menu_horario"
+        : "menu_beneficio";
 
     if (req.method === "GET") {
         try {
@@ -32,9 +30,9 @@ export default async function handler(req, res) {
             });
 
             const datos = await respuesta.json();
-            const personal = datos.result ? JSON.parse(datos.result) : [];
+            const valor = datos.result ? JSON.parse(datos.result) : (tipo === "horario" ? { desde: "20:00", hasta: "23:59" } : []);
 
-            res.status(200).json(personal);
+            res.status(200).json(valor);
 
         } catch (error) {
             console.error(error);
@@ -45,7 +43,7 @@ export default async function handler(req, res) {
 
     if (req.method === "POST") {
         try {
-            const personal = req.body;
+            const valor = req.body;
 
             await fetch(`${KV_URL}/set/${clave}`, {
                 method: "POST",
@@ -53,7 +51,7 @@ export default async function handler(req, res) {
                     Authorization: `Bearer ${KV_TOKEN}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(personal)
+                body: JSON.stringify(valor)
             });
 
             res.status(200).json({ ok: true });

@@ -142,7 +142,7 @@ function pedirDato({ titulo, placeholder, maxLength }) {
 // =====================
 
 function tieneBeneficioLavado(cliente) {
-    const categoriasAutomaticas = ["Bespoke", "Diamond"];
+    const categoriasAutomaticas = ["Bespoke", "Diamond", "Diamond Seg."];
     return categoriasAutomaticas.includes(cliente.categoria) || !!cliente.excepcionLavado?.activa;
 }
 
@@ -498,7 +498,7 @@ function initVistaAdmin() {
     });
 
     document.getElementById("btn-volver-admin-login").addEventListener("click", () => {
-        window.history.back();
+        window.location.href = "index.html";
     });
 }
 

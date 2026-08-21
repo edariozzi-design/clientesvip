@@ -936,14 +936,11 @@ MENÚ INFORME (DROPDOWN)
 }
 
 .dropdown-item:hover {
-    background: #daa520 !important;
-    color: black !important;
+    background: #daa520;
+    color: black;
 }
 
-#btn-metricas {
-    border: none !important;
-    background: transparent !important;
-}
+
 
 
 /* =========================

@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>Gastronomía</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+<style>
+    :root {
+        --dorado: #daa520;
+        --card: #1a1a1a;
+        --texto: #f0f0f0;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background-image: url(/img/fondo-vip.avif);
+        background-size: cover;
+        background-repeat: repeat-y;
+        background-position: center;
+        color: var(--texto);
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        padding-bottom: 40px;
+    }
+
+    .pantalla { display: none; padding: 20px 16px; }
+    .pantalla.activa { display: block; }
+
+    .card-login {
+        background: var(--card);
+        border: 2px solid var(--dorado);
+        border-radius: 16px;
+        padding: 30px 24px;
+        width: 100%;
+        max-width: 380px;
+        margin: 30px auto;
+        text-align: center;
+    }
+
+    .logo-login {
+        width: 8rem;
+        max-width: 100%;
+        border-radius: 2rem;
+        border: 0.1rem solid var(--dorado);
+        margin-bottom: 14px;
+    }
+
+    h1.titulo-login {
+        color: var(--dorado);
+        font-size: 22px;
+        margin: 10px 0 20px;
+    }
+
+    input, select, textarea {
+        width: 100%;
+        padding: 14px;
+        font-size: 17px;
+        border-radius: 10px;
+        border: 2px solid var(--dorado);
+        background: #000;
+        color: white;
+        text-align: center;
+        margin-bottom: 12px;
+    }
+
+    button.btn-principal {
+        width: 100%;
+        padding: 14px;
+        font-size: 17px;
+        font-weight: 700;
+        border-radius: 10px;
+        border: none;
+        background: var(--dorado);
+        color: #1a1a1a;
+        cursor: pointer;
+    }
+
+    button.btn-secundario {
+        width: 100%;
+        padding: 12px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 10px;
+        border: 1.5px solid var(--dorado);
+        background: transparent;
+        color: var(--dorado);
+        cursor: pointer;
+        margin-top: 8px;
+    }
+
+    .msg-error { color: #ff6b6b; margin-top: 8px; min-height: 20px; font-size: 14px; }
+    .msg-ok { color: #6bff8f; margin-top: 8px; font-size: 14px; }
+
+    header.top { text-align: center; margin-bottom: 16px; }
+    header.top h2 { color: var(--dorado); margin: 0; }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--card);
+        border: 1.5px solid var(--dorado);
+        border-radius: 12px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
+    }
+
+    .menu-item .info { text-align: left; }
+    .menu-item .nombre { font-weight: 700; color: white; font-size: 15px; }
+    .menu-item .precio { color: var(--dorado); font-size: 13px; }
+
+    .menu-item .cantidad-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .menu-item .cantidad-control button {
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: 1.5px solid var(--dorado);
+        background: transparent;
+        color: var(--dorado);
+        font-size: 18px;
+        line-height: 1;
+    }
+
+    .menu-item .cantidad-valor {
+        min-width: 20px;
+        text-align: center;
+        font-weight: 700;
+    }
+
+    #resumen-pedido {
+        position: sticky;
+        bottom: 0;
+        background: var(--card);
+        border-top: 2px solid var(--dorado);
+        padding: 14px 16px;
+        margin: 20px -16px -40px;
+    }
+
+    .pedido-card {
+        background: var(--card);
+        border: 1.5px solid var(--dorado);
+        border-radius: 14px;
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+
+    .vacio { text-align: center; color: #888; padding: 40px 20px; }
+
+    .columnas-admin {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .bloque-admin {
+        flex: 1;
+        min-width: 340px;
+    }
+
+    .qr-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+    }
+
+    .qr-item {
+        background: white;
+        border-radius: 10px;
+        padding: 10px;
+        text-align: center;
+        width: 140px;
+    }
+
+    .qr-item img { width: 100%; }
+    .qr-item span { color: #111; font-size: 12px; font-weight: 700; display: block; margin-top: 4px; }
+
+    .tabs { display: flex; gap: 10px; margin-bottom: 16px; }
+    .tabs button {
+        flex: 1;
+        padding: 10px;
+        border-radius: 10px;
+        border: 1.5px solid var(--dorado);
+        background: transparent;
+        color: var(--dorado);
+        font-weight: 600;
+    }
+    .tabs button.activo { background: var(--dorado); color: #1a1a1a; }
+</style>
+</head>
+<body>
+
+    <!-- ============ VISTA: CLIENTE - LOGIN ============ -->
+    <div id="cliente-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Gastronomía</h1>
+            <input type="text" id="cliente-dni" placeholder="DNI" inputmode="numeric">
+            <input type="text" id="cliente-pin" placeholder="PIN" inputmode="numeric" maxlength="6" autocomplete="off">
+            <button class="btn-principal" id="btn-cliente-entrar">Ingresar</button>
+            <div class="msg-error" id="cliente-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: CLIENTE - MENÚ ============ -->
+    <div id="cliente-menu" class="pantalla">
+        <header class="top">
+            <h2 id="titulo-menu-cliente">Menú</h2>
+            <div id="submenu-cliente" style="color:#d4af37; font-size:13px;"></div>
+        </header>
+
+        <div id="lista-menu-cliente"></div>
+
+        <div id="resumen-pedido">
+            <div style="display:flex; justify-content:space-between; color:var(--dorado); font-weight:700; margin-bottom:10px;">
+                <span id="resumen-cantidad">0 ítems</span>
+                <span id="resumen-total"></span>
+            </div>
+            <input type="text" id="cliente-punto" placeholder="N° de máquina / mesa / barra">
+            <button class="btn-principal" id="btn-enviar-pedido">Enviar pedido</button>
+            <div class="msg-error" id="pedido-error"></div>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: CLIENTE - ESTADO ============ -->
+    <div id="cliente-estado" class="pantalla">
+        <div class="vacio">
+            <i class="bi bi-cup-hot-fill" style="font-size:48px; color:var(--dorado);"></i>
+            <p id="texto-estado-cliente" style="font-size:18px; margin-top:14px;">Tu pedido fue enviado...</p>
+        </div>
+    </div>
+
+    <!-- ============ VISTA: CAMARERO - CIERRE DE TURNO ============ -->
+    <div id="cierre-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Cierre de turno</h1>
+            <input type="text" id="cierre-legajo" placeholder="Legajo" inputmode="numeric">
+            <input type="text" id="cierre-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
+            <button class="btn-principal" id="btn-cierre-entrar">Ver mi rendición</button>
+            <div class="msg-error" id="cierre-error"></div>
+        </div>
+    </div>
+
+    <div id="cierre-resultado" class="pantalla">
+        <header class="top">
+            <h2 id="titulo-cierre"></h2>
+        </header>
+        <div id="lista-cierre"></div>
+        <div id="vacio-cierre" class="vacio" style="display:none;">Sin pedidos confirmados hoy</div>
+        <button class="btn-principal" id="btn-imprimir-cierre" style="margin-top:16px;">Imprimir</button>
+        <button class="btn-secundario" id="btn-volver-cierre">Volver</button>
+    </div>
+
+    <!-- ============ VISTA: ADMIN ============ -->
+    <div id="admin-login" class="pantalla">
+        <div class="card-login">
+            <img src="img/Logo-ingreso.jpeg" class="logo-login">
+            <h1 class="titulo-login">Administrar Gastronomía</h1>
+            <input type="password" id="admin-pass" placeholder="Contraseña de supervisor" autocomplete="off">
+            <button class="btn-principal" id="btn-admin-entrar">Ingresar</button>
+            <button class="btn-secundario" id="btn-volver-admin-login">Volver</button>
+            <div class="msg-error" id="admin-error"></div>
+        </div>
+    </div>
+
+    <div id="admin-gestion" class="pantalla">
+        <div style="text-align:right; margin-bottom:14px;">
+            <button class="btn-secundario" id="btn-volver-admin" style="display:inline-block; width:auto; padding:10px 20px;">
+                <i class="bi bi-arrow-left"></i> Volver
+            </button>
+        </div>
+
+        <div class="tabs">
+            <button class="activo" data-tab="tab-menu">Menú</button>
+            <button data-tab="tab-puntos">Puntos de pedido</button>
+            <button data-tab="tab-camareros">Camareros</button>
+            <button data-tab="tab-qr">Generar QR</button>
+        </div>
+
+        <!-- TAB MENÚ -->
+        <div id="tab-menu">
+            <div class="columnas-admin">
+
+                <div class="bloque-admin">
+                    <header class="top"><h2>Menú con beneficio (sin precio)</h2></header>
+
+                    <div style="color:#d4af37; text-align:center; margin-bottom:10px;">
+                        Horario:
+                        <input type="time" id="horario-desde" style="width:auto; display:inline-block; margin:0 6px;">
+                        a
+                        <input type="time" id="horario-hasta" style="width:auto; display:inline-block; margin:0 6px;">
+                        <button class="btn-secundario" id="btn-guardar-horario" style="width:auto; padding:8px 14px; display:inline-block;">Guardar</button>
+                    </div>
+
+                    <div class="card-login" style="margin:0 0 16px;">
+                        <input type="text" id="nuevo-item-beneficio" placeholder="Nombre del ítem">
+                        <button class="btn-principal" id="btn-agregar-beneficio">Agregar</button>
+                    </div>
+
+                    <div id="lista-menu-beneficio"></div>
+                </div>
+
+                <div class="bloque-admin">
+                    <header class="top"><h2>Menú sin horario (con precio)</h2></header>
+
+                    <div class="card-login" style="margin:0 0 16px;">
+                        <input type="text" id="nuevo-item-pago" placeholder="Nombre del ítem">
+                        <input type="number" id="nuevo-item-precio" placeholder="Precio">
+                        <button class="btn-principal" id="btn-agregar-pago">Agregar</button>
+                    </div>
+
+                    <div id="lista-menu-pago"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB PUNTOS -->
+        <div id="tab-puntos" style="display:none;">
+            <div class="columnas-admin">
+
+                <div class="bloque-admin">
+                    <header class="top"><h2>Islas</h2></header>
+                    <div class="card-login" style="margin:0 0 16px;">
+                        <input type="text" id="nueva-isla-codigo" placeholder="Código (4 dígitos)" maxlength="4">
+                        <button class="btn-principal" id="btn-agregar-isla">Agregar</button>
+                    </div>
+                    <div id="lista-islas"></div>
+                </div>
+
+                <div class="bloque-admin">
+                    <header class="top"><h2>Barras</h2></header>
+                    <button class="btn-principal" id="btn-crear-barras" style="max-width:280px;">Crear Barra 1 y Barra 2</button>
+                    <div id="lista-barras" style="margin-top:14px;"></div>
+                </div>
+
+                <div class="bloque-admin">
+                    <header class="top"><h2>Mesas</h2></header>
+                    <div class="card-login" style="margin:0 0 16px;">
+                        <input type="number" id="cantidad-mesas" placeholder="Cantidad de mesas a crear">
+                        <button class="btn-principal" id="btn-crear-mesas">Crear</button>
+                    </div>
+                    <div id="lista-mesas"></div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- TAB CAMAREROS -->
+        <div id="tab-camareros" style="display:none;">
+            <header class="top"><h2>Camareros</h2></header>
+
+            <div class="card-login" style="margin:0 0 20px;">
+                <input type="text" id="nuevo-camarero-legajo" placeholder="Legajo">
+                <input type="text" id="nuevo-camarero-nombre" placeholder="Nombre">
+                <input type="text" id="nuevo-camarero-apellido" placeholder="Apellido">
+                <input type="text" id="nuevo-camarero-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                <button class="btn-principal" id="btn-agregar-camarero">Agregar</button>
+            </div>
+
+            <div id="lista-camareros"></div>
+        </div>
+
+        <!-- TAB QR -->
+        <div id="tab-qr" style="display:none;">
+            <header class="top"><h2>Códigos QR de todos los puntos</h2></header>
+            <p style="color:#d4af37; text-align:center;">Se genera un QR por cada isla, barra y mesa cargada.</p>
+            <div id="qr-grid" class="qr-grid"></div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="gastronomia.js"></script>
+</body>
+</html>

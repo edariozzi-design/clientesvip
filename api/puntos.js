@@ -1,11 +1,7 @@
-// api/personal.js
+// api/puntos.js
 //
-// Guarda y lee tres listas chicas de personas:
-// - ?tipo=lavadero   -> personal tercerizado que lava los autos (dni, nombre, pin de 4 dígitos)
-// - ?tipo=empresa    -> personal de la empresa que puede autorizar un lavado (legajo, nombre, apellido, pin de 4 dígitos)
-// - ?tipo=camareros  -> personal que confirma pedidos de gastronomía (legajo, nombre, apellido, pin de 4 dígitos)
-//
-// Mismo patrón que api/clientes.js y api/lavados.js.
+// Guarda la lista de puntos de pedido: islas (código de 4 dígitos),
+// barras y mesas. Se usa tanto para el QR como para el buscador del camarero.
 
 export default async function handler(req, res) {
 
@@ -17,24 +13,16 @@ export default async function handler(req, res) {
         return;
     }
 
-    const tipo = req.query?.tipo === "empresa" ? "empresa"
-        : req.query?.tipo === "camareros" ? "camareros"
-        : "lavadero";
-
-    const clave = tipo === "empresa" ? "personal_empresa"
-        : tipo === "camareros" ? "personal_camareros"
-        : "personal_lavadero";
-
     if (req.method === "GET") {
         try {
-            const respuesta = await fetch(`${KV_URL}/get/${clave}`, {
+            const respuesta = await fetch(`${KV_URL}/get/puntos_pedido`, {
                 headers: { Authorization: `Bearer ${KV_TOKEN}` }
             });
 
             const datos = await respuesta.json();
-            const personal = datos.result ? JSON.parse(datos.result) : [];
+            const puntos = datos.result ? JSON.parse(datos.result) : [];
 
-            res.status(200).json(personal);
+            res.status(200).json(puntos);
 
         } catch (error) {
             console.error(error);
@@ -45,15 +33,15 @@ export default async function handler(req, res) {
 
     if (req.method === "POST") {
         try {
-            const personal = req.body;
+            const puntos = req.body;
 
-            await fetch(`${KV_URL}/set/${clave}`, {
+            await fetch(`${KV_URL}/set/puntos_pedido`, {
                 method: "POST",
                 headers: {
                     Authorization: `Bearer ${KV_TOKEN}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify(personal)
+                body: JSON.stringify(puntos)
             });
 
             res.status(200).json({ ok: true });
