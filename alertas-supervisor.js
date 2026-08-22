@@ -14,7 +14,10 @@ const NOMBRES_ALERTA = {
     ALERTA_NOVEDAD: "Novedad pendiente",
     ALERTA_NO_SOCIO: "Ingreso de no socio",
     ALERTA_MANUAL: "Alerta del supervisor",
-    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado"
+    ALERTA_LAVADO_FINALIZADO: "Lavado finalizado",
+    ALERTA_VERIFICACION: "Verificación de beneficio",
+    ALERTA_TOPE_GASTRONOMIA: "Tope diario de consumo alcanzado",
+    ALERTA_PEDIDO_DEMORADO: "Pedido de gastronomía sin confirmar (10+ min)"
 };
 
 let clientesCache = [];
@@ -60,6 +63,124 @@ function intentarLogin() {
 }
 
 document.getElementById("btn-actualizar").addEventListener("click", cargarAlertas);
+
+// =====================
+// EXCEPCIONES DE GASTRONOMÍA
+// =====================
+
+let clienteSeleccionadoExcepcion = null;
+
+document.getElementById("btn-excepciones").addEventListener("click", () => {
+    document.getElementById("pantalla-alertas").style.display = "none";
+    document.getElementById("pantalla-excepciones").style.display = "block";
+    document.getElementById("excepcion-buscar").value = "";
+    document.getElementById("excepcion-resultados").innerHTML = "";
+    document.getElementById("excepcion-form").style.display = "none";
+});
+
+document.getElementById("btn-volver-excepciones").addEventListener("click", () => {
+    document.getElementById("pantalla-excepciones").style.display = "none";
+    document.getElementById("pantalla-alertas").style.display = "block";
+});
+
+document.getElementById("excepcion-buscar").addEventListener("input", () => {
+
+    const termino = document.getElementById("excepcion-buscar").value.trim().toLowerCase();
+    const contenedor = document.getElementById("excepcion-resultados");
+
+    document.getElementById("excepcion-form").style.display = "none";
+
+    if (termino.length < 2) {
+        contenedor.innerHTML = "";
+        return;
+    }
+
+    const resultados = clientesCache
+        .filter(c => c.dni?.toLowerCase().includes(termino) || c.nombre?.toLowerCase().includes(termino))
+        .slice(0, 8);
+
+    contenedor.innerHTML = resultados.length === 0
+        ? `<p style="color:#888; text-align:center;">Sin resultados</p>`
+        : resultados.map(c => `
+            <div class="persona-card" onclick="seleccionarClienteExcepcion('${c.id}')">
+                <strong>${c.nombre}</strong><br>
+                <small style="color:#999;">DNI: ${c.dni} · ${c.categoria}</small>
+            </div>
+        `).join("");
+});
+
+function seleccionarClienteExcepcion(clienteId) {
+    clienteSeleccionadoExcepcion = clientesCache.find(c => c.id === clienteId);
+    if (!clienteSeleccionadoExcepcion) return;
+
+    document.getElementById("excepcion-cliente-nombre").textContent =
+        `${clienteSeleccionadoExcepcion.nombre} (${clienteSeleccionadoExcepcion.categoria})`;
+    document.getElementById("excepcion-error").textContent = "";
+    document.getElementById("excepcion-legajo").value = "";
+    document.getElementById("excepcion-pin").value = "";
+    document.getElementById("excepcion-form").style.display = "block";
+}
+
+document.getElementById("btn-autorizar-excepcion").addEventListener("click", async () => {
+
+    const errorEl = document.getElementById("excepcion-error");
+    errorEl.textContent = "";
+
+    if (!clienteSeleccionadoExcepcion) return;
+
+    const legajo = document.getElementById("excepcion-legajo").value.trim();
+    const pin = document.getElementById("excepcion-pin").value.trim();
+
+    if (!legajo || !pin) {
+        errorEl.textContent = "Completá tu legajo y PIN";
+        return;
+    }
+
+    try {
+        const personal = await (await fetch("/api/personal?tipo=empresa")).json();
+        const persona = personal.find(p => String(p.legajo) === legajo && String(p.pin) === pin);
+
+        if (!persona) {
+            errorEl.textContent = "Legajo o PIN incorrecto";
+            return;
+        }
+
+        const clientesActuales = await (await fetch("/api/clientes")).json();
+        const cliente = clientesActuales.find(c => c.id === clienteSeleccionadoExcepcion.id);
+
+        if (!cliente) {
+            errorEl.textContent = "No se encontró al cliente";
+            return;
+        }
+
+        cliente.excepcionGastronomia = {
+            activa: true,
+            motivo: `Excepción autorizada desde el celular por ${persona.apellido}`,
+            maxItems: 3,
+            usado: false,
+            autorizadoPorLegajo: persona.legajo,
+            autorizadoPorApellido: persona.apellido,
+            fecha: Date.now()
+        };
+
+        await fetch("/api/clientes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(clientesActuales)
+        });
+
+        document.getElementById("excepcion-form").style.display = "none";
+        document.getElementById("excepcion-buscar").value = "";
+        document.getElementById("excepcion-resultados").innerHTML =
+            `<p style="color:#6bff8f; text-align:center;">Excepción autorizada para ${cliente.nombre}.</p>`;
+
+        clientesCache = clientesActuales;
+
+    } catch (error) {
+        errorEl.textContent = "No se pudo autorizar, probá de nuevo";
+        console.error(error);
+    }
+});
 
 async function cargarAlertas() {
 

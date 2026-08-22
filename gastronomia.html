@@ -97,6 +97,20 @@
     header.top { text-align: center; margin-bottom: 16px; }
     header.top h2 { color: var(--dorado); margin: 0; }
 
+    .banner-categoria {
+        text-align: center;
+        background: linear-gradient(90deg, transparent, rgba(218,165,32,0.25), transparent);
+        border-top: 1px solid var(--dorado);
+        border-bottom: 1px solid var(--dorado);
+        color: var(--dorado);
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        padding: 10px 0;
+        margin: 20px 0 12px;
+        font-size: 15px;
+    }
+
     .menu-item {
         display: flex;
         align-items: center;
@@ -153,6 +167,28 @@
     }
 
     .vacio { text-align: center; color: #888; padding: 40px 20px; }
+
+    .pedidos-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        gap: 16px;
+    }
+
+    .pedidos-grid .pedido-card {
+        margin-bottom: 0;
+    }
+
+    .pedido-card.demorado {
+        border-color: #ff6b6b;
+        box-shadow: 0 0 12px rgba(255,107,107,0.5);
+    }
+
+    .pedido-card .aviso-demora {
+        color: #ff6b6b;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: 6px;
+    }
 
     .columnas-admin {
         display: flex;
@@ -225,6 +261,7 @@
                 <span id="resumen-total"></span>
             </div>
             <input type="text" id="cliente-punto" placeholder="N° de máquina / mesa / barra">
+            <textarea id="cliente-aclaraciones" placeholder="¿Alguna aclaración? (ej: el café con menos leche)" style="min-height:70px; text-align:left;"></textarea>
             <button class="btn-principal" id="btn-enviar-pedido">Enviar pedido</button>
             <div class="msg-error" id="pedido-error"></div>
         </div>
@@ -260,6 +297,16 @@
         <button class="btn-secundario" id="btn-volver-cierre">Volver</button>
     </div>
 
+    <!-- ============ VISTA: PEDIDOS (PC/Tablet, sin login) ============ -->
+    <div id="pedidos-pantalla" class="pantalla" style="max-width:1100px; margin:0 auto;">
+        <header class="top" style="text-align:left; margin-bottom:20px;">
+            <h2 style="text-align:center;">Pedidos entrantes</h2>
+        </header>
+
+        <div id="pedidos-grid" class="pedidos-grid"></div>
+        <div id="pedidos-vacio" class="vacio" style="display:none;">Sin pedidos pendientes</div>
+    </div>
+
     <!-- ============ VISTA: ADMIN ============ -->
     <div id="admin-login" class="pantalla">
         <div class="card-login">
@@ -282,8 +329,6 @@
         <div class="tabs">
             <button class="activo" data-tab="tab-menu">Menú</button>
             <button data-tab="tab-puntos">Puntos de pedido</button>
-            <button data-tab="tab-camareros">Camareros</button>
-            <button data-tab="tab-qr">Generar QR</button>
         </div>
 
         <!-- TAB MENÚ -->
@@ -291,34 +336,45 @@
             <div class="columnas-admin">
 
                 <div class="bloque-admin">
-                    <header class="top"><h2>Menú con beneficio (sin precio)</h2></header>
-
-                    <div style="color:#d4af37; text-align:center; margin-bottom:10px;">
-                        Horario:
-                        <input type="time" id="horario-desde" style="width:auto; display:inline-block; margin:0 6px;">
-                        a
-                        <input type="time" id="horario-hasta" style="width:auto; display:inline-block; margin:0 6px;">
-                        <button class="btn-secundario" id="btn-guardar-horario" style="width:auto; padding:8px 14px; display:inline-block;">Guardar</button>
-                    </div>
+                    <header class="top"><h2>Horarios de comida</h2></header>
+                    <p style="color:#888; text-align:center; font-size:13px;">
+                        Las categorías "siempre disponibles" (ej. Cortesías) se ven las 24 hs.
+                        El resto solo se ve dentro de estas franjas.
+                    </p>
 
                     <div class="card-login" style="margin:0 0 16px;">
-                        <input type="text" id="nuevo-item-beneficio" placeholder="Nombre del ítem">
-                        <button class="btn-principal" id="btn-agregar-beneficio">Agregar</button>
+                        <input type="text" id="nuevo-horario-nombre" placeholder="Nombre (ej: Almuerzo)">
+                        <input type="time" id="nuevo-horario-desde">
+                        <input type="time" id="nuevo-horario-hasta">
+                        <button class="btn-principal" id="btn-agregar-horario">Agregar franja</button>
                     </div>
 
-                    <div id="lista-menu-beneficio"></div>
+                    <div id="lista-horarios"></div>
+
+                    <header class="top" style="margin-top:24px;"><h2>Categorías</h2></header>
+
+                    <div class="card-login" style="margin:0 0 16px;">
+                        <input type="text" id="nueva-categoria-nombre" placeholder="Nombre (ej: Platos)">
+                        <label style="display:flex; align-items:center; gap:8px; justify-content:center; color:#d4af37; margin-bottom:12px;">
+                            <input type="checkbox" id="nueva-categoria-siempre" style="width:auto; margin:0;">
+                            Siempre disponible (24 hs)
+                        </label>
+                        <button class="btn-principal" id="btn-agregar-categoria">Agregar categoría</button>
+                    </div>
+
+                    <div id="lista-categorias"></div>
                 </div>
 
                 <div class="bloque-admin">
-                    <header class="top"><h2>Menú sin horario (con precio)</h2></header>
+                    <header class="top"><h2>Ítems de la carta</h2></header>
 
                     <div class="card-login" style="margin:0 0 16px;">
-                        <input type="text" id="nuevo-item-pago" placeholder="Nombre del ítem">
-                        <input type="number" id="nuevo-item-precio" placeholder="Precio">
-                        <button class="btn-principal" id="btn-agregar-pago">Agregar</button>
+                        <input type="text" id="nuevo-item-nombre" placeholder="Nombre del ítem">
+                        <select id="nuevo-item-categoria"></select>
+                        <button class="btn-principal" id="btn-agregar-item">Agregar</button>
                     </div>
 
-                    <div id="lista-menu-pago"></div>
+                    <div id="lista-items-menu"></div>
                 </div>
 
             </div>
@@ -354,31 +410,8 @@
 
             </div>
         </div>
-
-        <!-- TAB CAMAREROS -->
-        <div id="tab-camareros" style="display:none;">
-            <header class="top"><h2>Camareros</h2></header>
-
-            <div class="card-login" style="margin:0 0 20px;">
-                <input type="text" id="nuevo-camarero-legajo" placeholder="Legajo">
-                <input type="text" id="nuevo-camarero-nombre" placeholder="Nombre">
-                <input type="text" id="nuevo-camarero-apellido" placeholder="Apellido">
-                <input type="text" id="nuevo-camarero-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
-                <button class="btn-principal" id="btn-agregar-camarero">Agregar</button>
-            </div>
-
-            <div id="lista-camareros"></div>
-        </div>
-
-        <!-- TAB QR -->
-        <div id="tab-qr" style="display:none;">
-            <header class="top"><h2>Códigos QR de todos los puntos</h2></header>
-            <p style="color:#d4af37; text-align:center;">Se genera un QR por cada isla, barra y mesa cargada.</p>
-            <div id="qr-grid" class="qr-grid"></div>
-        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="gastronomia.js"></script>
 </body>
 </html>

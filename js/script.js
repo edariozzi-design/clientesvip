@@ -3236,6 +3236,7 @@ let clienteActual = null;
 let vistaActual = "historial";
 let modoCrearNovedad = false;
 let historialDesde = "";
+let gastronomiaFechaCliente = ""; // vacío = "hoy" por defecto
 let historialHasta = "";
 let mesHistorialSeleccionado = "06";
 
@@ -3266,9 +3267,7 @@ function getEnSalaAhora() {
 
         resultado.total++;
 
-        if (cliente.acompanante?.ingresa) {
-            resultado.acompanantes++;
-        }
+        resultado.acompanantes += cliente.acompanantes?.length || 0;
 
         const categoria = cliente.categoria;
 
@@ -3460,6 +3459,7 @@ function actualizarVistaUsuario() {
 
     const btnLavadosDiaItem = document.getElementById("btn-lavados-dia")?.closest("li");
     const btnAdministradorItem = document.querySelector('a[href*="vista=admin"]')?.closest("li");
+    const btnGastronomiaItem = document.getElementById("btn-gastronomia-informe")?.closest("li");
 
     if (usuarioActual.rol === "supervisor") {
 
@@ -3474,6 +3474,7 @@ function actualizarVistaUsuario() {
 
         if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "block";
         if (btnAdministradorItem) btnAdministradorItem.style.display = "block";
+        if (btnGastronomiaItem) btnGastronomiaItem.style.display = "block";
 
     } else {
 
@@ -3487,6 +3488,7 @@ function actualizarVistaUsuario() {
 
         if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "none";
         if (btnAdministradorItem) btnAdministradorItem.style.display = "none";
+        if (btnGastronomiaItem) btnGastronomiaItem.style.display = "none";
     }
 
     renderCampanaAlertas();
@@ -3499,143 +3501,7 @@ function actualizarVistaUsuario() {
 
 //CATEGORIAS PARA METRICAS//
 
-function getMetricasCategoria() {
 
-    const categorias = {};
-
-    clientes.forEach(c => {
-        categorias[c.categoria] = (categorias[c.categoria] || 0) + 1;
-    });
-
-    return categorias;
-}
-
-function calcularMovimientosPorHora(historial) {
-
-    const movimientos = {};
-
-    historial.forEach(evento => {
-
-        const e = normalizarEvento(evento);
-        if (!e) return;
-
-        const fecha = new Date(e.fecha);
-        const hora = fecha.getHours();
-
-        if (!movimientos[hora]) {
-            movimientos[hora] = {
-                hora,
-                ingresos: 0,
-                egresos: 0
-            };
-        }
-
-        if (e.tipo === "INGRESO") {
-            movimientos[hora].ingresos++;
-        }
-
-        if (e.tipo === "EGRESO") {
-            movimientos[hora].egresos++;
-        }
-    });
-
-    return Object.values(movimientos)
-        .sort((a, b) => a.hora - b.hora);
-}
-
-
-function getFlujoOperativo(clientes) {
-
-    let ingresosSocios = 0;
-    let ingresosAcompanantes = 0;
-    let egresosSocios = 0;
-    let egresosAcompanantes = 0;
-
-    clientes.forEach(c => {
-
-        if (!c.historial) return;
-
-        c.historial.forEach(evento => {
-
-            if (evento.tipo === "INGRESO") {
-                ingresosSocios++;
-            }
-
-            if (evento.tipo === "EGRESO") {
-                egresosSocios++;
-            }
-
-            if (evento.tipo === "INGRESO") {
-                ingresosAcompanantes++;
-            }
-
-            if (evento.tipo === "EGRESO") {
-                egresosAcompanantes++;
-            }
-        });
-    });
-
-    return {
-        ingresosSocios,
-        ingresosAcompanantes,
-        egresosSocios,
-        egresosAcompanantes
-    };
-}
-
-
-function getMovimientosHoy() {
-
-    let ingresos = 0;
-    let egresos = 0;
-
-    const ingresosCategoria = {};
-    const egresosCategoria = {};
-
-    const hoy = new Date().toDateString();
-
-    clientes.forEach(cliente => {
-
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-
-            if (isNaN(fecha.getTime())) return;
-
-            if (fecha.toDateString() !== hoy) return;
-
-            const categoria = cliente.categoria || "Sin categoría";
-
-            if (mov.tipo?.includes("INGRESO")) {
-
-                ingresos++;
-
-                ingresosCategoria[categoria] =
-                    (ingresosCategoria[categoria] || 0) + 1;
-            }
-
-            if (
-                mov.tipo?.includes("EGRESO") ||
-                mov.tipo?.includes("SALIO")
-            ) {
-
-                egresos++;
-
-                egresosCategoria[categoria] =
-                    (egresosCategoria[categoria] || 0) + 1;
-            }
-        });
-
-    });
-
-    return {
-        ingresos,
-        egresos,
-        ingresosCategoria,
-        egresosCategoria
-    };
-
-}
 
 function getFechaOperativa(fecha) {
     const f = new Date(fecha);
@@ -3699,29 +3565,6 @@ function getMovimientoDiarioPorCategoria() {
 
 
 
-function getMetricasTurno() {
-
-    let manana = 0;
-    let tarde = 0;
-    let noche = 0;
-
-    clientes.forEach(cliente => {
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-            if (isNaN(fecha.getTime())) return;
-
-            const hora = fecha.getHours();
-
-            if (hora >= 6 && hora <= 13) manana++;
-            else if (hora >= 14 && hora <= 20) tarde++;
-            else noche++;
-        });
-    });
-
-    return { manana, tarde, noche };
-}
-
 
 function getActividadPorHora(lista = clientes) {
 
@@ -3742,73 +3585,6 @@ function getActividadPorHora(lista = clientes) {
 }
 
 
-function getMovimientosFiltradosPorFecha(lista = clientes) {
-
-    const desde = document.getElementById("fechaDesde").value;
-    const hasta = document.getElementById("fechaHasta").value;
-
-    if (!desde || !hasta) {
-
-        return lista.flatMap(c =>
-            (c.historial || []).map(mov => ({
-                ...mov,
-                clienteId: c.id,
-                categoria: c.categoria
-            }))
-        );
-    }
-
-    const fechaDesde = new Date(desde);
-    const fechaHasta = new Date(hasta);
-    fechaHasta.setHours(23, 59, 59, 999);
-
-    let movimientos = [];
-
-    lista.forEach(cliente => {
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-            if (isNaN(fecha.getTime())) return;
-
-            if (fecha >= fechaDesde && fecha <= fechaHasta) {
-                movimientos.push({
-                    ...mov,
-                    clienteId: cliente.id,
-                    categoria: cliente.categoria
-                });
-            }
-        });
-    });
-
-    return movimientos;
-}
-
-
-function getClientesPorHoraCategoria(lista = clientes) {
-
-    const resultado = {};
-
-    lista.forEach(cliente => {
-
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-            if (isNaN(fecha.getTime())) return;
-
-            const hora = fecha.getHours();
-            const categoria = cliente.categoria || "Sin categoría";
-
-            if (!resultado[hora]) {
-                resultado[hora] = {};
-            }
-
-            resultado[hora][categoria] =
-                (resultado[hora][categoria] || 0) + 1;
-        });
-    });
-
-    return resultado;
-}
 
 
 
@@ -3818,10 +3594,6 @@ function getClientesPorHoraCategoria(lista = clientes) {
 // FIX COMPATIBILIDAD UI
 // =====================
 
-
-function seleccionarCategoria(cat) {
-    toggleCategoria(cat);
-}
 
 // =====================
 // FIX SEGURIDAD RENDER METRICAS
@@ -3892,12 +3664,6 @@ function renderEstadisticas() {
     <!-- LAVADOS -->
     <div class="metric-card" id="tarjeta-lavados-metricas" style="max-height:340px; overflow-y:auto;">
         <h5>LAVADO DE AUTOS</h5>
-        <div style="color:#d4af37; text-align:center;">Cargando...</div>
-    </div>
-
-    <!-- GASTRONOMÍA -->
-    <div class="metric-card" id="tarjeta-gastronomia-metricas" style="max-height:340px; overflow-y:auto;">
-        <h5>GASTRONOMÍA</h5>
         <div style="color:#d4af37; text-align:center;">Cargando...</div>
     </div>
 
@@ -3988,7 +3754,6 @@ function renderEstadisticas() {
 
     renderOverlayCategoria(clientesEnSala);
     renderTarjetaLavados();
-    renderTarjetaGastronomia();
 }
 
 async function renderTarjetaLavados() {
@@ -4050,73 +3815,6 @@ async function renderTarjetaLavados() {
 
                     <div style="font-size:12px; color:#999; margin-top:4px;">
                         ${esAceptado ? `Llavero <strong style="color:#daa520;">${l.numeroLlavero}</strong>` : `Autorizó: ${l.autorizadoPorApellido || "-"}`}
-                    </div>
-                </div>
-            `;
-            }).join("")
-        }
-    `;
-}
-
-async function renderTarjetaGastronomia() {
-
-    const tarjeta = document.getElementById("tarjeta-gastronomia-metricas");
-    if (!tarjeta) return;
-
-    let pedidos = [];
-
-    try {
-        const respuesta = await fetch("/api/pedidos");
-        pedidos = await respuesta.json();
-    } catch (error) {
-        tarjeta.innerHTML += `<div style="color:#ff6b6b; text-align:center;">No se pudo cargar</div>`;
-        return;
-    }
-
-    if (!Array.isArray(pedidos)) pedidos = [];
-
-    const enCurso = pedidos.filter(p => p.estado === "pendiente" || p.estado === "confirmado");
-    const jornadaActual = getFechaOperativa(new Date()).getTime();
-
-    const entregadosHoy = pedidos.filter(p => {
-        if (p.estado !== "entregado" || !p.horaEntrega) return false;
-        return getFechaOperativa(new Date(p.horaEntrega)).getTime() === jornadaActual;
-    });
-
-    tarjeta.innerHTML = `
-        <h5>GASTRONOMÍA</h5>
-
-        <div class="d-flex justify-content-around" style="margin-bottom:12px;">
-            <div style="text-align:center;">
-                <div style="font-size:26px; color:gold; font-weight:bold;">${enCurso.length}</div>
-                <div style="font-size:12px; color:#d4af37;">En curso</div>
-            </div>
-            <div style="text-align:center;">
-                <div style="font-size:26px; color:gold; font-weight:bold;">${entregadosHoy.length}</div>
-                <div style="font-size:12px; color:#d4af37;">Entregados hoy</div>
-            </div>
-        </div>
-
-        ${enCurso.length === 0
-            ? `<div style="color:#888; text-align:center; font-size:13px; padding:10px 0;">Sin pedidos en curso</div>`
-            : enCurso.map(p => {
-                const esConfirmado = p.estado === "confirmado";
-                return `
-                <div style="border:1px solid rgba(218,165,32,0.35); border-radius:10px; padding:10px 12px; margin-top:8px; text-align:left;">
-
-                    <span style="
-                        display:inline-block; font-size:11px; font-weight:700;
-                        padding:2px 10px; border-radius:999px; margin-bottom:6px;
-                        background:${esConfirmado ? "rgba(46,204,113,0.15)" : "rgba(218,165,32,0.15)"};
-                        color:${esConfirmado ? "#2ecc71" : "#daa520"};">
-                        ${esConfirmado ? "EN PREPARACIÓN" : "ESPERANDO CAMARERO"}
-                    </span>
-
-                    <div style="font-weight:700; color:white; font-size:14px;">${p.clienteNombre}</div>
-                    <div style="font-size:13px; color:#d4af37;">Punto: ${p.punto}</div>
-
-                    <div style="font-size:12px; color:#999; margin-top:4px;">
-                        ${esConfirmado ? `Confirmó: ${p.confirmadoPorApellido || "-"}` : "Sin confirmar"}
                     </div>
                 </div>
             `;
@@ -4226,7 +3924,7 @@ function getMetricasCruce(lista = clientes) {
             let turno;
 
             if (hora >= 6 && hora <= 13) turno = "manana";
-            else if (hora >= 14 && hora <= 20) turno = "tarde";
+            else if (hora >= 14 && hora <= 21) turno = "tarde";
             else turno = "noche";
 
             metricas[categoria][turno]++;
@@ -4236,79 +3934,11 @@ function getMetricasCruce(lista = clientes) {
     return metricas;
 }
 
-function getMetricasPorDia(lista = clientes) {
-
-    const dias = {};
-
-    lista.forEach(cliente => {
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-            if (isNaN(fecha.getTime())) return;
-
-            const dia = fecha.toISOString().split("T")[0]; // YYYY-MM-DD
-
-            dias[dia] = (dias[dia] || 0) + 1;
-        });
-    });
-
-    return dias;
-}
-
 
 
 //FRANJAS HORARIAS//
 
-function obtenerFranja(fechaTexto) {
-
-    const fecha = new Date(fechaTexto);
-
-    if (isNaN(fecha)) return;
-
-    const hora = fecha.getHours();
-
-    if (hora >= 6 && hora <= 13) return "Mañana";
-    if (hora >= 14 && hora <= 20) return "Tarde";
-
-    return "Noche";
-}
-
-function getMetricasPorMes(lista = clientes) {
-
-    const meses = {};
-
-    lista.forEach(cliente => {
-
-        (cliente.historial || []).forEach(mov => {
-
-            const fecha = new Date(Number(mov.fecha));
-            if (isNaN(fecha.getTime())) return;
-
-            const mes =
-                `${fecha.getFullYear()}-${String(fecha.getMonth() + 1).padStart(2, "0")}`;
-
-            meses[mes] = (meses[mes] || 0) + 1;
-        });
-    });
-
-    return meses;
-}
-
 //ESTADISTICAS FILTRADAS//
-
-function renderEstadisticasFiltradas(lista) {
-
-    const total = lista.length;
-    const enVip = lista.filter(c => c.enVip).length;
-
-    panelEstadisticas.innerHTML = `
-        <div class="card p-3">
-            <h5>ESTADÍSTICAS FILTRADAS</h5>
-            <p>Total: ${total}</p>
-            <p>En VIP: ${enVip}</p>
-        </div>
-    `;
-}
 
 function getClientesFiltradosPorFecha() {
 
@@ -4474,7 +4104,7 @@ function renderCliente(cliente) {
 
     <div>${estadoTexto}</div>
 
-    ${(cliente.categoria === "Diamond" || cliente.categoria === "Bespoke")
+    ${["Diamond", "Diamond Seg.", "Bespoke"].includes(cliente.categoria)
         ? `<div>Acompañantes: ${cantidadAcompanantes}</div>`
         : ""}
 
@@ -4543,16 +4173,19 @@ function renderCliente(cliente) {
 `;
 
     const acompanantes = cliente.acompanantes || [];
+    const tieneBeneficioAcompanante = ["Diamond", "Diamond Seg.", "Bespoke"].includes(cliente.categoria);
 
     html += `
 <article class="datos-contenedor" style="align-items:center;">
 
+    ${tieneBeneficioAcompanante ? `
     <div class="acomp-toolbar">
         <button class="btn-agregar-acomp" data-action="agregar-acompanante" title="Agregar acompañante">
             <i class="bi bi-person-plus-fill"></i>
             Agregar acompañante
         </button>
     </div>
+    ` : ""}
 `;
 
     if (acompanantes.length === 0) {
@@ -4690,40 +4323,6 @@ function formatearFecha(ts) {
 
 function refreshUI() {
     renderCliente(clienteActual);
-}
-
-function actualizarMetricas() {
-
-    const total = clientes.length;
-
-    const enSala = clientes.filter(c => {
-        return obtenerEstadoActual(c)?.estado === "EN_SALA";
-    }).length;
-
-    const fuera = total - enSala;
-
-    document.getElementById("metricas-total").textContent = total;
-    document.getElementById("metricas-en-sala").textContent = enSala;
-    document.getElementById("metricas-fuera").textContent = fuera;
-}
-
-function calcularMetricas() {
-
-    const data = clientes; // SIEMPRE ARRAY GLOBAL
-
-    const resultado = {};
-
-    data.forEach(c => {
-        const cat = c.categoria;
-
-        if (!resultado[cat]) {
-            resultado[cat] = 0;
-        }
-
-        resultado[cat]++;
-    });
-
-    return resultado;
 }
 
 function formatearHora(ts) {
@@ -5185,18 +4784,39 @@ function renderPanel() {
 
     else if (vistaActual === "gastronomia-historial") {
 
+        const hoyISO = new Date().toISOString().slice(0, 10);
+        const fechaActiva = gastronomiaFechaCliente || hoyISO;
+
+        const pedidosDelDia = pedidosClienteActual.filter(p => {
+            const fechaISO = getFechaOperativa(new Date(p.fechaCreacion)).toISOString().slice(0, 10);
+            return fechaISO === fechaActiva;
+        });
+
         let html = `
             <div class="d-flex align-items-center gap-1 mb-2">
                 <h5 class="m-0">Gastronomía</h5>
             </div>
+
+            <div class="d-flex justify-content-center align-items-center gap-2 mb-3" style="flex-wrap:wrap;">
+                <input type="date" id="gastronomia-fecha-cliente" value="${fechaActiva}"
+                    onchange="gastronomiaFechaCliente=this.value;renderPanel();">
+
+                ${gastronomiaFechaCliente && gastronomiaFechaCliente !== hoyISO ? `
+                    <button type="button" class="icon-btn"
+                        onclick="gastronomiaFechaCliente='';renderPanel();"
+                        title="Volver a hoy">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                ` : ""}
+            </div>
         `;
 
-        if (pedidosClienteActual.length === 0) {
-            html += `<p style="color:#daa520; text-align:center;">Sin pedidos registrados</p>`;
+        if (pedidosDelDia.length === 0) {
+            html += `<p style="color:#daa520; text-align:center;">Sin pedidos ese día</p>`;
         } else {
             html += `<div class="row g-2">`;
 
-            pedidosClienteActual.forEach(p => {
+            pedidosDelDia.forEach(p => {
                 const fecha = new Date(p.fechaCreacion).toLocaleDateString("es-AR");
                 const hora = new Date(p.fechaCreacion).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" });
                 const detalle = p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ");
@@ -5208,7 +4828,7 @@ function renderPanel() {
                                 <strong>Punto ${p.punto}</strong><br>
                                 <small>${fecha} ${hora} · Estado: ${p.estado}</small><br>
                                 <small>${detalle}</small><br>
-                                ${p.total ? `<small>Total: $${p.total}</small><br>` : ""}
+                                ${p.aclaraciones ? `<small style="font-style:italic;">"${p.aclaraciones}"</small><br>` : ""}
                                 <small>Confirmó: ${p.confirmadoPorApellido || "-"}</small>
                             </div>
                         </div>
@@ -5429,6 +5049,14 @@ ${usuarioActual.rol === "supervisor" ? `
         Excepción: beneficio de lavado de auto
     </label>
 
+    <div style="display:flex; gap:8px; justify-content:center; margin-top:6px;">
+        <input id="edit-excepcion-lavado-legajo" class="form-control" placeholder="Legajo autoriza" style="max-width:140px;">
+        <input id="edit-excepcion-lavado-pin" class="form-control" placeholder="PIN" maxlength="4" style="max-width:100px;">
+    </div>
+    <div style="color:#999; font-size:11px; text-align:center;">
+        Legajo+PIN solo hace falta si tildás o cambiás la excepción de arriba
+    </div>
+
     <input
         id="edit-motivo-restriccion"
         class="form-control"
@@ -5587,6 +5215,7 @@ document.addEventListener("click", async function (e) {
             renderPanel();
         } else {
             vistaActual = "gastronomia-historial";
+            gastronomiaFechaCliente = "";
             cargarPedidosDelCliente(clienteActual.id);
         }
     }
@@ -5752,15 +5381,6 @@ document.addEventListener("click", async function (e) {
         }, 4000);
     }
 
-    /* =========================
-    ACOMPAÑANTE
-    ========================== */
-
-    if (action === "toggle-acompanante") {
-        clienteActual.acompanante.ingresa = e.target.checked;
-        guardarClientes();
-    }
-
 });
 
 
@@ -5852,6 +5472,13 @@ document.addEventListener("click", function (e) {
 
     /* AGREGAR */
     if (action === "agregar-acompanante") {
+
+        const categoriasConAcompanante = ["Diamond", "Diamond Seg.", "Bespoke"];
+        if (!categoriasConAcompanante.includes(clienteActual.categoria)) {
+            mostrarAviso(`La categoría ${clienteActual.categoria} no tiene el beneficio de acompañante.`);
+            return;
+        }
+
         const form = document.getElementById("form-acompanante-dinamico");
         if (form) form.style.display = "block";
     }
@@ -6408,7 +6035,7 @@ btnNuevo.addEventListener("click", function () {
 // EDITAR / NUEVO CLIENTE (delegación de eventos)
 // =====================
 
-document.addEventListener("click", function (e) {
+document.addEventListener("click", async function (e) {
 
     // --- EDITAR CLIENTE ---
 
@@ -6479,13 +6106,35 @@ document.addEventListener("click", function (e) {
             }
 
             const excepcionLavadoMarcada = document.getElementById("edit-excepcion-lavado")?.checked || false;
+            const yaTeniaExcepcionLavado = !!clienteActual.excepcionLavado?.activa;
 
-            clienteActual.excepcionLavado = {
-                activa: excepcionLavadoMarcada,
-                motivo,
-                autorizadoPor: usuarioActual.rol,
-                fecha: excepcionLavadoMarcada ? Date.now() : (clienteActual.excepcionLavado?.fecha || null)
-            };
+            if (excepcionLavadoMarcada !== yaTeniaExcepcionLavado) {
+
+                const legajoAutoriza = document.getElementById("edit-excepcion-lavado-legajo")?.value.trim();
+                const pinAutoriza = document.getElementById("edit-excepcion-lavado-pin")?.value.trim();
+
+                if (!legajoAutoriza || !pinAutoriza) {
+                    mostrarAviso("Para activar o quitar la excepción de lavado, poné legajo y PIN de quien autoriza.");
+                    return;
+                }
+
+                const personalEmpresa = await (await fetch("/api/personal?tipo=empresa")).json();
+                const persona = personalEmpresa.find(p => String(p.legajo) === legajoAutoriza && String(p.pin) === pinAutoriza);
+
+                if (!persona) {
+                    mostrarAviso("Legajo o PIN incorrecto — no se guardó la excepción de lavado.");
+                    return;
+                }
+
+                clienteActual.excepcionLavado = {
+                    activa: excepcionLavadoMarcada,
+                    motivo,
+                    autorizadoPorLegajo: persona.legajo,
+                    autorizadoPorApellido: persona.apellido,
+                    fecha: excepcionLavadoMarcada ? Date.now() : (clienteActual.excepcionLavado?.fecha || null)
+                };
+
+            }
         }
 
         const file = document.getElementById("edit-foto")?.files?.[0];
@@ -6776,13 +6425,16 @@ async function abrirInformeGastronomia() {
     pedidos = (Array.isArray(pedidos) ? pedidos : []).sort((a, b) => b.fechaCreacion - a.fechaCreacion);
 
     const hoy = new Date();
-    const jornadaActual = getFechaOperativa(hoy).getTime();
+    const hoyISO = hoy.toISOString().slice(0, 10); // yyyy-mm-dd, para el <input type="date">
 
     const filaDe = p => {
-        const hora = new Date(p.fechaCreacion).toLocaleString("es-AR");
+        const fechaObj = new Date(p.fechaCreacion);
+        const fechaISO = getFechaOperativa(fechaObj).toISOString().slice(0, 10);
+        const hora = fechaObj.toLocaleString("es-AR");
         const detalle = p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ");
+
         return `
-            <tr data-jornada="${getFechaOperativa(p.fechaCreacion).getTime()}">
+            <tr data-fecha="${fechaISO}">
                 <td>${p.clienteNombre}</td>
                 <td>${p.clienteCategoria}</td>
                 <td>${detalle}</td>
@@ -6816,16 +6468,14 @@ async function abrirInformeGastronomia() {
                 th, td { border: 1px solid #999; padding: 6px 8px; font-size: 12px; text-align: center; }
                 th { background: #eee; }
                 .barra-acciones {
-                    display: flex; gap: 10px; justify-content: center; margin-top: 16px;
+                    display: flex; gap: 10px; justify-content: center; align-items: center; margin-top: 16px;
                 }
-                .barra-acciones button {
-                    padding: 10px 20px; font-size: 14px; font-weight: 600;
+                .barra-acciones input, .barra-acciones button {
+                    padding: 10px 16px; font-size: 14px; font-weight: 600;
                     border-radius: 8px; border: 1.5px solid #daa520;
                     background: transparent; color: #111; cursor: pointer;
                 }
-                .barra-acciones button.activo { background: #daa520; }
-                #btn-imprimir-gastronomia { background: #daa520; }
-                @media print { .barra-acciones { display: none; } }
+                #btn-hoy-gastronomia.activo { background: #daa520; }
             </style>
         </head>
         <body>
@@ -6851,30 +6501,32 @@ async function abrirInformeGastronomia() {
             </table>
 
             <div class="barra-acciones">
-                <button id="btn-vista-dia" class="activo">Jornada de hoy</button>
-                <button id="btn-vista-historico">Histórico general</button>
-                <button id="btn-imprimir-gastronomia">Imprimir</button>
+                <button id="btn-hoy-gastronomia" class="activo">Hoy</button>
+                <input type="date" id="fecha-informe-gastronomia" value="${hoyISO}">
+                <button id="btn-buscar-fecha-gastronomia">Buscar esa fecha</button>
             </div>
 
             <script>
-                const jornadaActual = ${jornadaActual};
-
-                function filtrarVista(soloHoy) {
-                    document.querySelectorAll("#cuerpo-informe-gastronomia tr[data-jornada]").forEach(fila => {
-                        const esDeHoy = Number(fila.dataset.jornada) === jornadaActual;
-                        fila.style.display = (!soloHoy || esDeHoy) ? "" : "none";
+                function filtrarPorFecha(fechaISO, esHoy) {
+                    document.querySelectorAll("#cuerpo-informe-gastronomia tr[data-fecha]").forEach(fila => {
+                        fila.style.display = (fila.dataset.fecha === fechaISO) ? "" : "none";
                     });
                     document.getElementById("titulo-informe-gastronomia").textContent =
-                        soloHoy ? "Gastronomía — Jornada de hoy" : "Gastronomía — Histórico general";
-                    document.getElementById("btn-vista-dia").classList.toggle("activo", soloHoy);
-                    document.getElementById("btn-vista-historico").classList.toggle("activo", !soloHoy);
+                        esHoy ? "Gastronomía — Jornada de hoy" : "Gastronomía — " + fechaISO;
+                    document.getElementById("btn-hoy-gastronomia").classList.toggle("activo", esHoy);
                 }
 
-                document.getElementById("btn-vista-dia").addEventListener("click", () => filtrarVista(true));
-                document.getElementById("btn-vista-historico").addEventListener("click", () => filtrarVista(false));
-                document.getElementById("btn-imprimir-gastronomia").addEventListener("click", () => window.print());
+                document.getElementById("btn-hoy-gastronomia").addEventListener("click", () => {
+                    document.getElementById("fecha-informe-gastronomia").value = "${hoyISO}";
+                    filtrarPorFecha("${hoyISO}", true);
+                });
 
-                filtrarVista(true);
+                document.getElementById("btn-buscar-fecha-gastronomia").addEventListener("click", () => {
+                    const fecha = document.getElementById("fecha-informe-gastronomia").value;
+                    if (fecha) filtrarPorFecha(fecha, fecha === "${hoyISO}");
+                });
+
+                filtrarPorFecha("${hoyISO}", true);
             </script>
         </body>
         </html>
@@ -6959,7 +6611,8 @@ const NOMBRES_ALERTA = {
     ALERTA_MANUAL: "Alerta del supervisor",
     ALERTA_LAVADO_FINALIZADO: "Lavado finalizado",
     ALERTA_VERIFICACION: "Verificación de beneficio",
-    ALERTA_TOPE_GASTRONOMIA: "Tope diario de consumo alcanzado"
+    ALERTA_TOPE_GASTRONOMIA: "Tope diario de consumo alcanzado",
+    ALERTA_PEDIDO_DEMORADO: "Pedido de gastronomía sin confirmar (10+ min)"
 };
 
 function mostrarAviso(mensaje) {
@@ -7163,7 +6816,8 @@ async function getAlertasPendientes() {
                     clienteNombre: p.clienteNombre,
                     tipo: "PEDIDO_PENDIENTE",
                     nombreTipo: "Pedido de gastronomía pendiente",
-                    motivo: `Punto ${p.punto} — ${p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ")}`,
+                    motivo: `Punto ${p.punto} — ${p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ")}`
+                        + (p.aclaraciones ? ` · "${p.aclaraciones}"` : ""),
                     fecha: p.fechaCreacion
                 });
             });

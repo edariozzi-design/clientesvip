@@ -70,19 +70,22 @@ function getFechaOperativa(fecha) {
     return f;
 }
 
-function estaEnHorarioBeneficio(horario) {
+function dentroDeAlgunaFranja(horarios) {
     const ahora = new Date();
-    const [hd, md] = horario.desde.split(":").map(Number);
-    const [hh, mh] = horario.hasta.split(":").map(Number);
     const minutosAhora = ahora.getHours() * 60 + ahora.getMinutes();
-    const minutosDesde = hd * 60 + md;
-    const minutosHasta = hh * 60 + mh;
 
-    if (minutosDesde <= minutosHasta) {
-        return minutosAhora >= minutosDesde && minutosAhora <= minutosHasta;
-    }
-    // Horario que cruza medianoche (ej: 20:00 a 02:00)
-    return minutosAhora >= minutosDesde || minutosAhora <= minutosHasta;
+    return (horarios || []).some(h => {
+        const [hd, md] = h.desde.split(":").map(Number);
+        const [hh, mh] = h.hasta.split(":").map(Number);
+        const minutosDesde = hd * 60 + md;
+        const minutosHasta = hh * 60 + mh;
+
+        if (minutosDesde <= minutosHasta) {
+            return minutosAhora >= minutosDesde && minutosAhora <= minutosHasta;
+        }
+        // Franja que cruza medianoche (ej: 21:00 a 01:00)
+        return minutosAhora >= minutosDesde || minutosAhora <= minutosHasta;
+    });
 }
 
 function tieneIngresoReciente(cliente, minutos) {
@@ -145,6 +148,175 @@ async function verificarPedidosVencidos() {
     }
 }
 
+// Avisa al celular del jefe si un pedido lleva 10+ minutos sin que
+// ningún camarero lo confirme (distinto del resaltado visual de 5 min,
+// que es solo local en la pantalla de pedidos).
+async function verificarPedidosDemorados() {
+
+    const MINUTOS_DEMORA = 10;
+    const ahora = Date.now();
+
+    const pedidos = await apiGet("/api/pedidos");
+    const demorados = pedidos.filter(p =>
+        p.estado === "pendiente" &&
+        !p.alertaDemoraEnviada &&
+        (ahora - p.fechaCreacion) >= MINUTOS_DEMORA * 60000
+    );
+
+    if (demorados.length === 0) return;
+
+    const clientesActuales = await apiGet("/api/clientes");
+    let huboCambios = false;
+
+    for (const pedido of demorados) {
+
+        const cliente = clientesActuales.find(c => c.id === pedido.clienteId);
+
+        if (cliente) {
+            if (!cliente.historial) cliente.historial = [];
+
+            cliente.historial.push({
+                tipo: "ALERTA_PEDIDO_DEMORADO",
+                fecha: Date.now(),
+                motivo: `Pedido sin confirmar hace más de ${MINUTOS_DEMORA} min (punto ${pedido.punto})`,
+                revisada: false
+            });
+
+            huboCambios = true;
+        }
+
+        pedido.alertaDemoraEnviada = true;
+    }
+
+    await apiPost("/api/pedidos", pedidos);
+
+    if (huboCambios) {
+        await apiPost("/api/clientes", clientesActuales);
+    }
+}
+
+// =====================================================
+// VISTA PEDIDOS (pantalla fija de PC/Tablet, sin login)
+// =====================================================
+
+function initVistaPedidos() {
+    mostrarPantalla("pedidos-pantalla");
+    cargarPedidosPantalla();
+    setInterval(cargarPedidosPantalla, 10000);
+    setInterval(verificarPedidosDemorados, 60000);
+}
+
+async function cargarPedidosPantalla() {
+
+    const pedidos = await apiGet("/api/pedidos");
+    const pendientes = pedidos
+        .filter(p => p.estado === "pendiente")
+        .sort((a, b) => a.fechaCreacion - b.fechaCreacion);
+
+    const grid = document.getElementById("pedidos-grid");
+    const vacio = document.getElementById("pedidos-vacio");
+
+    if (pendientes.length === 0) {
+        grid.innerHTML = "";
+        vacio.style.display = "block";
+        return;
+    }
+
+    vacio.style.display = "none";
+
+    const ahora = Date.now();
+
+    grid.innerHTML = pendientes.map(p => {
+
+        const minutosEsperando = Math.floor((ahora - p.fechaCreacion) / 60000);
+        const demorado = minutosEsperando >= 5;
+        const detalle = p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ");
+
+        return `
+            <div class="pedido-card ${demorado ? "demorado" : ""}">
+                <div style="font-weight:700; color:white; font-size:16px;">${p.clienteNombre}</div>
+                <div style="color:#d4af37; font-size:13px;">Punto: ${p.punto}</div>
+                <div style="color:#d4af37; font-size:14px; margin-top:6px;">${detalle}</div>
+                ${p.aclaraciones ? `<div style="color:#999; font-size:12px; font-style:italic; margin-top:4px;">"${p.aclaraciones}"</div>` : ""}
+                ${demorado ? `<div class="aviso-demora">⚠ Pedido pendiente de confirmar (${minutosEsperando} min)</div>` : ""}
+                <button class="btn-principal" style="margin-top:12px;" onclick="abrirConfirmarPedidoPantalla('${p.id}')">Confirmar</button>
+            </div>
+        `;
+    }).join("");
+}
+
+function abrirConfirmarPedidoPantalla(pedidoId) {
+
+    document.getElementById("modal-confirmar-pedido-pantalla")?.remove();
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-confirmar-pedido-pantalla";
+    overlay.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,0.75);
+        display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+    `;
+
+    overlay.innerHTML = `
+        <div class="card-login" style="width:100%; max-width:320px; margin:0;">
+            <h1 style="color:var(--dorado); font-size:20px; margin-bottom:14px;">Confirmar pedido</h1>
+            <input type="text" id="confirmar-pantalla-legajo" placeholder="Legajo">
+            <input type="password" id="confirmar-pantalla-pin" placeholder="PIN" maxlength="4" autocomplete="off">
+            <div class="msg-error" id="confirmar-pantalla-error"></div>
+            <button class="btn-principal" id="btn-confirmar-pantalla-ok">Confirmar</button>
+            <button class="btn-secundario" id="btn-confirmar-pantalla-cancelar">Cancelar</button>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("btn-confirmar-pantalla-cancelar").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
+
+    document.getElementById("btn-confirmar-pantalla-ok").addEventListener("click", async () => {
+
+        const legajo = document.getElementById("confirmar-pantalla-legajo").value.trim();
+        const pin = document.getElementById("confirmar-pantalla-pin").value.trim();
+        const errorEl = document.getElementById("confirmar-pantalla-error");
+
+        if (!legajo || !pin) {
+            errorEl.textContent = "Completá legajo y PIN";
+            return;
+        }
+
+        try {
+            const personal = await apiGet("/api/personal?tipo=camareros");
+            const persona = personal.find(p => String(p.legajo) === legajo && String(p.pin) === pin);
+
+            if (!persona) {
+                errorEl.textContent = "Legajo o PIN incorrecto";
+                return;
+            }
+
+            const pedidos = await apiGet("/api/pedidos");
+            const pedido = pedidos.find(p => p.id === pedidoId);
+
+            if (!pedido) {
+                errorEl.textContent = "El pedido ya no existe (¿otro camarero lo confirmó?)";
+                return;
+            }
+
+            pedido.estado = "confirmado";
+            pedido.confirmadoPorLegajo = persona.legajo;
+            pedido.confirmadoPorApellido = persona.apellido;
+            pedido.horaConfirmacion = Date.now();
+
+            await apiPost("/api/pedidos", pedidos);
+
+            overlay.remove();
+            cargarPedidosPantalla();
+
+        } catch (error) {
+            errorEl.textContent = "No se pudo confirmar, probá de nuevo";
+            console.error(error);
+        }
+    });
+}
+
 function tieneBeneficioGastronomia(cliente) {
     const categoriasAutomaticas = ["Bespoke", "Diamond", "Diamond Seg.", "Platinum"];
     return categoriasAutomaticas.includes(cliente.categoria) || !!cliente.excepcionGastronomia?.activa;
@@ -157,8 +329,9 @@ function tieneBeneficioGastronomia(cliente) {
 let clienteLogueado = null;
 let menuActivo = [];
 let tipoMenuActivo = "beneficio"; // "beneficio" | "pago"
-let carrito = {}; // { nombreItem: {cantidad, precio} }
+let carrito = {}; // { nombreItem: {cantidad} }
 let pedidoActualId = null;
+let categoriasActivas = [];
 
 function initVistaCliente() {
     mostrarPantalla("cliente-login");
@@ -183,33 +356,31 @@ function initVistaCliente() {
             return;
         }
 
-        const tieneBeneficio = tieneBeneficioGastronomia(cliente);
-        const horario = await apiGet("/api/menu?tipo=horario");
-        const dentroDeHorario = estaEnHorarioBeneficio(horario);
+        const tieneExcepcion = cliente.excepcionGastronomia?.activa && !cliente.excepcionGastronomia?.usado;
+
+        if (!tieneBeneficioGastronomia(cliente) && !tieneExcepcion) {
+            errorEl.textContent = "No tenés el beneficio de gastronomía habilitado";
+            return;
+        }
 
         clienteLogueado = cliente;
+        tipoMenuActivo = "beneficio";
 
-        if (tieneBeneficio && dentroDeHorario) {
-            tipoMenuActivo = "beneficio";
-            menuActivo = await apiGet("/api/menu?tipo=beneficio");
-            document.getElementById("titulo-menu-cliente").textContent = "Menú";
-            document.getElementById("submenu-cliente").textContent = "Beneficio incluido";
-        } else {
-            tipoMenuActivo = "pago";
-            menuActivo = await apiGet("/api/menu?tipo=pago");
-            document.getElementById("titulo-menu-cliente").textContent = "Menú";
-            document.getElementById("submenu-cliente").textContent = tieneBeneficio
-                ? "Fuera del horario de beneficio — este menú tiene precio"
-                : "";
-        }
+        const [categorias, horarios, items] = await Promise.all([
+            apiGet("/api/menu?tipo=categorias"),
+            apiGet("/api/menu?tipo=horarios"),
+            apiGet("/api/menu?tipo=items")
+        ]);
 
-        // Si tiene una excepción activa (máximo 3 ítems, sin importar horario)
-        if (cliente.excepcionGastronomia?.activa && !cliente.excepcionGastronomia?.usado) {
-            tipoMenuActivo = "beneficio";
-            menuActivo = await apiGet("/api/menu?tipo=beneficio");
-            document.getElementById("submenu-cliente").textContent =
-                `Excepción autorizada — hasta ${cliente.excepcionGastronomia.maxItems || 3} ítems`;
-        }
+        const dentroDeHorario = dentroDeAlgunaFranja(horarios);
+
+        categoriasActivas = categorias.filter(c => c.siempreDisponible || dentroDeHorario);
+        menuActivo = items.filter(i => categoriasActivas.some(c => c.nombre === i.categoria));
+
+        document.getElementById("titulo-menu-cliente").textContent = "Carta";
+        document.getElementById("submenu-cliente").textContent = tieneExcepcion
+            ? `Excepción autorizada — hasta ${cliente.excepcionGastronomia.maxItems || 3} ítems`
+            : (dentroDeHorario ? "" : "Fuera de horario de comida — solo cortesías");
 
         carrito = {};
         renderMenuCliente();
@@ -224,22 +395,32 @@ function renderMenuCliente() {
     const contenedor = document.getElementById("lista-menu-cliente");
 
     if (menuActivo.length === 0) {
-        contenedor.innerHTML = `<div class="vacio">Todavía no hay ítems cargados en este menú</div>`;
-    } else {
-        contenedor.innerHTML = menuActivo.map(item => `
-            <div class="menu-item">
-                <div class="info">
-                    <div class="nombre">${item.nombre}</div>
-                    ${tipoMenuActivo === "pago" ? `<div class="precio">$${item.precio}</div>` : ""}
-                </div>
-                <div class="cantidad-control">
-                    <button onclick="cambiarCantidad('${item.nombre}', -1)">−</button>
-                    <span class="cantidad-valor" id="cant-${item.nombre.replace(/\\s+/g, "_")}">0</span>
-                    <button onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
-                </div>
-            </div>
-        `).join("");
+        contenedor.innerHTML = `<div class="vacio">No hay ítems disponibles en este momento</div>`;
+        actualizarResumen();
+        return;
     }
+
+    contenedor.innerHTML = categoriasActivas.map(cat => {
+
+        const items = menuActivo.filter(i => i.categoria === cat.nombre);
+        if (items.length === 0) return "";
+
+        return `
+            <div class="banner-categoria">${cat.nombre}${cat.siempreDisponible ? " (24 hs)" : ""}</div>
+            ${items.map(item => `
+                <div class="menu-item">
+                    <div class="info">
+                        <div class="nombre">${item.nombre}</div>
+                    </div>
+                    <div class="cantidad-control">
+                        <button onclick="cambiarCantidad('${item.nombre}', -1)">−</button>
+                        <span class="cantidad-valor" id="cant-${item.nombre.replace(/\s+/g, "_")}">0</span>
+                        <button onclick="cambiarCantidad('${item.nombre}', 1)">+</button>
+                    </div>
+                </div>
+            `).join("")}
+        `;
+    }).join("");
 
     actualizarResumen();
 }
@@ -260,7 +441,7 @@ function cambiarCantidad(nombre, delta) {
     const item = menuActivo.find(i => i.nombre === nombre);
     if (!item) return;
 
-    if (!carrito[nombre]) carrito[nombre] = { cantidad: 0, precio: item.precio || 0 };
+    if (!carrito[nombre]) carrito[nombre] = { cantidad: 0 };
 
     carrito[nombre].cantidad = Math.max(0, carrito[nombre].cantidad + delta);
 
@@ -274,10 +455,9 @@ function cambiarCantidad(nombre, delta) {
 
 function actualizarResumen() {
     const cantidadTotal = Object.values(carrito).reduce((s, i) => s + i.cantidad, 0);
-    const total = Object.values(carrito).reduce((s, i) => s + i.cantidad * i.precio, 0);
 
     document.getElementById("resumen-cantidad").textContent = `${cantidadTotal} ítem${cantidadTotal === 1 ? "" : "s"}`;
-    document.getElementById("resumen-total").textContent = tipoMenuActivo === "pago" ? `$${total}` : "";
+    document.getElementById("resumen-total").textContent = "";
 }
 
 async function enviarPedido() {
@@ -286,8 +466,10 @@ async function enviarPedido() {
     errorEl.textContent = "";
 
     const punto = document.getElementById("cliente-punto").value.trim();
+    const aclaraciones = document.getElementById("cliente-aclaraciones").value.trim();
+
     const items = Object.entries(carrito).map(([nombre, datos]) => ({
-        nombre, cantidad: datos.cantidad, precio: datos.precio
+        nombre, cantidad: datos.cantidad
     }));
 
     if (items.length === 0) {
@@ -298,47 +480,6 @@ async function enviarPedido() {
     if (!punto) {
         errorEl.textContent = "Indicá el número de máquina, mesa o barra";
         return;
-    }
-
-    // Control del tope diario ($50.000) para pedidos del menú sin horario
-    if (tipoMenuActivo === "pago") {
-        const totalPedido = items.reduce((s, i) => s + i.cantidad * i.precio, 0);
-
-        if (tieneBeneficioGastronomia(clienteLogueado)) {
-            const TOPE_DIARIO = 50000;
-            const pedidosPrevios = await apiGet("/api/pedidos");
-            const jornadaActual = getFechaOperativa(new Date()).getTime();
-
-            const gastadoHoy = pedidosPrevios
-                .filter(p => p.clienteId === clienteLogueado.id
-                    && p.tipoMenu === "pago"
-                    && getFechaOperativa(p.fechaCreacion).getTime() === jornadaActual)
-                .reduce((s, p) => s + (p.total || 0), 0);
-
-            if (gastadoHoy + totalPedido > TOPE_DIARIO) {
-                errorEl.textContent = `Superás el tope diario del beneficio ($${TOPE_DIARIO}). Ya consumiste $${gastadoHoy} hoy.`;
-
-                // Avisamos al supervisor, aunque al cliente no se le bloquea con dramatismo.
-                try {
-                    const clientesActuales = await apiGet("/api/clientes");
-                    const c = clientesActuales.find(x => x.id === clienteLogueado.id);
-                    if (c) {
-                        if (!c.historial) c.historial = [];
-                        c.historial.push({
-                            tipo: "ALERTA_TOPE_GASTRONOMIA",
-                            fecha: Date.now(),
-                            motivo: `Alcanzó el tope diario de consumo ($${TOPE_DIARIO}) en gastronomía`,
-                            revisada: false
-                        });
-                        await apiPost("/api/clientes", clientesActuales);
-                    }
-                } catch (error) {
-                    console.error("No se pudo registrar la alerta de tope:", error);
-                }
-
-                return;
-            }
-        }
     }
 
     const pedidos = await apiGet("/api/pedidos");
@@ -352,8 +493,8 @@ async function enviarPedido() {
         clienteCategoria: clienteLogueado.categoria,
         punto,
         items,
+        aclaraciones,
         tipoMenu: tipoMenuActivo,
-        total: items.reduce((s, i) => s + i.cantidad * i.precio, 0),
         estado: "pendiente",
         confirmadoPorLegajo: null,
         confirmadoPorApellido: null,
@@ -384,6 +525,7 @@ async function enviarPedido() {
 
     setInterval(actualizarEstadoCliente, 8000);
     setInterval(verificarPedidosVencidos, 60000);
+    setInterval(verificarPedidosDemorados, 60000);
 }
 
 async function actualizarEstadoCliente() {
@@ -468,27 +610,18 @@ function renderCierre() {
 
     vacio.style.display = "none";
 
-    let totalGeneral = 0;
-
-    contenedor.innerHTML = pedidosCierre.map(p => {
-        totalGeneral += p.total || 0;
-        return `
+    contenedor.innerHTML = pedidosCierre.map(p => `
         <div class="pedido-card">
             <div style="font-weight:700; color:white;">${p.clienteNombre} — Punto ${p.punto}</div>
             <div style="color:#d4af37; font-size:13px;">
                 ${p.items.map(i => `${i.cantidad}x ${i.nombre}`).join(", ")}
             </div>
+            ${p.aclaraciones ? `<div style="color:#999; font-size:12px; font-style:italic;">"${p.aclaraciones}"</div>` : ""}
             <div style="color:#999; font-size:12px; margin-top:4px;">
                 ${new Date(p.horaConfirmacion).toLocaleTimeString("es-AR")}
-                ${p.total ? ` · $${p.total}` : ""}
             </div>
         </div>
-    `;
-    }).join("") + `
-        <div style="text-align:right; color:var(--dorado); font-weight:700; margin-top:10px;">
-            Total: $${totalGeneral}
-        </div>
-    `;
+    `).join("");
 }
 
 // =====================================================
@@ -524,41 +657,71 @@ function initVistaAdmin() {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("activo"));
             btn.classList.add("activo");
-            ["tab-menu", "tab-puntos", "tab-camareros", "tab-qr"].forEach(id => {
+            ["tab-menu", "tab-puntos"].forEach(id => {
                 document.getElementById(id).style.display = id === btn.dataset.tab ? "block" : "none";
             });
-            if (btn.dataset.tab === "tab-qr") generarTodosLosQR();
         });
     });
 
-    document.getElementById("btn-guardar-horario").addEventListener("click", async () => {
-        const desde = document.getElementById("horario-desde").value;
-        const hasta = document.getElementById("horario-hasta").value;
-        if (!desde || !hasta) return;
-        await apiPost("/api/menu?tipo=horario", { desde, hasta });
-        mostrarAviso("Horario guardado");
+    document.getElementById("btn-agregar-horario").addEventListener("click", async () => {
+        const nombre = document.getElementById("nuevo-horario-nombre").value.trim();
+        const desde = document.getElementById("nuevo-horario-desde").value;
+        const hasta = document.getElementById("nuevo-horario-hasta").value;
+
+        if (!nombre || !desde || !hasta) {
+            mostrarAviso("Completá nombre, desde y hasta");
+            return;
+        }
+
+        const lista = await apiGet("/api/menu?tipo=horarios");
+        lista.push({ nombre, desde, hasta });
+        await apiPost("/api/menu?tipo=horarios", lista);
+
+        document.getElementById("nuevo-horario-nombre").value = "";
+        document.getElementById("nuevo-horario-desde").value = "";
+        document.getElementById("nuevo-horario-hasta").value = "";
+        cargarHorarios();
     });
 
-    document.getElementById("btn-agregar-beneficio").addEventListener("click", async () => {
-        const nombre = document.getElementById("nuevo-item-beneficio").value.trim();
-        if (!nombre) return;
-        const lista = await apiGet("/api/menu?tipo=beneficio");
-        lista.push({ nombre });
-        await apiPost("/api/menu?tipo=beneficio", lista);
-        document.getElementById("nuevo-item-beneficio").value = "";
-        cargarMenuBeneficio();
+    document.getElementById("btn-agregar-categoria").addEventListener("click", async () => {
+        const nombre = document.getElementById("nueva-categoria-nombre").value.trim();
+        const siempreDisponible = document.getElementById("nueva-categoria-siempre").checked;
+
+        if (!nombre) {
+            mostrarAviso("Poné un nombre para la categoría");
+            return;
+        }
+
+        const lista = await apiGet("/api/menu?tipo=categorias");
+
+        if (lista.some(c => c.nombre === nombre)) {
+            mostrarAviso("Ya existe una categoría con ese nombre");
+            return;
+        }
+
+        lista.push({ nombre, siempreDisponible });
+        await apiPost("/api/menu?tipo=categorias", lista);
+
+        document.getElementById("nueva-categoria-nombre").value = "";
+        document.getElementById("nueva-categoria-siempre").checked = false;
+        cargarCategorias();
     });
 
-    document.getElementById("btn-agregar-pago").addEventListener("click", async () => {
-        const nombre = document.getElementById("nuevo-item-pago").value.trim();
-        const precio = Number(document.getElementById("nuevo-item-precio").value) || 0;
-        if (!nombre) return;
-        const lista = await apiGet("/api/menu?tipo=pago");
-        lista.push({ nombre, precio });
-        await apiPost("/api/menu?tipo=pago", lista);
-        document.getElementById("nuevo-item-pago").value = "";
-        document.getElementById("nuevo-item-precio").value = "";
-        cargarMenuPago();
+    document.getElementById("btn-agregar-item").addEventListener("click", async () => {
+        const nombre = document.getElementById("nuevo-item-nombre").value.trim();
+        const categoria = document.getElementById("nuevo-item-categoria").value;
+
+        if (!nombre || !categoria) {
+            mostrarAviso("Completá el nombre y elegí una categoría");
+            return;
+        }
+
+        const lista = await apiGet("/api/menu?tipo=items");
+        lista.push({ nombre, categoria });
+        await apiPost("/api/menu?tipo=items", lista);
+
+        document.getElementById("nuevo-item-nombre").value = "";
+        cargarItemsMenu();
     });
 
     document.getElementById("btn-agregar-isla").addEventListener("click", async () => {
@@ -605,46 +768,13 @@ function initVistaAdmin() {
         document.getElementById("cantidad-mesas").value = "";
         cargarPuntos();
     });
-
-    document.getElementById("btn-agregar-camarero").addEventListener("click", async () => {
-        const legajo = document.getElementById("nuevo-camarero-legajo").value.trim();
-        const nombre = document.getElementById("nuevo-camarero-nombre").value.trim();
-        const apellido = document.getElementById("nuevo-camarero-apellido").value.trim();
-        const pinManual = document.getElementById("nuevo-camarero-pin").value.trim();
-
-        if (!legajo || !nombre || !apellido) {
-            mostrarAviso("Completá legajo, nombre y apellido");
-            return;
-        }
-
-        const lista = await apiGet("/api/personal?tipo=camareros");
-
-        if (lista.some(p => p.legajo === legajo)) {
-            mostrarAviso("Ya existe un camarero con ese legajo");
-            return;
-        }
-
-        lista.push({ legajo, nombre, apellido, pin: pinManual || generarPinLocal(4) });
-        await apiPost("/api/personal?tipo=camareros", lista);
-
-        document.getElementById("nuevo-camarero-legajo").value = "";
-        document.getElementById("nuevo-camarero-nombre").value = "";
-        document.getElementById("nuevo-camarero-apellido").value = "";
-        document.getElementById("nuevo-camarero-pin").value = "";
-
-        cargarCamareros();
-    });
 }
 
 async function cargarTodoAdmin() {
-    const horario = await apiGet("/api/menu?tipo=horario");
-    document.getElementById("horario-desde").value = horario.desde || "20:00";
-    document.getElementById("horario-hasta").value = horario.hasta || "23:59";
-
-    await cargarMenuBeneficio();
-    await cargarMenuPago();
+    await cargarHorarios();
+    await cargarCategorias();
+    await cargarItemsMenu();
     await cargarPuntos();
-    await cargarCamareros();
 }
 
 function generarPinLocal(cantidadDigitos) {
@@ -653,57 +783,77 @@ function generarPinLocal(cantidadDigitos) {
     return String(Math.floor(min + Math.random() * (max - min + 1)));
 }
 
-async function cargarCamareros() {
-    const lista = await apiGet("/api/personal?tipo=camareros");
-    document.getElementById("lista-camareros").innerHTML = lista.length === 0
-        ? `<p style="color:#888;">Sin camareros cargados todavía</p>`
-        : lista.map(p => `
+async function cargarHorarios() {
+    const lista = await apiGet("/api/menu?tipo=horarios");
+    document.getElementById("lista-horarios").innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin franjas cargadas</p>`
+        : lista.map((h, i) => `
             <div class="menu-item">
                 <div class="info">
-                    <div class="nombre">${p.nombre} ${p.apellido}</div>
-                    <div class="precio">Legajo: ${p.legajo} · PIN: ${p.pin}</div>
+                    <div class="nombre">${h.nombre}</div>
+                    <div class="precio">${h.desde} a ${h.hasta}</div>
                 </div>
-                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarCamarero('${p.legajo}')">Borrar</button>
+                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarHorario(${i})">Borrar</button>
             </div>
         `).join("");
 }
 
-async function borrarCamarero(legajo) {
-    let lista = await apiGet("/api/personal?tipo=camareros");
-    lista = lista.filter(p => p.legajo !== legajo);
-    await apiPost("/api/personal?tipo=camareros", lista);
-    cargarCamareros();
-}
-
-async function cargarMenuBeneficio() {
-    const lista = await apiGet("/api/menu?tipo=beneficio");
-    document.getElementById("lista-menu-beneficio").innerHTML = lista.length === 0
-        ? `<p style="color:#888;">Sin ítems cargados</p>`
-        : lista.map((item, i) => `
-            <div class="menu-item">
-                <div class="info"><div class="nombre">${item.nombre}</div></div>
-                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarItemMenu('beneficio', ${i})">Borrar</button>
-            </div>
-        `).join("");
-}
-
-async function cargarMenuPago() {
-    const lista = await apiGet("/api/menu?tipo=pago");
-    document.getElementById("lista-menu-pago").innerHTML = lista.length === 0
-        ? `<p style="color:#888;">Sin ítems cargados</p>`
-        : lista.map((item, i) => `
-            <div class="menu-item">
-                <div class="info"><div class="nombre">${item.nombre}</div><div class="precio">$${item.precio}</div></div>
-                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarItemMenu('pago', ${i})">Borrar</button>
-            </div>
-        `).join("");
-}
-
-async function borrarItemMenu(tipo, indice) {
-    const lista = await apiGet(`/api/menu?tipo=${tipo}`);
+async function borrarHorario(indice) {
+    const lista = await apiGet("/api/menu?tipo=horarios");
     lista.splice(indice, 1);
-    await apiPost(`/api/menu?tipo=${tipo}`, lista);
-    if (tipo === "beneficio") cargarMenuBeneficio(); else cargarMenuPago();
+    await apiPost("/api/menu?tipo=horarios", lista);
+    cargarHorarios();
+}
+
+async function cargarCategorias() {
+    const lista = await apiGet("/api/menu?tipo=categorias");
+
+    document.getElementById("lista-categorias").innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin categorías cargadas</p>`
+        : lista.map((c, i) => `
+            <div class="menu-item">
+                <div class="info">
+                    <div class="nombre">${c.nombre}</div>
+                    <div class="precio">${c.siempreDisponible ? "Siempre disponible" : "Depende del horario"}</div>
+                </div>
+                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarCategoria(${i})">Borrar</button>
+            </div>
+        `).join("");
+
+    // Actualiza también el <select> del formulario de ítems.
+    const select = document.getElementById("nuevo-item-categoria");
+    select.innerHTML = lista.length === 0
+        ? `<option value="">Primero cargá una categoría</option>`
+        : lista.map(c => `<option value="${c.nombre}">${c.nombre}</option>`).join("");
+}
+
+async function borrarCategoria(indice) {
+    const lista = await apiGet("/api/menu?tipo=categorias");
+    lista.splice(indice, 1);
+    await apiPost("/api/menu?tipo=categorias", lista);
+    cargarCategorias();
+}
+
+async function cargarItemsMenu() {
+    const lista = await apiGet("/api/menu?tipo=items");
+    document.getElementById("lista-items-menu").innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin ítems cargados</p>`
+        : lista.map((item, i) => `
+            <div class="menu-item">
+                <div class="info">
+                    <div class="nombre">${item.nombre}</div>
+                    <div class="precio">${item.categoria}</div>
+                </div>
+                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarItemMenu(${i})">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function borrarItemMenu(indice) {
+    const lista = await apiGet("/api/menu?tipo=items");
+    lista.splice(indice, 1);
+    await apiPost("/api/menu?tipo=items", lista);
+    cargarItemsMenu();
 }
 
 async function cargarPuntos() {
@@ -733,30 +883,9 @@ async function borrarPunto(codigo) {
     cargarPuntos();
 }
 
-async function generarTodosLosQR() {
-    const puntos = await apiGet("/api/puntos");
-    const grid = document.getElementById("qr-grid");
-    grid.innerHTML = "";
-
-    const baseUrl = window.location.origin + window.location.pathname.replace("gastronomia.html", "gastronomia.html");
-
-    for (const punto of puntos) {
-        const url = `${baseUrl}?punto=${encodeURIComponent(punto.codigo)}`;
-
-        const div = document.createElement("div");
-        div.className = "qr-item";
-        div.innerHTML = `<canvas></canvas><span>${punto.nombre}</span>`;
-        grid.appendChild(div);
-
-        const canvas = div.querySelector("canvas");
-        // eslint-disable-next-line no-undef
-        QRCode.toCanvas(canvas, url, { width: 120 });
-    }
-
-    if (puntos.length === 0) {
-        grid.innerHTML = `<p style="color:#888;">Cargá islas, barras o mesas primero, en la pestaña "Puntos de pedido"</p>`;
-    }
-}
+// La generación de QR se hace con una herramienta externa, apuntando cada
+// código a: gastronomia.html?punto=CODIGO (donde CODIGO es el código de la
+// isla, barra o mesa, tal como se cargó en la pestaña "Puntos de pedido").
 
 // =====================================================
 // ARRANQUE SEGÚN LA VISTA
@@ -769,6 +898,8 @@ if (vista === "cierre") {
     initVistaCierre();
 } else if (vista === "admin") {
     initVistaAdmin();
+} else if (vista === "pedidos") {
+    initVistaPedidos();
 } else {
     initVistaCliente();
 }

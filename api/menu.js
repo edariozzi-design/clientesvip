@@ -1,9 +1,12 @@
 // api/menu.js
 //
-// Guarda los 2 menús de gastronomía:
-// - "beneficio" (con horario, sin precios)
-// - "pago" (sin horario, con precios)
-// Y la configuración de horario del menú beneficio.
+// Guarda el menú de gastronomía (por ahora, un solo menú: el de beneficio,
+// el de la carta real). Se organiza en categorías, y cada categoría dice si
+// está siempre disponible o si depende de los horarios cargados.
+//
+// - ?tipo=items       -> lista de ítems del menú [{nombre, categoria}]
+// - ?tipo=categorias  -> lista de categorías [{nombre, siempreDisponible}]
+// - ?tipo=horarios    -> lista de franjas horarias [{nombre, desde, hasta}]
 
 export default async function handler(req, res) {
 
@@ -15,13 +18,13 @@ export default async function handler(req, res) {
         return;
     }
 
-    const tipo = req.query?.tipo === "pago" ? "pago"
-        : req.query?.tipo === "horario" ? "horario"
-        : "beneficio";
+    const tipo = req.query?.tipo === "categorias" ? "categorias"
+        : req.query?.tipo === "horarios" ? "horarios"
+        : "items";
 
-    const clave = tipo === "pago" ? "menu_pago"
-        : tipo === "horario" ? "menu_horario"
-        : "menu_beneficio";
+    const clave = tipo === "categorias" ? "menu_categorias"
+        : tipo === "horarios" ? "menu_horarios"
+        : "menu_items";
 
     if (req.method === "GET") {
         try {
@@ -30,7 +33,7 @@ export default async function handler(req, res) {
             });
 
             const datos = await respuesta.json();
-            const valor = datos.result ? JSON.parse(datos.result) : (tipo === "horario" ? { desde: "20:00", hasta: "23:59" } : []);
+            const valor = datos.result ? JSON.parse(datos.result) : [];
 
             res.status(200).json(valor);
 

@@ -485,11 +485,12 @@ function initVistaAdmin() {
         }
 
         mostrarPantalla("admin-gestion");
-        await Promise.all([cargarListaLavadero(), cargarListaEmpresa()]);
+        await Promise.all([cargarListaLavadero(), cargarListaEmpresa(), cargarListaCamareros()]);
     });
 
     document.getElementById("btn-agregar-lavador").addEventListener("click", agregarLavador);
     document.getElementById("btn-agregar-empresa").addEventListener("click", agregarEmpresa);
+    document.getElementById("btn-agregar-camarero").addEventListener("click", agregarCamarero);
 
     document.getElementById("btn-volver-admin").addEventListener("click", () => {
         document.getElementById("admin-pass").value = "";
@@ -534,6 +535,21 @@ async function cargarListaEmpresa() {
                 <div class="nombre">${p.nombre} ${p.apellido}</div>
                 <div class="datos">Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span></div>
                 <button onclick="eliminarEmpresa('${p.legajo}')">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function cargarListaCamareros() {
+    const lista = await apiGet("/api/personal?tipo=camareros");
+    const contenedor = document.getElementById("lista-camareros");
+
+    contenedor.innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin camareros cargados todavía</p>`
+        : lista.map(p => `
+            <div class="persona-card">
+                <div class="nombre">${p.nombre} ${p.apellido}</div>
+                <div class="datos">Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span></div>
+                <button onclick="eliminarCamarero('${p.legajo}')">Borrar</button>
             </div>
         `).join("");
 }
@@ -601,6 +617,39 @@ async function agregarEmpresa() {
     cargarListaEmpresa();
 }
 
+async function agregarCamarero() {
+    const legajo = document.getElementById("nuevo-camarero-legajo").value.trim();
+    const nombre = document.getElementById("nuevo-camarero-nombre").value.trim();
+    const apellido = document.getElementById("nuevo-camarero-apellido").value.trim();
+
+    if (!legajo || !nombre || !apellido) {
+        mostrarAviso("Completá legajo, nombre y apellido");
+        return;
+    }
+
+    const lista = await apiGet("/api/personal?tipo=camareros");
+
+    if (lista.some(p => p.legajo === legajo)) {
+        mostrarAviso("Ya existe una persona con ese legajo");
+        return;
+    }
+
+    lista.push({
+        legajo,
+        nombre,
+        apellido,
+        pin: document.getElementById("nuevo-camarero-pin").value.trim() || generarPinLocal(4)
+    });
+    await apiPost("/api/personal?tipo=camareros", lista);
+
+    document.getElementById("nuevo-camarero-legajo").value = "";
+    document.getElementById("nuevo-camarero-nombre").value = "";
+    document.getElementById("nuevo-camarero-apellido").value = "";
+    document.getElementById("nuevo-camarero-pin").value = "";
+
+    cargarListaCamareros();
+}
+
 async function eliminarLavador(dni) {
     if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
 
@@ -617,6 +666,15 @@ async function eliminarEmpresa(legajo) {
     lista = lista.filter(p => p.legajo !== legajo);
     await apiPost("/api/personal?tipo=empresa", lista);
     cargarListaEmpresa();
+}
+
+async function eliminarCamarero(legajo) {
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
+
+    let lista = await apiGet("/api/personal?tipo=camareros");
+    lista = lista.filter(p => p.legajo !== legajo);
+    await apiPost("/api/personal?tipo=camareros", lista);
+    cargarListaCamareros();
 }
 
 // =====================================================
