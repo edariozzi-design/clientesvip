@@ -277,9 +277,11 @@ async function verEnElMapa(punto) {
 
     overlay.innerHTML = ubicacion
         ? `
-            <div style="position:relative; max-width:100%; max-height:100%;">
-                <img src="img/plano-entrepiso.png" style="display:block; max-width:100%; max-height:90vh; border-radius:10px;">
-                <div class="marcador-mapa destacado" style="left:${ubicacion.x}%; top:${ubicacion.y}%;">${punto}</div>
+            <div>
+                <div style="position:relative; display:inline-block; max-width:100%; border-radius:10px; overflow:hidden;">
+                    <img src="img/plano-entrepiso.png" style="display:block; width:100%; max-width:1000px;">
+                    <div class="marcador-mapa destacado" style="left:${ubicacion.x}%; top:${ubicacion.y}%;"></div>
+                </div>
                 <button class="btn-principal" id="btn-cerrar-ver-mapa" style="margin-top:14px;">Cerrar</button>
             </div>
         `
@@ -1053,9 +1055,7 @@ async function cargarMarcadoresMapa() {
     const contenedor = document.getElementById("mapa-marcadores");
 
     contenedor.innerHTML = coordenadas.map(c => `
-        <div class="marcador-mapa" style="left:${c.x}%; top:${c.y}%;" title="${c.codigo}">
-            ${c.codigo.length <= 4 ? c.codigo : "•"}
-        </div>
+        <div class="marcador-mapa" style="left:${c.x}%; top:${c.y}%;" title="${c.codigo}"></div>
     `).join("");
 
     const listaTexto = document.getElementById("lista-mapa-marcados");
