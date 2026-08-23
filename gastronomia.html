@@ -202,6 +202,46 @@
         min-width: 340px;
     }
 
+    .persona-card {
+        background: #1a1a1a;
+        border: 1.5px solid var(--dorado);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 8px;
+        color: var(--dorado);
+        font-weight: 600;
+        text-align: center;
+    }
+
+    .persona-card:hover {
+        background: rgba(218,165,32,0.15);
+    }
+
+    .marcador-mapa {
+        position: absolute;
+        width: 22px;
+        height: 22px;
+        border-radius: 50%;
+        background: #ff6b6b;
+        border: 2px solid white;
+        transform: translate(-50%, -50%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 10px;
+        font-weight: 700;
+        cursor: pointer;
+        box-shadow: 0 0 6px rgba(0,0,0,0.6);
+    }
+
+    .marcador-mapa.destacado {
+        background: #2ecc71;
+        width: 30px;
+        height: 30px;
+        box-shadow: 0 0 12px rgba(46,204,113,0.9);
+    }
+
     .qr-grid {
         display: flex;
         flex-wrap: wrap;
@@ -342,6 +382,7 @@
         <div class="tabs">
             <button class="activo" data-tab="tab-menu">Menú</button>
             <button data-tab="tab-puntos">Puntos de pedido</button>
+            <button data-tab="tab-mapa">Mapa</button>
         </div>
 
         <!-- TAB MENÚ -->
@@ -422,6 +463,23 @@
                 </div>
 
             </div>
+        </div>
+
+        <!-- TAB MAPA -->
+        <div id="tab-mapa" style="display:none;">
+            <p style="color:#d4af37; text-align:center;">
+                Hacé clic sobre el plano, en el lugar exacto de cada isla/barra/mesa, y elegí a cuál corresponde.
+            </p>
+
+            <div id="mapa-contenedor" style="position:relative; display:inline-block; max-width:100%; border:2px solid var(--dorado); border-radius:10px; overflow:hidden;">
+                <img id="mapa-imagen" src="img/plano-entrepiso.png" style="display:block; width:100%; max-width:1000px; cursor:crosshair;">
+                <div id="mapa-marcadores"></div>
+            </div>
+
+            <p style="color:#888; font-size:12px; text-align:center; margin-top:10px;" id="mapa-sin-imagen"></p>
+
+            <header class="top" style="margin-top:24px;"><h2>Puntos ya marcados</h2></header>
+            <div id="lista-mapa-marcados"></div>
         </div>
     </div>
 

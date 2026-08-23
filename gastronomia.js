@@ -254,10 +254,46 @@ async function cargarPedidosPantalla() {
                 <div style="color:#d4af37; font-size:14px; margin-top:6px;">${detalle}</div>
                 ${p.aclaraciones ? `<div style="color:#999; font-size:12px; font-style:italic; margin-top:4px;">"${p.aclaraciones}"</div>` : ""}
                 ${demorado ? `<div class="aviso-demora">⚠ Pedido pendiente de confirmar (${minutosEsperando} min)</div>` : ""}
-                <button class="btn-principal" style="margin-top:12px;" onclick="abrirConfirmarPedidoPantalla('${p.id}')">Confirmar</button>
+                <button class="btn-secundario" onclick="verEnElMapa('${p.punto}')">Ver en el mapa</button>
+                <button class="btn-principal" style="margin-top:8px;" onclick="abrirConfirmarPedidoPantalla('${p.id}')">Confirmar</button>
             </div>
         `;
     }).join("");
+}
+
+async function verEnElMapa(punto) {
+
+    document.getElementById("modal-ver-mapa")?.remove();
+
+    const coordenadas = await apiGet("/api/mapa");
+    const ubicacion = coordenadas.find(c => c.codigo === punto);
+
+    const overlay = document.createElement("div");
+    overlay.id = "modal-ver-mapa";
+    overlay.style.cssText = `
+        position:fixed; inset:0; background:rgba(0,0,0,0.9);
+        display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+    `;
+
+    overlay.innerHTML = ubicacion
+        ? `
+            <div style="position:relative; max-width:100%; max-height:100%;">
+                <img src="img/plano-entrepiso.png" style="display:block; max-width:100%; max-height:90vh; border-radius:10px;">
+                <div class="marcador-mapa destacado" style="left:${ubicacion.x}%; top:${ubicacion.y}%;">${punto}</div>
+                <button class="btn-principal" id="btn-cerrar-ver-mapa" style="margin-top:14px;">Cerrar</button>
+            </div>
+        `
+        : `
+            <div class="card-login" style="max-width:320px;">
+                <p style="color:#f0f0f0;">Todavía no se marcó "${punto}" en el mapa. Cargalo desde el panel de Administrador, pestaña "Mapa".</p>
+                <button class="btn-principal" id="btn-cerrar-ver-mapa">Cerrar</button>
+            </div>
+        `;
+
+    document.body.appendChild(overlay);
+
+    document.getElementById("btn-cerrar-ver-mapa").addEventListener("click", () => overlay.remove());
+    overlay.addEventListener("click", e => { if (e.target === overlay) overlay.remove(); });
 }
 
 function abrirConfirmarPedidoPantalla(pedidoId) {
@@ -678,9 +714,10 @@ function initVistaAdmin() {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("activo"));
             btn.classList.add("activo");
-            ["tab-menu", "tab-puntos"].forEach(id => {
+            ["tab-menu", "tab-puntos", "tab-mapa"].forEach(id => {
                 document.getElementById(id).style.display = id === btn.dataset.tab ? "block" : "none";
             });
+            if (btn.dataset.tab === "tab-mapa") initMapaAdmin();
         });
     });
 
@@ -907,6 +944,137 @@ async function borrarPunto(codigo) {
 // La generación de QR se hace con una herramienta externa, apuntando cada
 // código a: gastronomia.html?punto=CODIGO (donde CODIGO es el código de la
 // isla, barra o mesa, tal como se cargó en la pestaña "Puntos de pedido").
+
+// =====================================================
+// MAPA (herramienta de marcado, dentro del admin)
+// =====================================================
+
+let mapaInicializado = false;
+
+function elegirPuntoDelMapa(puntos) {
+
+    return new Promise(resolve => {
+
+        document.getElementById("modal-elegir-punto")?.remove();
+
+        const overlay = document.createElement("div");
+        overlay.id = "modal-elegir-punto";
+        overlay.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.75);
+            display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+        `;
+
+        overlay.innerHTML = `
+            <div class="card-login" style="width:100%; max-width:360px; margin:0; max-height:70vh; overflow-y:auto;">
+                <h1 style="color:var(--dorado); font-size:18px; margin-bottom:14px;">¿A qué punto corresponde?</h1>
+                <input type="text" id="filtro-elegir-punto" placeholder="Buscar código...">
+                <div id="lista-elegir-punto"></div>
+                <button class="btn-secundario" id="btn-cancelar-elegir-punto">Cancelar</button>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const renderLista = (filtro = "") => {
+            const filtrados = puntos.filter(p => p.codigo.toLowerCase().includes(filtro.toLowerCase()));
+            document.getElementById("lista-elegir-punto").innerHTML = filtrados.map(p => `
+                <div class="persona-card" style="cursor:pointer;" onclick="window.__resolverElegirPunto('${p.codigo}')">
+                    ${p.nombre}
+                </div>
+            `).join("");
+        };
+
+        renderLista();
+
+        document.getElementById("filtro-elegir-punto").addEventListener("input", (e) => renderLista(e.target.value));
+
+        const cerrar = (valor) => { overlay.remove(); resolve(valor); };
+
+        document.getElementById("btn-cancelar-elegir-punto").addEventListener("click", () => cerrar(null));
+        overlay.addEventListener("click", e => { if (e.target === overlay) cerrar(null); });
+
+        window.__resolverElegirPunto = (codigo) => cerrar(codigo);
+    });
+}
+
+function initMapaAdmin() {
+
+    const imagen = document.getElementById("mapa-imagen");
+
+    imagen.onerror = () => {
+        document.getElementById("mapa-sin-imagen").textContent =
+            "No se encontró img/plano-entrepiso.png en el proyecto. Subí la imagen del plano con ese nombre para poder marcar los puntos.";
+    };
+
+    if (mapaInicializado) {
+        cargarMarcadoresMapa();
+        return;
+    }
+    mapaInicializado = true;
+
+    imagen.addEventListener("click", async (e) => {
+
+        const rect = imagen.getBoundingClientRect();
+        const xPorcentaje = ((e.clientX - rect.left) / rect.width) * 100;
+        const yPorcentaje = ((e.clientY - rect.top) / rect.height) * 100;
+
+        const puntos = await apiGet("/api/puntos");
+
+        if (puntos.length === 0) {
+            mostrarAviso("Primero cargá islas, barras o mesas en la pestaña \"Puntos de pedido\".");
+            return;
+        }
+
+        const codigo = await elegirPuntoDelMapa(puntos);
+
+        if (!codigo) return;
+
+        const coordenadas = await apiGet("/api/mapa");
+        const yaExiste = coordenadas.findIndex(c => c.codigo === codigo);
+
+        const nuevoPunto = { codigo, x: xPorcentaje, y: yPorcentaje };
+
+        if (yaExiste >= 0) {
+            coordenadas[yaExiste] = nuevoPunto;
+        } else {
+            coordenadas.push(nuevoPunto);
+        }
+
+        await apiPost("/api/mapa", coordenadas);
+        cargarMarcadoresMapa();
+    });
+
+    cargarMarcadoresMapa();
+}
+
+async function cargarMarcadoresMapa() {
+
+    const coordenadas = await apiGet("/api/mapa");
+    const contenedor = document.getElementById("mapa-marcadores");
+
+    contenedor.innerHTML = coordenadas.map(c => `
+        <div class="marcador-mapa" style="left:${c.x}%; top:${c.y}%;" title="${c.codigo}">
+            ${c.codigo.length <= 4 ? c.codigo : "•"}
+        </div>
+    `).join("");
+
+    const listaTexto = document.getElementById("lista-mapa-marcados");
+    listaTexto.innerHTML = coordenadas.length === 0
+        ? `<p style="color:#888;">Todavía no marcaste ningún punto</p>`
+        : coordenadas.map(c => `
+            <div class="menu-item">
+                <div class="info"><div class="nombre">${c.codigo}</div></div>
+                <button class="btn-secundario" style="width:auto; padding:6px 12px;" onclick="borrarMarcadorMapa('${c.codigo}')">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function borrarMarcadorMapa(codigo) {
+    let coordenadas = await apiGet("/api/mapa");
+    coordenadas = coordenadas.filter(c => c.codigo !== codigo);
+    await apiPost("/api/mapa", coordenadas);
+    cargarMarcadoresMapa();
+}
 
 // =====================================================
 // ARRANQUE SEGÚN LA VISTA
