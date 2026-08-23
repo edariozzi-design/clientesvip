@@ -275,36 +275,48 @@
         </div>
     </div>
 
-    <!-- ============ VISTA: CAMARERO - CIERRE DE TURNO ============ -->
-    <div id="cierre-login" class="pantalla">
-        <div class="card-login">
-            <img src="img/Logo-ingreso.jpeg" class="logo-login">
-            <h1 class="titulo-login">Cierre de turno</h1>
-            <input type="text" id="cierre-legajo" placeholder="Legajo" inputmode="numeric">
-            <input type="text" id="cierre-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
-            <button class="btn-principal" id="btn-cierre-entrar">Ver mi rendición</button>
-            <div class="msg-error" id="cierre-error"></div>
+    <!-- ============ VISTA: CAMARERO (pedidos + cierre de turno) ============ -->
+    <div id="camarero-pantalla" class="pantalla" style="max-width:1100px; margin:0 auto;">
+
+        <header class="top" style="margin-bottom:16px;">
+            <h2 style="text-align:center;">Camarero</h2>
+        </header>
+
+        <div class="tabs">
+            <button class="activo" data-tab-camarero="tab-pedidos-camarero">Pedidos entrantes</button>
+            <button data-tab-camarero="tab-cierre-camarero">Cierre de turno</button>
         </div>
-    </div>
 
-    <div id="cierre-resultado" class="pantalla">
-        <header class="top">
-            <h2 id="titulo-cierre"></h2>
-        </header>
-        <div id="lista-cierre"></div>
-        <div id="vacio-cierre" class="vacio" style="display:none;">Sin pedidos confirmados hoy</div>
-        <button class="btn-principal" id="btn-imprimir-cierre" style="margin-top:16px;">Imprimir</button>
-        <button class="btn-secundario" id="btn-volver-cierre">Volver</button>
-    </div>
+        <!-- TAB: PEDIDOS ENTRANTES -->
+        <div id="tab-pedidos-camarero">
+            <div id="pedidos-grid" class="pedidos-grid"></div>
+            <div id="pedidos-vacio" class="vacio" style="display:none;">Sin pedidos pendientes</div>
+        </div>
 
-    <!-- ============ VISTA: PEDIDOS (PC/Tablet, sin login) ============ -->
-    <div id="pedidos-pantalla" class="pantalla" style="max-width:1100px; margin:0 auto;">
-        <header class="top" style="text-align:left; margin-bottom:20px;">
-            <h2 style="text-align:center;">Pedidos entrantes</h2>
-        </header>
+        <!-- TAB: CIERRE DE TURNO -->
+        <div id="tab-cierre-camarero" style="display:none;">
 
-        <div id="pedidos-grid" class="pedidos-grid"></div>
-        <div id="pedidos-vacio" class="vacio" style="display:none;">Sin pedidos pendientes</div>
+            <div id="cierre-login-sub">
+                <div class="card-login">
+                    <h1 class="titulo-login">Cierre de turno</h1>
+                    <input type="text" id="cierre-legajo" placeholder="Legajo" inputmode="numeric">
+                    <input type="text" id="cierre-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
+                    <button class="btn-principal" id="btn-cierre-entrar">Ver mi rendición</button>
+                    <div class="msg-error" id="cierre-error"></div>
+                </div>
+            </div>
+
+            <div id="cierre-resultado-sub" style="display:none;">
+                <header class="top">
+                    <h2 id="titulo-cierre"></h2>
+                </header>
+                <div id="lista-cierre"></div>
+                <div id="vacio-cierre" class="vacio" style="display:none;">Sin pedidos confirmados hoy</div>
+                <button class="btn-principal" id="btn-imprimir-cierre" style="margin-top:16px;">Imprimir</button>
+                <button class="btn-secundario" id="btn-volver-cierre">Volver</button>
+            </div>
+
+        </div>
     </div>
 
     <!-- ============ VISTA: ADMIN ============ -->

@@ -199,11 +199,26 @@ async function verificarPedidosDemorados() {
 // VISTA PEDIDOS (pantalla fija de PC/Tablet, sin login)
 // =====================================================
 
-function initVistaPedidos() {
-    mostrarPantalla("pedidos-pantalla");
+function initVistaCamarero() {
+    mostrarPantalla("camarero-pantalla");
+
+    // Pestañas internas: Pedidos entrantes / Cierre de turno
+    document.querySelectorAll("[data-tab-camarero]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            document.querySelectorAll("[data-tab-camarero]").forEach(b => b.classList.remove("activo"));
+            btn.classList.add("activo");
+            document.getElementById("tab-pedidos-camarero").style.display =
+                btn.dataset.tabCamarero === "tab-pedidos-camarero" ? "block" : "none";
+            document.getElementById("tab-cierre-camarero").style.display =
+                btn.dataset.tabCamarero === "tab-cierre-camarero" ? "block" : "none";
+        });
+    });
+
     cargarPedidosPantalla();
     setInterval(cargarPedidosPantalla, 10000);
     setInterval(verificarPedidosDemorados, 60000);
+
+    initCierreDeTurno();
 }
 
 async function cargarPedidosPantalla() {
@@ -551,8 +566,7 @@ async function actualizarEstadoCliente() {
 let camareroLogueado = null;
 let pedidosCierre = [];
 
-function initVistaCierre() {
-    mostrarPantalla("cierre-login");
+function initCierreDeTurno() {
 
     document.getElementById("btn-cierre-entrar").addEventListener("click", async () => {
 
@@ -587,12 +601,15 @@ function initVistaCierre() {
 
         document.getElementById("titulo-cierre").textContent = `Rendición de ${persona.nombre} ${persona.apellido}`;
         renderCierre();
-        mostrarPantalla("cierre-resultado");
+
+        document.getElementById("cierre-login-sub").style.display = "none";
+        document.getElementById("cierre-resultado-sub").style.display = "block";
     });
 
     document.getElementById("btn-imprimir-cierre").addEventListener("click", () => window.print());
     document.getElementById("btn-volver-cierre").addEventListener("click", () => {
-        mostrarPantalla("cierre-login");
+        document.getElementById("cierre-resultado-sub").style.display = "none";
+        document.getElementById("cierre-login-sub").style.display = "block";
         document.getElementById("cierre-legajo").value = "";
         document.getElementById("cierre-pin").value = "";
     });
@@ -894,12 +911,10 @@ async function borrarPunto(codigo) {
 // Si el QR trae un punto pre-cargado, lo completamos solo al llegar al menú
 const puntoDesdeQR = params.get("punto");
 
-if (vista === "cierre") {
-    initVistaCierre();
+if (vista === "camarero") {
+    initVistaCamarero();
 } else if (vista === "admin") {
     initVistaAdmin();
-} else if (vista === "pedidos") {
-    initVistaPedidos();
 } else {
     initVistaCliente();
 }
