@@ -613,6 +613,10 @@ function initCierreDeTurno() {
         document.getElementById("cierre-legajo").value = "";
         document.getElementById("cierre-pin").value = "";
     });
+
+    document.getElementById("btn-volver-pedidos-desde-cierre").addEventListener("click", () => {
+        document.querySelector('[data-tab-camarero="tab-pedidos-camarero"]').click();
+    });
 }
 
 function renderCierre() {

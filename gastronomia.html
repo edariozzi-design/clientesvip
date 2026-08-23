@@ -299,9 +299,10 @@
             <div id="cierre-login-sub">
                 <div class="card-login">
                     <h1 class="titulo-login">Cierre de turno</h1>
-                    <input type="text" id="cierre-legajo" placeholder="Legajo" inputmode="numeric">
-                    <input type="text" id="cierre-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="off">
+                    <input type="text" id="cierre-legajo" placeholder="Legajo" inputmode="numeric" autocomplete="off">
+                    <input type="text" id="cierre-pin" placeholder="PIN" inputmode="numeric" maxlength="4" autocomplete="one-time-code">
                     <button class="btn-principal" id="btn-cierre-entrar">Ver mi rendición</button>
+                    <button class="btn-secundario" id="btn-volver-pedidos-desde-cierre">← Volver a Pedidos entrantes</button>
                     <div class="msg-error" id="cierre-error"></div>
                 </div>
             </div>
