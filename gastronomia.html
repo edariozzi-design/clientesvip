@@ -217,6 +217,74 @@
         background: rgba(218,165,32,0.15);
     }
 
+    .persona-card .nombre {
+        font-size: 19px;
+        font-weight: 700;
+        color: white;
+        text-align: right;
+        margin-bottom: 6px;
+    }
+
+    .persona-card .datos {
+        font-size: 15px;
+        color: #ccc;
+        text-align: right;
+    }
+
+    .persona-card .pin {
+        color: var(--dorado);
+        font-weight: 700;
+    }
+
+    .persona-card button {
+        display: block;
+        margin-left: auto;
+        margin-top: 10px;
+        background: transparent;
+        border: 1.5px solid #ff6b6b;
+        color: #ff6b6b;
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    .columnas-personal {
+        display: flex;
+        gap: 30px;
+        flex-wrap: wrap;
+        align-items: flex-start;
+    }
+
+    .bloque-personal {
+        flex: 1;
+        min-width: 500px;
+    }
+
+    .bloque-personal .fila-personal {
+        display: flex;
+        gap: 16px;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .bloque-personal .card-login {
+        flex-shrink: 0;
+        width: 260px;
+    }
+
+    .grilla-tarjetas-personal {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        min-width: 220px;
+    }
+
+    .grilla-tarjetas-personal .persona-card {
+        width: 220px;
+        margin-bottom: 0;
+    }
+
     .marcador-mapa {
         position: absolute;
         width: 22px;
@@ -365,7 +433,7 @@
         <div class="card-login">
             <img src="img/Logo-ingreso.jpeg" class="logo-login">
             <h1 class="titulo-login">Administrar Gastronomía</h1>
-            <input type="password" id="admin-pass" placeholder="Contraseña de supervisor" autocomplete="off">
+            <input type="password" id="admin-pass" placeholder="Contraseña de administrador" autocomplete="off">
             <button class="btn-principal" id="btn-admin-entrar">Ingresar</button>
             <button class="btn-secundario" id="btn-volver-admin-login">Volver</button>
             <div class="msg-error" id="admin-error"></div>
@@ -383,6 +451,7 @@
             <button class="activo" data-tab="tab-menu">Menú</button>
             <button data-tab="tab-puntos">Puntos de pedido</button>
             <button data-tab="tab-mapa">Mapa</button>
+            <button data-tab="tab-personal">Personal</button>
         </div>
 
         <!-- TAB MENÚ -->
@@ -480,6 +549,66 @@
 
             <header class="top" style="margin-top:24px;"><h2>Puntos ya marcados</h2></header>
             <div id="lista-mapa-marcados"></div>
+        </div>
+
+        <!-- TAB PERSONAL -->
+        <div id="tab-personal" style="display:none;">
+            <div class="columnas-personal">
+
+                <div class="bloque-personal">
+                    <header class="top">
+                        <h2>Personal que lava los autos</h2>
+                    </header>
+
+                    <div class="fila-personal">
+                        <div class="card-login" style="margin:0;">
+                            <input type="text" id="nuevo-lavador-dni" placeholder="DNI">
+                            <input type="text" id="nuevo-lavador-nombre" placeholder="Nombre y apellido">
+                            <input type="text" id="nuevo-lavador-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                            <button class="btn-principal" id="btn-agregar-lavador">Agregar</button>
+                        </div>
+
+                        <div id="lista-personal-lavadero" class="grilla-tarjetas-personal"></div>
+                    </div>
+                </div>
+
+                <div class="bloque-personal">
+                    <header class="top">
+                        <h2>Personal que autoriza (empresa)</h2>
+                    </header>
+
+                    <div class="fila-personal">
+                        <div class="card-login" style="margin:0;">
+                            <input type="text" id="nuevo-empresa-legajo" placeholder="Legajo">
+                            <input type="text" id="nuevo-empresa-nombre" placeholder="Nombre">
+                            <input type="text" id="nuevo-empresa-apellido" placeholder="Apellido">
+                            <input type="text" id="nuevo-empresa-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                            <button class="btn-principal" id="btn-agregar-empresa">Agregar</button>
+                        </div>
+
+                        <div id="lista-personal-empresa" class="grilla-tarjetas-personal"></div>
+                    </div>
+                </div>
+
+                <div class="bloque-personal">
+                    <header class="top">
+                        <h2>Camareros (gastronomía)</h2>
+                    </header>
+
+                    <div class="fila-personal">
+                        <div class="card-login" style="margin:0;">
+                            <input type="text" id="nuevo-camarero-legajo" placeholder="Legajo">
+                            <input type="text" id="nuevo-camarero-nombre" placeholder="Nombre">
+                            <input type="text" id="nuevo-camarero-apellido" placeholder="Apellido">
+                            <input type="text" id="nuevo-camarero-pin" placeholder="PIN (4 dígitos, opcional)" maxlength="4">
+                            <button class="btn-principal" id="btn-agregar-camarero">Agregar</button>
+                        </div>
+
+                        <div id="lista-camareros" class="grilla-tarjetas-personal"></div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </div>
 

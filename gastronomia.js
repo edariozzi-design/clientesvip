@@ -15,6 +15,12 @@
 // ⚠️ Misma contraseña que ya tenés en script.js -> const supervisor = { pass: "..." }
 const SUPERVISOR_PASS = "";
 
+// ⚠️ Contraseña EXCLUSIVA para gastronomia.html?vista=admin — tiene que ser
+// distinta a SUPERVISOR_PASS. Elegí algo largo y que no uses en ningún otro
+// lado (ni redes, ni mail, ni el resto del sistema), para que Chrome no la
+// marque como filtrada.
+const ADMIN_PASS = "";
+
 const params = new URLSearchParams(window.location.search);
 const vista = params.get("vista") || "cliente";
 
@@ -57,6 +63,35 @@ function mostrarAviso(mensaje) {
     `;
     document.body.appendChild(overlay);
     document.getElementById("btn-aviso-ok").addEventListener("click", () => overlay.remove());
+}
+
+function mostrarConfirmacion(mensaje) {
+    return new Promise(resolve => {
+        document.getElementById("modal-confirm")?.remove();
+
+        const overlay = document.createElement("div");
+        overlay.id = "modal-confirm";
+        overlay.style.cssText = `
+            position:fixed; inset:0; background:rgba(0,0,0,0.75);
+            display:flex; align-items:center; justify-content:center; z-index:9999; padding:20px;
+        `;
+        overlay.innerHTML = `
+            <div style="background:#1a1a1a; border:2px solid #daa520; border-radius:16px; padding:24px; width:100%; max-width:320px; text-align:center;">
+                <p style="color:#f0f0f0; font-size:15px; white-space:pre-line; margin-bottom:1.2rem;">${mensaje}</p>
+                <div style="display:flex; gap:10px;">
+                    <button id="btn-confirm-si" class="btn-principal">Sí</button>
+                    <button id="btn-confirm-no" class="btn-secundario">No</button>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const responder = valor => { overlay.remove(); resolve(valor); };
+
+        document.getElementById("btn-confirm-si").addEventListener("click", () => responder(true));
+        document.getElementById("btn-confirm-no").addEventListener("click", () => responder(false));
+        overlay.addEventListener("click", e => { if (e.target === overlay) responder(false); });
+    });
 }
 
 // =====================================================
@@ -693,7 +728,7 @@ function initVistaAdmin() {
     document.getElementById("btn-admin-entrar").addEventListener("click", async () => {
         const pass = document.getElementById("admin-pass").value;
 
-        if (pass !== SUPERVISOR_PASS) {
+        if (pass !== ADMIN_PASS) {
             document.getElementById("admin-error").textContent = "Contraseña incorrecta";
             return;
         }
@@ -716,10 +751,11 @@ function initVistaAdmin() {
         btn.addEventListener("click", () => {
             document.querySelectorAll(".tabs button").forEach(b => b.classList.remove("activo"));
             btn.classList.add("activo");
-            ["tab-menu", "tab-puntos", "tab-mapa"].forEach(id => {
+            ["tab-menu", "tab-puntos", "tab-mapa", "tab-personal"].forEach(id => {
                 document.getElementById(id).style.display = id === btn.dataset.tab ? "block" : "none";
             });
             if (btn.dataset.tab === "tab-mapa") initMapaAdmin();
+            if (btn.dataset.tab === "tab-personal") cargarTodoElPersonal();
         });
     });
 
@@ -828,6 +864,182 @@ function initVistaAdmin() {
         document.getElementById("cantidad-mesas").value = "";
         cargarPuntos();
     });
+
+    document.getElementById("btn-agregar-lavador").addEventListener("click", agregarLavador);
+    document.getElementById("btn-agregar-empresa").addEventListener("click", agregarEmpresa);
+    document.getElementById("btn-agregar-camarero").addEventListener("click", agregarCamarero);
+}
+
+async function cargarTodoElPersonal() {
+    await Promise.all([cargarListaLavadero(), cargarListaEmpresa(), cargarListaCamareros()]);
+}
+
+async function cargarListaLavadero() {
+    const lista = await apiGet("/api/personal?tipo=lavadero");
+    const contenedor = document.getElementById("lista-personal-lavadero");
+
+    contenedor.innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin personal cargado todavía</p>`
+        : lista.map(p => `
+            <div class="persona-card">
+                <div class="nombre">${p.nombre}</div>
+                <div class="datos">DNI: ${p.dni} · PIN: <span class="pin">${p.pin}</span></div>
+                <button onclick="eliminarLavador('${p.dni}')">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function cargarListaEmpresa() {
+    const lista = await apiGet("/api/personal?tipo=empresa");
+    const contenedor = document.getElementById("lista-personal-empresa");
+
+    contenedor.innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin personal cargado todavía</p>`
+        : lista.map(p => `
+            <div class="persona-card">
+                <div class="nombre">${p.nombre} ${p.apellido}</div>
+                <div class="datos">Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span></div>
+                <button onclick="eliminarEmpresa('${p.legajo}')">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function cargarListaCamareros() {
+    const lista = await apiGet("/api/personal?tipo=camareros");
+    const contenedor = document.getElementById("lista-camareros");
+
+    contenedor.innerHTML = lista.length === 0
+        ? `<p style="color:#888;">Sin camareros cargados todavía</p>`
+        : lista.map(p => `
+            <div class="persona-card">
+                <div class="nombre">${p.nombre} ${p.apellido}</div>
+                <div class="datos">Legajo: ${p.legajo} · PIN: <span class="pin">${p.pin}</span></div>
+                <button onclick="eliminarCamarero('${p.legajo}')">Borrar</button>
+            </div>
+        `).join("");
+}
+
+async function agregarLavador() {
+    const dni = document.getElementById("nuevo-lavador-dni").value.trim();
+    const nombre = document.getElementById("nuevo-lavador-nombre").value.trim();
+
+    if (!dni || !nombre) {
+        mostrarAviso("Completá DNI y nombre");
+        return;
+    }
+
+    const lista = await apiGet("/api/personal?tipo=lavadero");
+
+    if (lista.some(p => p.dni === dni)) {
+        mostrarAviso("Ya existe una persona con ese DNI");
+        return;
+    }
+
+    lista.push({
+        dni,
+        nombre,
+        pin: document.getElementById("nuevo-lavador-pin").value.trim() || generarPinLocal(4)
+    });
+    await apiPost("/api/personal?tipo=lavadero", lista);
+
+    document.getElementById("nuevo-lavador-dni").value = "";
+    document.getElementById("nuevo-lavador-nombre").value = "";
+    document.getElementById("nuevo-lavador-pin").value = "";
+
+    cargarListaLavadero();
+}
+
+async function agregarEmpresa() {
+    const legajo = document.getElementById("nuevo-empresa-legajo").value.trim();
+    const nombre = document.getElementById("nuevo-empresa-nombre").value.trim();
+    const apellido = document.getElementById("nuevo-empresa-apellido").value.trim();
+
+    if (!legajo || !nombre || !apellido) {
+        mostrarAviso("Completá legajo, nombre y apellido");
+        return;
+    }
+
+    const lista = await apiGet("/api/personal?tipo=empresa");
+
+    if (lista.some(p => p.legajo === legajo)) {
+        mostrarAviso("Ya existe una persona con ese legajo");
+        return;
+    }
+
+    lista.push({
+        legajo,
+        nombre,
+        apellido,
+        pin: document.getElementById("nuevo-empresa-pin").value.trim() || generarPinLocal(4)
+    });
+    await apiPost("/api/personal?tipo=empresa", lista);
+
+    document.getElementById("nuevo-empresa-legajo").value = "";
+    document.getElementById("nuevo-empresa-nombre").value = "";
+    document.getElementById("nuevo-empresa-apellido").value = "";
+    document.getElementById("nuevo-empresa-pin").value = "";
+
+    cargarListaEmpresa();
+}
+
+async function agregarCamarero() {
+    const legajo = document.getElementById("nuevo-camarero-legajo").value.trim();
+    const nombre = document.getElementById("nuevo-camarero-nombre").value.trim();
+    const apellido = document.getElementById("nuevo-camarero-apellido").value.trim();
+
+    if (!legajo || !nombre || !apellido) {
+        mostrarAviso("Completá legajo, nombre y apellido");
+        return;
+    }
+
+    const lista = await apiGet("/api/personal?tipo=camareros");
+
+    if (lista.some(p => p.legajo === legajo)) {
+        mostrarAviso("Ya existe una persona con ese legajo");
+        return;
+    }
+
+    lista.push({
+        legajo,
+        nombre,
+        apellido,
+        pin: document.getElementById("nuevo-camarero-pin").value.trim() || generarPinLocal(4)
+    });
+    await apiPost("/api/personal?tipo=camareros", lista);
+
+    document.getElementById("nuevo-camarero-legajo").value = "";
+    document.getElementById("nuevo-camarero-nombre").value = "";
+    document.getElementById("nuevo-camarero-apellido").value = "";
+    document.getElementById("nuevo-camarero-pin").value = "";
+
+    cargarListaCamareros();
+}
+
+async function eliminarLavador(dni) {
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
+
+    let lista = await apiGet("/api/personal?tipo=lavadero");
+    lista = lista.filter(p => p.dni !== dni);
+    await apiPost("/api/personal?tipo=lavadero", lista);
+    cargarListaLavadero();
+}
+
+async function eliminarEmpresa(legajo) {
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
+
+    let lista = await apiGet("/api/personal?tipo=empresa");
+    lista = lista.filter(p => p.legajo !== legajo);
+    await apiPost("/api/personal?tipo=empresa", lista);
+    cargarListaEmpresa();
+}
+
+async function eliminarCamarero(legajo) {
+    if (!(await mostrarConfirmacion("¿Borrar esta persona?"))) return;
+
+    let lista = await apiGet("/api/personal?tipo=camareros");
+    lista = lista.filter(p => p.legajo !== legajo);
+    await apiPost("/api/personal?tipo=camareros", lista);
+    cargarListaCamareros();
 }
 
 async function cargarTodoAdmin() {

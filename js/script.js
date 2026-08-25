@@ -3458,7 +3458,6 @@ function actualizarVistaUsuario() {
     panelAdmin.style.display = "block";
 
     const btnLavadosDiaItem = document.getElementById("btn-lavados-dia")?.closest("li");
-    const btnAdministradorItem = document.querySelector('a[href*="vista=admin"]')?.closest("li");
     const btnGastronomiaItem = document.getElementById("btn-gastronomia-informe")?.closest("li");
 
     if (usuarioActual.rol === "supervisor") {
@@ -3473,7 +3472,6 @@ function actualizarVistaUsuario() {
         if (btnNuevo) btnNuevo.style.setProperty("display", "none", "important");
 
         if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "block";
-        if (btnAdministradorItem) btnAdministradorItem.style.display = "block";
         if (btnGastronomiaItem) btnGastronomiaItem.style.display = "block";
 
     } else {
@@ -3487,7 +3485,6 @@ function actualizarVistaUsuario() {
         if (btnNuevo) btnNuevo.style.display = "inline-flex";
 
         if (btnLavadosDiaItem) btnLavadosDiaItem.style.display = "none";
-        if (btnAdministradorItem) btnAdministradorItem.style.display = "none";
         if (btnGastronomiaItem) btnGastronomiaItem.style.display = "none";
     }
 
