@@ -69,6 +69,7 @@ document.getElementById("btn-actualizar").addEventListener("click", cargarAlerta
 // =====================
 
 let clienteSeleccionadoExcepcion = null;
+let tipoExcepcionSeleccionado = "gastronomia"; // "gastronomia" | "lavado"
 
 document.getElementById("btn-excepciones").addEventListener("click", () => {
     document.getElementById("pantalla-alertas").style.display = "none";
@@ -76,7 +77,17 @@ document.getElementById("btn-excepciones").addEventListener("click", () => {
     document.getElementById("excepcion-buscar").value = "";
     document.getElementById("excepcion-resultados").innerHTML = "";
     document.getElementById("excepcion-form").style.display = "none";
+    seleccionarTipoExcepcion("gastronomia");
 });
+
+function seleccionarTipoExcepcion(tipo) {
+    tipoExcepcionSeleccionado = tipo;
+    document.getElementById("btn-tipo-gastronomia").className = tipo === "gastronomia" ? "btn-principal" : "btn-secundario";
+    document.getElementById("btn-tipo-lavado").className = tipo === "lavado" ? "btn-principal" : "btn-secundario";
+}
+
+document.getElementById("btn-tipo-gastronomia").addEventListener("click", () => seleccionarTipoExcepcion("gastronomia"));
+document.getElementById("btn-tipo-lavado").addEventListener("click", () => seleccionarTipoExcepcion("lavado"));
 
 document.getElementById("btn-volver-excepciones").addEventListener("click", () => {
     document.getElementById("pantalla-excepciones").style.display = "none";
@@ -119,6 +130,7 @@ function seleccionarClienteExcepcion(clienteId) {
     document.getElementById("excepcion-legajo").value = "";
     document.getElementById("excepcion-pin").value = "";
     document.getElementById("excepcion-form").style.display = "block";
+    seleccionarTipoExcepcion("gastronomia");
 }
 
 document.getElementById("btn-autorizar-excepcion").addEventListener("click", async () => {
@@ -153,15 +165,40 @@ document.getElementById("btn-autorizar-excepcion").addEventListener("click", asy
             return;
         }
 
-        cliente.excepcionGastronomia = {
-            activa: true,
-            motivo: `Excepción autorizada desde el celular por ${persona.apellido}`,
-            maxItems: 3,
-            usado: false,
-            autorizadoPorLegajo: persona.legajo,
-            autorizadoPorApellido: persona.apellido,
-            fecha: Date.now()
-        };
+        if (!cliente.historial) cliente.historial = [];
+
+        if (tipoExcepcionSeleccionado === "lavado") {
+            cliente.excepcionLavado = {
+                activa: true,
+                motivo: `Excepción autorizada desde el celular por ${persona.apellido}`,
+                autorizadoPorLegajo: persona.legajo,
+                autorizadoPorApellido: persona.apellido,
+                fecha: Date.now()
+            };
+
+            cliente.historial.push({
+                tipo: "EXCEPCION_LAVADO",
+                fecha: Date.now(),
+                motivo: `Excepción de lavado de auto autorizada por ${persona.apellido} (legajo ${persona.legajo})`
+            });
+
+        } else {
+            cliente.excepcionGastronomia = {
+                activa: true,
+                motivo: `Excepción autorizada desde el celular por ${persona.apellido}`,
+                maxItems: 3,
+                usado: false,
+                autorizadoPorLegajo: persona.legajo,
+                autorizadoPorApellido: persona.apellido,
+                fecha: Date.now()
+            };
+
+            cliente.historial.push({
+                tipo: "EXCEPCION_GASTRONOMIA",
+                fecha: Date.now(),
+                motivo: `Excepción de gastronomía (hasta 3 ítems) autorizada por ${persona.apellido} (legajo ${persona.legajo})`
+            });
+        }
 
         await fetch("/api/clientes", {
             method: "POST",

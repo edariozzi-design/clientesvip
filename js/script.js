@@ -5041,19 +5041,6 @@ ${usuarioActual.rol === "supervisor" ? `
         Autoexclusión
     </label>
 
-    <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-top:6px;">
-        <input type="checkbox" id="edit-excepcion-lavado" ${clienteActual.excepcionLavado?.activa ? "checked" : ""}>
-        Excepción: beneficio de lavado de auto
-    </label>
-
-    <div style="display:flex; gap:8px; justify-content:center; margin-top:6px;">
-        <input id="edit-excepcion-lavado-legajo" class="form-control" placeholder="Legajo autoriza" style="max-width:140px;">
-        <input id="edit-excepcion-lavado-pin" class="form-control" placeholder="PIN" maxlength="4" style="max-width:100px;">
-    </div>
-    <div style="color:#999; font-size:11px; text-align:center;">
-        Legajo+PIN solo hace falta si tildás o cambiás la excepción de arriba
-    </div>
-
     <input
         id="edit-motivo-restriccion"
         class="form-control"
@@ -6100,37 +6087,6 @@ document.addEventListener("click", async function (e) {
             if (autoexclusionMarcada && !yaTeniaAutoexclusion) {
                 mostrarAviso(`ALERTA SUPERVISOR: se activó AUTOEXCLUSIÓN para ${nombre}.`);
                 registrarEventoCliente(clienteActual.id, "ALERTA_AUTOEXCLUSION", { motivo });
-            }
-
-            const excepcionLavadoMarcada = document.getElementById("edit-excepcion-lavado")?.checked || false;
-            const yaTeniaExcepcionLavado = !!clienteActual.excepcionLavado?.activa;
-
-            if (excepcionLavadoMarcada !== yaTeniaExcepcionLavado) {
-
-                const legajoAutoriza = document.getElementById("edit-excepcion-lavado-legajo")?.value.trim();
-                const pinAutoriza = document.getElementById("edit-excepcion-lavado-pin")?.value.trim();
-
-                if (!legajoAutoriza || !pinAutoriza) {
-                    mostrarAviso("Para activar o quitar la excepción de lavado, poné legajo y PIN de quien autoriza.");
-                    return;
-                }
-
-                const personalEmpresa = await (await fetch("/api/personal?tipo=empresa")).json();
-                const persona = personalEmpresa.find(p => String(p.legajo) === legajoAutoriza && String(p.pin) === pinAutoriza);
-
-                if (!persona) {
-                    mostrarAviso("Legajo o PIN incorrecto — no se guardó la excepción de lavado.");
-                    return;
-                }
-
-                clienteActual.excepcionLavado = {
-                    activa: excepcionLavadoMarcada,
-                    motivo,
-                    autorizadoPorLegajo: persona.legajo,
-                    autorizadoPorApellido: persona.apellido,
-                    fecha: excepcionLavadoMarcada ? Date.now() : (clienteActual.excepcionLavado?.fecha || null)
-                };
-
             }
         }
 
