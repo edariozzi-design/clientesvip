@@ -347,8 +347,8 @@ function abrirConfirmarPedidoPantalla(pedidoId) {
     overlay.innerHTML = `
         <div class="card-login" style="width:100%; max-width:320px; margin:0;">
             <h1 style="color:var(--dorado); font-size:20px; margin-bottom:14px;">Confirmar pedido</h1>
-            <input type="text" id="confirmar-pantalla-legajo" placeholder="Legajo">
-            <input type="password" id="confirmar-pantalla-pin" placeholder="PIN" maxlength="4" autocomplete="off">
+            <input type="text" id="confirmar-pantalla-legajo" placeholder="Legajo" autocomplete="off">
+            <input type="text" id="confirmar-pantalla-pin" placeholder="PIN" maxlength="4" autocomplete="one-time-code">
             <div class="msg-error" id="confirmar-pantalla-error"></div>
             <button class="btn-principal" id="btn-confirmar-pantalla-ok">Confirmar</button>
             <button class="btn-secundario" id="btn-confirmar-pantalla-cancelar">Cancelar</button>
