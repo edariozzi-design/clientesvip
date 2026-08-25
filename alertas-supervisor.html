@@ -315,7 +315,7 @@
         </header>
 
         <p style="color:#888; font-size:13px; text-align:center;">
-            Beneficio de gastronomía por excepción (hasta 3 ítems), para un cliente que no lo tiene por categoría.
+            Habilita un beneficio por excepción para un cliente que no lo tiene por categoría.
         </p>
 
         <input type="text" id="excepcion-buscar" placeholder="Buscar por DNI o nombre">
@@ -323,10 +323,16 @@
 
         <div id="excepcion-form" style="display:none;">
             <p style="color:var(--dorado); font-weight:700; text-align:center;" id="excepcion-cliente-nombre"></p>
+
+            <div style="display:flex; gap:8px; margin-bottom:12px;">
+                <button type="button" id="btn-tipo-gastronomia" class="btn-principal" style="flex:1;">Gastronomía</button>
+                <button type="button" id="btn-tipo-lavado" class="btn-secundario" style="flex:1; margin-top:0;">Lavado de auto</button>
+            </div>
+
             <input type="text" id="excepcion-legajo" placeholder="Tu legajo">
             <input type="password" id="excepcion-pin" placeholder="Tu PIN" maxlength="4" autocomplete="off">
             <div class="msg-error" id="excepcion-error"></div>
-            <button id="btn-autorizar-excepcion">Autorizar excepción</button>
+            <button id="btn-autorizar-excepcion" class="btn-principal">Autorizar excepción</button>
         </div>
     </div>
 
